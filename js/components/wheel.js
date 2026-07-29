@@ -1,8 +1,10 @@
 import {
+  describeArcLine,
   describeArcSegment,
   getLabelPosition,
   getMidAngle,
   mixWithWhite,
+  polarToCartesian,
 } from "../core/geometry.js";
 import { getSegmentAriaLabel } from "../utils/format.js";
 
@@ -13,6 +15,7 @@ const RADII = Object.freeze({
   center: 190,
   mainInner: 196,
   mainOuter: 295,
+  journey: 298,
   subInner: 301,
   subOuter: 382,
 });
@@ -52,7 +55,7 @@ function createBackdrop() {
   return group;
 }
 
-function createCenter() {
+function createCenter(age, birthDay) {
   const group = svgElement("g", { "aria-hidden": "true" });
   const disc = svgElement("circle", {
     cx: CENTER,
@@ -68,30 +71,104 @@ function createCenter() {
   });
   const knot = svgElement("circle", {
     cx: CENTER,
-    cy: 334,
+    cy: 328,
     r: 4,
     class: "center-knot",
   });
-  const title = svgElement("text", {
+  const label = svgElement("text", {
     x: CENTER,
-    y: 382,
-    class: "center-title",
+    y: 358,
+    class: "center-age-label",
   });
-  const total = svgElement("text", {
+  const years = svgElement("text", {
     x: CENTER,
-    y: 412,
-    class: "center-total",
+    y: 414,
+    class: "center-age-years",
   });
-  const hint = svgElement("text", {
+  const yearsNumber = svgElement("tspan", {
+    class: "center-age-number",
+  });
+  const yearsUnit = svgElement("tspan", {
+    dx: 8,
+    class: "center-age-unit",
+  });
+  const remainder = svgElement("text", {
     x: CENTER,
-    y: 442,
-    class: "center-hint",
+    y: 449,
+    class: "center-age-remainder",
+  });
+  const startDay = svgElement("text", {
+    x: CENTER,
+    y: 478,
+    class: "center-start-day",
   });
 
-  title.textContent = "พระเคราะห์เสวยอายุ";
-  total.textContent = "วงจรครบ 108 ปี";
-  hint.textContent = "แตะหรือชี้ที่แถบเพื่อดูรายละเอียด";
-  group.append(disc, orbit, knot, title, total, hint);
+  label.textContent = "อายุเต็ม";
+  yearsNumber.textContent = age.years;
+  yearsUnit.textContent = "ปี";
+  years.append(yearsNumber, yearsUnit);
+  remainder.textContent = `${age.months} เดือน ${age.days} วัน`;
+  startDay.textContent = `จุดเริ่ม · วัน${birthDay.label}`;
+  group.append(disc, orbit, knot, label, years, remainder, startDay);
+
+  return group;
+}
+
+function createJourneyOverlay(journey) {
+  const group = svgElement("g", {
+    class: "journey-overlay",
+    role: "img",
+    "aria-label": `เส้นทางอายุจากวัน${journey.birthDay.label}ถึงอายุ ${journey.age.years} ปี ${journey.age.months} เดือน ${journey.age.days} วัน`,
+  });
+  const path = svgElement("path", {
+    d: describeArcLine(
+      CENTER,
+      CENTER,
+      RADII.journey,
+      journey.startAngle,
+      journey.startAngle + journey.progressAngle,
+    ),
+    class: "journey-path",
+  });
+  const startPosition = polarToCartesian(
+    CENTER,
+    CENTER,
+    RADII.journey,
+    journey.startAngle,
+  );
+  const currentPosition = polarToCartesian(
+    CENTER,
+    CENTER,
+    RADII.journey,
+    journey.currentAngle,
+  );
+  const startDot = svgElement("circle", {
+    cx: startPosition.x,
+    cy: startPosition.y,
+    r: 7,
+    class: "journey-dot journey-start-dot",
+  });
+  const currentHalo = svgElement("circle", {
+    cx: currentPosition.x,
+    cy: currentPosition.y,
+    r: 10,
+    class: "journey-current-halo",
+  });
+  const currentDot = svgElement("circle", {
+    cx: currentPosition.x,
+    cy: currentPosition.y,
+    r: 5.5,
+    class: "journey-dot journey-current-dot",
+  });
+  const startTitle = svgElement("title");
+  const currentTitle = svgElement("title");
+
+  startTitle.textContent = `จุดเริ่มวัน${journey.birthDay.label}`;
+  currentTitle.textContent =
+    `ตำแหน่งอายุ ${journey.age.years} ปี ${journey.age.months} เดือน ${journey.age.days} วัน`;
+  startDot.append(startTitle);
+  currentDot.append(currentTitle);
+  group.append(path, startDot, currentHalo, currentDot);
 
   return group;
 }
@@ -140,6 +217,7 @@ function bindInteractions(group, segment, handlers) {
   group.setAttribute("role", "button");
   group.setAttribute("tabindex", "0");
   group.setAttribute("aria-label", getSegmentAriaLabel(segment));
+  group.setAttribute("aria-pressed", "false");
   group.dataset.segmentKey = segment.key;
 
   group.addEventListener("pointerenter", (event) => handlers.onPreview(segment, event));
@@ -159,8 +237,12 @@ function bindInteractions(group, segment, handlers) {
   });
 }
 
-function createMainSegment(segment, handlers) {
-  const group = svgElement("g", { class: "wheel-segment main-segment" });
+function createMainSegment(segment, handlers, journey) {
+  const currentClass =
+    segment.key === journey.activeMain.key ? " is-current-main" : "";
+  const group = svgElement("g", {
+    class: `wheel-segment main-segment${currentClass}`,
+  });
   const path = svgElement("path", {
     d: describeArcSegment(
       CENTER,
@@ -178,10 +260,12 @@ function createMainSegment(segment, handlers) {
   return group;
 }
 
-function createSubSegment(segment, index, handlers) {
+function createSubSegment(segment, index, handlers, journey) {
   const tightClass = segment.angle < 4.2 ? " is-tight" : "";
+  const currentClass =
+    segment.key === journey.activeSub.key ? " is-current-sub" : "";
   const group = svgElement("g", {
-    class: `wheel-segment sub-segment${tightClass}`,
+    class: `wheel-segment sub-segment${tightClass}${currentClass}`,
   });
   const lightRatio = 0.08 + (index % 4) * 0.085;
   const path = svgElement("path", {
@@ -201,7 +285,8 @@ function createSubSegment(segment, index, handlers) {
   return group;
 }
 
-export function renderWheel(container, model, handlers) {
+export function renderWheel(container, model, handlers, context) {
+  const { age, birthDay, journey } = context;
   const svg = svgElement("svg", {
     class: "planet-wheel",
     viewBox: `0 0 ${VIEWBOX_SIZE} ${VIEWBOX_SIZE}`,
@@ -215,16 +300,25 @@ export function renderWheel(container, model, handlers) {
 
   title.textContent = "วงแหวนพระเคราะห์เสวยอายุ";
   description.textContent =
-    "วงในแบ่งเป็นพระเคราะห์หลัก 8 ส่วนตามสัดส่วนปี วงนอกแบ่งเป็นแถบย่อยรวม 64 ส่วนตามสัดส่วนเวลา";
+    `จุดเริ่มวัน${birthDay.label} เส้นประแสดงการเดินทางตามอายุ ` +
+    `${age.years} ปี ${age.months} เดือน ${age.days} วัน`;
 
   model.mainSegments.forEach((segment) => {
-    mainGroup.append(createMainSegment(segment, handlers));
+    mainGroup.append(createMainSegment(segment, handlers, journey));
     segment.subSegments.forEach((subSegment, index) => {
-      subGroup.append(createSubSegment(subSegment, index, handlers));
+      subGroup.append(createSubSegment(subSegment, index, handlers, journey));
     });
   });
 
-  svg.append(title, description, createBackdrop(), mainGroup, subGroup, createCenter());
+  svg.append(
+    title,
+    description,
+    createBackdrop(),
+    mainGroup,
+    subGroup,
+    createJourneyOverlay(journey),
+    createCenter(age, birthDay),
+  );
   container.replaceChildren(svg);
 
   return {

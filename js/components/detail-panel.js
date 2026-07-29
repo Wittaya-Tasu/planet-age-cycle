@@ -1,5 +1,4 @@
 import {
-  formatAngle,
   formatDuration,
   formatMainDuration,
   formatPercentage,
@@ -36,7 +35,7 @@ function renderEmpty(container) {
   container.style.removeProperty("--detail-color");
 }
 
-export function renderDetailPanel(container, segment = null) {
+export function renderDetailPanel(container, segment = null, options = {}) {
   if (!segment) {
     renderEmpty(container);
     return;
@@ -57,7 +56,11 @@ export function renderDetailPanel(container, segment = null) {
   list.className = "detail-list";
 
   container.style.setProperty("--detail-color", color);
-  eyebrow.textContent = segment.type === "main" ? "แถบหลัก" : "แถบย่อย";
+  eyebrow.textContent = options.isCurrent
+    ? "ช่วงที่ตรงกับอายุ"
+    : segment.type === "main"
+      ? "แถบหลัก"
+      : "แถบย่อย";
   title.textContent = getSegmentTitle(segment);
   subtitle.textContent =
     segment.type === "main"
@@ -67,7 +70,6 @@ export function renderDetailPanel(container, segment = null) {
   if (segment.type === "main") {
     list.append(
       createRow("ระยะเวลา", formatMainDuration(segment.mainPlanet.years)),
-      createRow("องศา", formatAngle(segment.angle)),
       createRow("สัดส่วนวงจร", formatPercentage(segment.percentageOfCycle)),
       createRow("จำนวนแถบย่อย", `${segment.subSegments.length} ส่วน`),
     );
@@ -76,7 +78,6 @@ export function renderDetailPanel(container, segment = null) {
       createRow("แถบหลัก", segment.mainPlanet.name),
       createRow("แถบย่อย", segment.subPlanet.name),
       createRow("ระยะเวลา", formatDuration(segment.duration)),
-      createRow("องศาในวง", formatAngle(segment.angle)),
       createRow("สัดส่วนในแถบหลัก", formatPercentage(segment.percentageOfMain)),
     );
   }

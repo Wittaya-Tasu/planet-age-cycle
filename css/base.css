@@ -18,12 +18,10 @@ body {
   overflow-x: hidden;
   color: var(--color-ink);
   background:
-    radial-gradient(circle at 10% 5%, rgba(182, 138, 58, 0.15), transparent 28rem),
-    radial-gradient(circle at 95% 30%, rgba(111, 29, 27, 0.09), transparent 32rem),
+    radial-gradient(circle at 10% 5%, rgba(182, 138, 58, 0.11), transparent 28rem),
+    radial-gradient(circle at 95% 30%, rgba(111, 29, 27, 0.065), transparent 32rem),
     var(--color-bg);
-  font-family:
-    "Thonburi", "Noto Sans Thai", "Leelawadee UI", "Tahoma",
-    system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: "Sarabun", "Thonburi", "Noto Sans Thai", sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -39,6 +37,29 @@ button {
   color: inherit;
 }
 
+select,
+input {
+  min-height: 46px;
+  width: 100%;
+  border: 1px solid rgba(70, 47, 33, 0.18);
+  border-radius: 12px;
+  color: var(--color-ink);
+  background: var(--color-input);
+}
+
+select {
+  padding: 9px 34px 9px 12px;
+}
+
+input {
+  padding: 9px 12px;
+}
+
+select:focus,
+input:focus {
+  border-color: var(--color-accent);
+}
+
 a {
   color: inherit;
 }
@@ -48,6 +69,13 @@ h2,
 h3,
 p {
   margin: 0;
+}
+
+fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
 }
 
 h1,

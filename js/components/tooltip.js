@@ -1,7 +1,7 @@
 import {
-  formatAngle,
   formatDuration,
   formatMainDuration,
+  formatPercentage,
   getSegmentTitle,
 } from "../utils/format.js";
 
@@ -12,8 +12,8 @@ function setContent(element, segment) {
   title.textContent = getSegmentTitle(segment);
   detail.textContent =
     segment.type === "main"
-      ? `แถบหลัก · ${formatMainDuration(segment.mainPlanet.years)} · ${formatAngle(segment.angle)}`
-      : `${formatDuration(segment.duration)} · ${formatAngle(segment.angle)}`;
+      ? `แถบหลัก · ${formatMainDuration(segment.mainPlanet.years)} · ${formatPercentage(segment.percentageOfCycle)} ของวงจร`
+      : `${formatDuration(segment.duration)} · ${formatPercentage(segment.percentageOfMain)} ของแถบหลัก`;
 
   element.replaceChildren(title, detail);
 }
@@ -45,7 +45,11 @@ export function createTooltipController(element) {
       setContent(element, segment);
       element.hidden = false;
 
-      if (source instanceof PointerEvent || source instanceof MouseEvent) {
+      if (
+        source &&
+        typeof source.clientX === "number" &&
+        typeof source.clientY === "number"
+      ) {
         positionTooltip(element, source.clientX, source.clientY);
         return;
       }

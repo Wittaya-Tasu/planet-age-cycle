@@ -13,6 +13,7 @@
   height: auto;
   max-height: min(76svh, 850px);
   overflow: visible;
+  font-family: "Sarabun", sans-serif;
 }
 
 .wheel-backdrop {
@@ -61,6 +62,20 @@
   stroke-width: 3;
 }
 
+.wheel-segment.is-current-main path {
+  stroke: #ffe7aa;
+  stroke-width: 3;
+}
+
+.wheel-segment.is-current-sub path {
+  stroke: var(--color-accent-dark);
+  stroke-width: 4;
+}
+
+.wheel-segment.is-current-sub {
+  filter: brightness(1.05) drop-shadow(0 4px 7px rgba(53, 31, 17, 0.18));
+}
+
 .wheel-label {
   pointer-events: none;
   fill: var(--label-color, #fff);
@@ -106,6 +121,79 @@
 
 .center-knot {
   fill: var(--color-accent);
+}
+
+.center-age-label,
+.center-age-years,
+.center-age-remainder,
+.center-start-day {
+  text-anchor: middle;
+}
+
+.center-age-label {
+  fill: var(--color-muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.center-age-years {
+  fill: var(--color-ink);
+}
+
+.center-age-number {
+  font-size: 52px;
+  font-weight: 800;
+}
+
+.center-age-unit {
+  fill: var(--color-accent);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.center-age-remainder {
+  fill: var(--color-accent);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.center-start-day {
+  fill: var(--color-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.journey-path {
+  fill: none;
+  stroke: var(--color-journey);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-dasharray: 5 8;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 2px 2px rgba(255, 255, 255, 0.9));
+}
+
+.journey-dot {
+  vector-effect: non-scaling-stroke;
+}
+
+.journey-start-dot {
+  fill: #fffaf1;
+  stroke: var(--color-journey);
+  stroke-width: 3;
+}
+
+.journey-current-halo {
+  fill: rgba(255, 236, 181, 0.58);
+  stroke: none;
+}
+
+.journey-current-dot {
+  fill: var(--color-journey);
+  stroke: #fffaf1;
+  stroke-width: 2;
+  filter: drop-shadow(0 2px 3px rgba(53, 31, 17, 0.35));
 }
 
 .center-title {

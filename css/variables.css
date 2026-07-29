@@ -1,15 +1,17 @@
 :root {
-  --color-bg: #f5efe3;
-  --color-surface: rgba(255, 253, 248, 0.94);
-  --color-surface-strong: #fffdf8;
-  --color-ink: #2a211c;
-  --color-muted: #756961;
+  --color-bg: #f3eee5;
+  --color-surface: rgba(255, 253, 249, 0.96);
+  --color-surface-strong: #fffdf9;
+  --color-ink: #29221e;
+  --color-muted: #746b65;
   --color-line: rgba(70, 47, 33, 0.14);
   --color-accent: #6f1d1b;
   --color-accent-dark: #4e1211;
   --color-gold: #b68a3a;
   --color-success: #2e6f4e;
   --color-error: #a51d27;
+  --color-input: #fffdfa;
+  --color-journey: #8f211e;
 
   --planet-1: #c92f35;
   --planet-2: #e0ad19;
@@ -20,11 +22,11 @@
   --planet-8: #30333a;
   --planet-6: #2873b8;
 
-  --shadow-soft: 0 18px 50px rgba(64, 40, 23, 0.09);
+  --shadow-soft: 0 18px 50px rgba(64, 40, 23, 0.075);
   --shadow-float: 0 16px 42px rgba(42, 27, 18, 0.22);
   --radius-sm: 14px;
   --radius-md: 22px;
-  --radius-lg: 30px;
+  --radius-lg: 28px;
   --content-width: 1360px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-right: env(safe-area-inset-right, 0px);

@@ -1,7 +1,7 @@
-export function formatNumber(value, maximumFractionDigits = 4) {
+export function formatNumber(value, maximumFractionDigits = 1, minimumFractionDigits = 1) {
   return new Intl.NumberFormat("th-TH", {
     maximumFractionDigits,
-    minimumFractionDigits: 0,
+    minimumFractionDigits,
   }).format(value);
 }
 
@@ -10,7 +10,7 @@ export function formatAngle(angle) {
 }
 
 export function formatPercentage(value) {
-  return `${formatNumber(value, 4)}%`;
+  return `${formatNumber(value, 1, 1)}%`;
 }
 
 export function formatDuration(duration) {
@@ -26,6 +26,29 @@ export function formatDuration(duration) {
 
 export function formatMainDuration(years) {
   return `${years} ปี`;
+}
+
+export function formatThaiDate(parts) {
+  const monthNames = [
+    "มกราคม",
+    "กุมภาพันธ์",
+    "มีนาคม",
+    "เมษายน",
+    "พฤษภาคม",
+    "มิถุนายน",
+    "กรกฎาคม",
+    "สิงหาคม",
+    "กันยายน",
+    "ตุลาคม",
+    "พฤศจิกายน",
+    "ธันวาคม",
+  ];
+
+  return `${parts.day} ${monthNames[parts.month - 1]} ${parts.yearBe}`;
+}
+
+export function formatCalendarAge(age) {
+  return `${age.years} ปี ${age.months} เดือน ${age.days} วัน`;
 }
 
 export function getSegmentTitle(segment) {
