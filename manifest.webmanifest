@@ -1,0 +1,26 @@
+{
+  "name": "พระเคราะห์เสวยอายุ",
+  "short_name": "เสวยอายุ",
+  "description": "วงแหวนพระเคราะห์เสวยอายุ 108 ปีตามสัดส่วนเวลา",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f5efe3",
+  "theme_color": "#6f1d1b",
+  "icons": [
+    {
+      "src": "./assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

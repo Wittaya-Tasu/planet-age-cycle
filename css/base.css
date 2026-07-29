@@ -1,0 +1,99 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--color-bg);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100svh;
+  overflow-x: hidden;
+  color: var(--color-ink);
+  background:
+    radial-gradient(circle at 10% 5%, rgba(182, 138, 58, 0.15), transparent 28rem),
+    radial-gradient(circle at 95% 30%, rgba(111, 29, 27, 0.09), transparent 32rem),
+    var(--color-bg);
+  font-family:
+    "Thonburi", "Noto Sans Thai", "Leelawadee UI", "Tahoma",
+    system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.22;
+}
+
+strong {
+  font-weight: 750;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 1000;
+  top: 10px;
+  left: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--color-accent);
+  transform: translateY(-160%);
+  transition: transform 160ms ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+  filter: drop-shadow(0 0 0.2rem var(--color-accent));
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

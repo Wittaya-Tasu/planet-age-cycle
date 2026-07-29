@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
+  <title id="title">ไอคอนพระเคราะห์เสวยอายุ</title>
+  <defs>
+    <radialGradient id="bg" cx="38%" cy="28%" r="78%">
+      <stop offset="0" stop-color="#94352f"/>
+      <stop offset="1" stop-color="#4e1211"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#f5efe3"/>
+  <circle cx="256" cy="256" r="204" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="166" fill="none" stroke="#e4b85f" stroke-width="22" stroke-dasharray="50 16"/>
+  <circle cx="256" cy="256" r="119" fill="#fff7e8"/>
+  <circle cx="256" cy="256" r="101" fill="none" stroke="#b68a3a" stroke-width="3" stroke-dasharray="3 10"/>
+  <text x="256" y="277" fill="#6f1d1b" font-family="Tahoma, sans-serif" font-size="70" font-weight="800" text-anchor="middle">๑๐๘</text>
+</svg>

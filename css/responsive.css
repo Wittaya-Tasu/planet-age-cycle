@@ -1,0 +1,165 @@
+@media (max-width: 1080px) {
+  .visualization-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(270px, 310px);
+  }
+
+  .legend-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 820px) {
+  .app-shell {
+    padding:
+      calc(16px + var(--safe-top))
+      calc(18px + var(--safe-right))
+      calc(22px + var(--safe-bottom))
+      calc(18px + var(--safe-left));
+  }
+
+  .site-header {
+    grid-template-columns: auto 1fr;
+    gap: 14px;
+  }
+
+  .brand-mark {
+    width: 56px;
+  }
+
+  .header-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .visualization-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .side-stack {
+    position: static;
+    grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+  }
+
+  .detail-card {
+    min-height: 0;
+  }
+
+  .detail-empty {
+    min-height: 200px;
+  }
+
+  .formula-note {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 560px) {
+  .app-shell {
+    padding-right: calc(12px + var(--safe-right));
+    padding-left: calc(12px + var(--safe-left));
+  }
+
+  .site-header {
+    padding-bottom: 18px;
+  }
+
+  .brand-mark {
+    width: 50px;
+    font-size: 0.8rem;
+  }
+
+  .brand-copy h1 {
+    font-size: 1.55rem;
+  }
+
+  .intro {
+    font-size: 0.83rem;
+  }
+
+  .status-pill {
+    min-height: 36px;
+  }
+
+  .wheel-card,
+  .legend-section,
+  .formula-note {
+    border-radius: 22px;
+  }
+
+  .wheel-card {
+    padding: 14px 8px 13px;
+  }
+
+  .wheel-card > .section-heading {
+    padding: 3px 7px 0;
+  }
+
+  .ring-key {
+    display: none;
+  }
+
+  .planet-wheel {
+    max-height: none;
+  }
+
+  .main-label-name {
+    display: none;
+  }
+
+  .main-label-number {
+    font-size: 30px;
+  }
+
+  .sub-label {
+    font-size: 18px;
+  }
+
+  .center-title {
+    font-size: 20px;
+  }
+
+  .center-hint {
+    display: none;
+  }
+
+  .side-stack {
+    grid-template-columns: 1fr;
+  }
+
+  .info-card {
+    order: -1;
+  }
+
+  .detail-card {
+    padding: 18px;
+  }
+
+  .detail-empty {
+    min-height: 170px;
+  }
+
+  .legend-grid {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .legend-item {
+    min-height: 54px;
+  }
+
+  .formula-grid p {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+}
+
+@media (display-mode: standalone) {
+  .app-shell {
+    padding-top: calc(12px + var(--safe-top));
+  }
+
+  .install-button {
+    display: none !important;
+  }
+}

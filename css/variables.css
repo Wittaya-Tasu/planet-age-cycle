@@ -1,0 +1,33 @@
+:root {
+  --color-bg: #f5efe3;
+  --color-surface: rgba(255, 253, 248, 0.94);
+  --color-surface-strong: #fffdf8;
+  --color-ink: #2a211c;
+  --color-muted: #756961;
+  --color-line: rgba(70, 47, 33, 0.14);
+  --color-accent: #6f1d1b;
+  --color-accent-dark: #4e1211;
+  --color-gold: #b68a3a;
+  --color-success: #2e6f4e;
+  --color-error: #a51d27;
+
+  --planet-1: #c92f35;
+  --planet-2: #e0ad19;
+  --planet-3: #e96e21;
+  --planet-4: #3d8750;
+  --planet-7: #7652a0;
+  --planet-5: #a97716;
+  --planet-8: #30333a;
+  --planet-6: #2873b8;
+
+  --shadow-soft: 0 18px 50px rgba(64, 40, 23, 0.09);
+  --shadow-float: 0 16px 42px rgba(42, 27, 18, 0.22);
+  --radius-sm: 14px;
+  --radius-md: 22px;
+  --radius-lg: 30px;
+  --content-width: 1360px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
