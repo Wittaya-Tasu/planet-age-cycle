@@ -6,7 +6,7 @@ import {
   mixWithWhite,
   polarToCartesian,
 } from "../core/geometry.js";
-import { getRelationBadge } from "../core/relations.js";
+import { getActiveSegmentRelationBadge } from "../core/relations.js";
 import { getSegmentAriaLabel } from "../utils/format.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -239,12 +239,14 @@ function createRelationMarker(relation, position, size, variant) {
   return group;
 }
 
-function relationForPlanet(context, planetNumber) {
+function relationForActiveSegment(context, segment, activeSegment) {
   if (!context.relationsData || !context.birthDayType) return null;
-  return getRelationBadge(
+
+  return getActiveSegmentRelationBadge(
     context.relationsData,
     context.birthDayType,
-    planetNumber,
+    segment,
+    activeSegment,
   );
 }
 
@@ -310,7 +312,11 @@ function createMainSegment(segment, handlers, context) {
   const { journey, birthDay } = context;
   const currentClass =
     segment.key === journey.activeMain.key ? " is-current-main" : "";
-  const relation = relationForPlanet(context, segment.mainNumber);
+  const relation = relationForActiveSegment(
+    context,
+    segment,
+    journey.activeMain,
+  );
   const group = svgElement("g", {
     class: `wheel-segment main-segment${currentClass}`,
   });
@@ -349,7 +355,11 @@ function createSubSegment(segment, index, handlers, context) {
   const tightClass = segment.angle < 4.2 ? " is-tight" : "";
   const currentClass =
     segment.key === journey.activeSub.key ? " is-current-sub" : "";
-  const relation = relationForPlanet(context, segment.subNumber);
+  const relation = relationForActiveSegment(
+    context,
+    segment,
+    journey.activeSub,
+  );
   const group = svgElement("g", {
     class: `wheel-segment sub-segment${tightClass}${currentClass}`,
   });

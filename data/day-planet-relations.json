@@ -1,6 +1,12 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "unspecifiedBehavior": "hide",
+  "displayScope": {
+    "mode": "current-period-only",
+    "main": "active-main-only",
+    "sub": "active-sub-only",
+    "noteTh": "แสดงสัญลักษณ์เฉพาะแถบหลักและแถบย่อยที่ตรงกับอายุปัจจุบัน ไม่แสดงบนช่วงอดีตหรืออนาคต แม้ดาวนั้นจะอยู่ในตารางความสัมพันธ์"
+  },
   "birthDayTypes": [
     {
       "id": "sunday",

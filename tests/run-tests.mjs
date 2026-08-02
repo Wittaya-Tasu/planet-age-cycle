@@ -6,7 +6,10 @@ import { validateWheelModel } from "../js/utils/validation.js";
 import { loadPlanetAgeData } from "../js/data/loadData.js";
 import { buildCycle, findCurrentPeriod, validateCycleGeometry } from "../js/core/periodCalculator.js";
 import { bangkokPartsToEpochMs, birthdayAnniversaryEpochMs } from "../js/core/calendar.js";
-import { getPlanetRelation } from "../js/core/relations.js";
+import {
+  getActiveSegmentRelationBadge,
+  getPlanetRelation,
+} from "../js/core/relations.js";
 
 const model = buildWheelModel();
 const validation = validateWheelModel(model);
@@ -37,6 +40,71 @@ assert.equal(getPlanetRelation(datasets.relationsData, "sunday", 2), null);
 assert.equal(getPlanetRelation(datasets.relationsData, "wednesday-night", 7), "good");
 assert.equal(getPlanetRelation(datasets.relationsData, "saturday", 6), "bad");
 
+assert.equal(
+  datasets.relationsData.displayScope.mode,
+  "current-period-only",
+);
+
+const activeMainMars = {
+  key: "main-3",
+  type: "main",
+  mainNumber: 3,
+};
+const inactiveMainJupiter = {
+  key: "main-5",
+  type: "main",
+  mainNumber: 5,
+};
+const activeSubJupiter = {
+  key: "sub-3-5",
+  type: "sub",
+  mainNumber: 3,
+  subNumber: 5,
+};
+const inactiveSubMars = {
+  key: "sub-1-3",
+  type: "sub",
+  mainNumber: 1,
+  subNumber: 3,
+};
+
+assert.equal(
+  getActiveSegmentRelationBadge(
+    datasets.relationsData,
+    "sunday",
+    activeMainMars,
+    activeMainMars,
+  ).status,
+  "bad",
+);
+assert.equal(
+  getActiveSegmentRelationBadge(
+    datasets.relationsData,
+    "sunday",
+    inactiveMainJupiter,
+    activeMainMars,
+  ),
+  null,
+);
+assert.equal(
+  getActiveSegmentRelationBadge(
+    datasets.relationsData,
+    "sunday",
+    activeSubJupiter,
+    activeSubJupiter,
+  ).status,
+  "good",
+);
+assert.equal(
+  getActiveSegmentRelationBadge(
+    datasets.relationsData,
+    "sunday",
+    inactiveSubMars,
+    activeSubJupiter,
+  ),
+  null,
+);
+
 const profile = {
   birthDayType: "saturday",
   birth: { yearBE: 2527, month: 4, day: 21, hour: 1, minute: 49 },
@@ -60,7 +128,7 @@ assert.ok(result.current.startEpochMs <= target && target < result.current.endEp
 assert.ok(result.next);
 
 const sw = await readFile(`${root}sw.js`, "utf8");
-assert.match(sw, /planet-age-cycle-v0\.4\.1/);
+assert.match(sw, /planet-age-cycle-v0\.4\.2/);
 assert.match(sw, /data\/predictions\.json/);
 assert.match(sw, /js\/core\/exportImage\.js/);
 
@@ -78,6 +146,9 @@ assert.match(wheelSource, /journey-current-arrow/);
 assert.match(wheelSource, /subRelation:\s*398/);
 assert.match(wheelSource, /relation-marker-leader/);
 assert.match(wheelSource, /getMainRelationAngle/);
+assert.match(wheelSource, /getActiveSegmentRelationBadge/);
+assert.match(wheelSource, /journey\.activeMain/);
+assert.match(wheelSource, /journey\.activeSub/);
 assert.doesNotMatch(tooltipSource, /formatPercentage/);
 assert.doesNotMatch(detailSource, /สัดส่วนในแถบหลัก/);
 assert.match(detailSource, /คำพยากรณ์และรายละเอียด/);
@@ -90,7 +161,7 @@ console.log("✓ วงแหวน 8 แถบหลักและ 64 แถ�
 console.log("✓ คำพยากรณ์ 64 ช่องและข้อมูลพระอังคารแทรกพระพุธถูกต้อง");
 console.log("✓ ปฏิทินจริงและนโยบาย 29 กุมภาพันธ์ถูกต้อง");
 console.log("✓ แถบย่อยปิดพอดีกับแถบหลักทุกกลุ่ม");
-console.log("✓ สัญลักษณ์ดี/ไม่ดี จุดเริ่ม และลูกศรแสดงผลตามข้อกำหนด");
+console.log("✓ สัญลักษณ์ดี/ไม่ดีแสดงเฉพาะแถบหลักและแถบย่อยของอายุปัจจุบัน");
 console.log("✓ Tooltip และแผงรายละเอียดไม่แสดงสัดส่วนที่ตัดออก");
-console.log("✓ ตำแหน่งสัญลักษณ์และลำดับกล่องข้อมูล v0.4.1 ถูกต้อง");
-console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.4.1 พร้อมใช้งาน");
+console.log("✓ ตำแหน่งสัญลักษณ์และลำดับกล่องข้อมูล v0.4.2 ถูกต้อง");
+console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.4.2 พร้อมใช้งาน");
