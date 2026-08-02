@@ -57,9 +57,20 @@ export function renderDetailPanel(container, segment = null, options = {}) {
   colorLine.className = "detail-color-line";
   list.className = "detail-list";
   container.style.setProperty("--detail-color", segment.mainPlanet.color);
-  eyebrow.textContent = options.isCurrent ? "ช่วงที่ตรงกับอายุ" : segment.type === "main" ? "แถบหลัก" : "แถบย่อย";
-  title.textContent = getSegmentTitle(segment);
-  subtitle.textContent = segment.type === "main" ? `เลขพระเคราะห์ ${segment.mainPlanet.number}` : `${segment.subPlanet.name} ภายในช่วง ${segment.mainPlanet.name}`;
+  const isCurrentSub = Boolean(options.isCurrent && segment.type === "sub");
+  eyebrow.textContent = isCurrentSub
+    ? "ช่วงที่ตรงกับอายุ"
+    : segment.type === "main"
+      ? "แถบหลัก"
+      : "แถบย่อย";
+  title.textContent = isCurrentSub
+    ? "คำพยากรณ์และรายละเอียด"
+    : getSegmentTitle(segment);
+  subtitle.textContent = isCurrentSub
+    ? "ความสัมพันธ์ คำพยากรณ์ และข้อมูลตามตำรา"
+    : segment.type === "main"
+      ? `เลขพระเคราะห์ ${segment.mainPlanet.number}`
+      : `${segment.subPlanet.name} ภายในช่วง ${segment.mainPlanet.name}`;
 
   if (segment.type === "main") {
     list.append(
@@ -69,15 +80,13 @@ export function renderDetailPanel(container, segment = null, options = {}) {
     );
   } else {
     list.append(
-      createRow("แถบหลัก", segment.mainPlanet.name),
-      createRow("แถบย่อย", segment.subPlanet.name),
-      createRow("ระยะเวลา", formatDuration(segment.duration)),
+      createRow("ระยะเวลาตามตำรา", formatDuration(segment.duration)),
     );
   }
 
   const nodes = [eyebrow, title, subtitle, colorLine, list];
 
-  if (options.period) {
+  if (options.period && !isCurrentSub) {
     const dates = document.createElement("dl");
     dates.className = "detail-list period-date-list";
     dates.append(

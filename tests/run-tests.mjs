@@ -60,7 +60,7 @@ assert.ok(result.current.startEpochMs <= target && target < result.current.endEp
 assert.ok(result.next);
 
 const sw = await readFile(`${root}sw.js`, "utf8");
-assert.match(sw, /planet-age-cycle-v0\.4\.0/);
+assert.match(sw, /planet-age-cycle-v0\.4\.1/);
 assert.match(sw, /data\/predictions\.json/);
 assert.match(sw, /js\/core\/exportImage\.js/);
 
@@ -75,9 +75,15 @@ assert.doesNotMatch(wheelSource, /text\.textContent\s*=\s*segment\.subPlanet\.nu
 assert.match(wheelSource, /relation-marker/);
 assert.match(wheelSource, /birth-start-ring/);
 assert.match(wheelSource, /journey-current-arrow/);
+assert.match(wheelSource, /subRelation:\s*398/);
+assert.match(wheelSource, /relation-marker-leader/);
+assert.match(wheelSource, /getMainRelationAngle/);
 assert.doesNotMatch(tooltipSource, /formatPercentage/);
 assert.doesNotMatch(detailSource, /สัดส่วนในแถบหลัก/);
+assert.match(detailSource, /คำพยากรณ์และรายละเอียด/);
+assert.match(detailSource, /options\.period && !isCurrentSub/);
 assert.match(indexSource, /id="save-image-button"/);
+assert.ok(indexSource.indexOf('id="journey-summary"') < indexSource.indexOf('id="detail-panel"'));
 assert.match(exportSource, /saveDashboardImage/);
 
 console.log("✓ วงแหวน 8 แถบหลักและ 64 แถบย่อยถูกต้อง");
@@ -86,4 +92,5 @@ console.log("✓ ปฏิทินจริงและนโยบาย 29 �
 console.log("✓ แถบย่อยปิดพอดีกับแถบหลักทุกกลุ่ม");
 console.log("✓ สัญลักษณ์ดี/ไม่ดี จุดเริ่ม และลูกศรแสดงผลตามข้อกำหนด");
 console.log("✓ Tooltip และแผงรายละเอียดไม่แสดงสัดส่วนที่ตัดออก");
-console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.4.0 พร้อมใช้งาน");
+console.log("✓ ตำแหน่งสัญลักษณ์และลำดับกล่องข้อมูล v0.4.1 ถูกต้อง");
+console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.4.1 พร้อมใช้งาน");

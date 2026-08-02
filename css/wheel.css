@@ -119,6 +119,22 @@
   filter: drop-shadow(0 1px 2px rgba(30, 20, 15, 0.75));
 }
 
+.relation-marker-leader {
+  stroke-width: 2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+  opacity: 0.9;
+}
+
+.relation-marker-leader-good {
+  stroke: #248653;
+}
+
+.relation-marker-leader-bad {
+  stroke: #b4232e;
+}
+
 .relation-marker-shape {
   stroke: #fffdf8;
   stroke-width: 2;
@@ -143,12 +159,16 @@
   font-weight: 900;
 }
 
+.relation-marker-main .relation-marker-text {
+  font-size: 13px;
+}
+
 .relation-marker-sub .relation-marker-text {
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .relation-marker-sub.relation-marker-bad .relation-marker-text {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .center-disc {

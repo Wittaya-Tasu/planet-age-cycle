@@ -10,17 +10,17 @@ import { getRelationBadge } from "../core/relations.js";
 import { getSegmentAriaLabel } from "../utils/format.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const VIEWBOX_SIZE = 800;
+const VIEWBOX_SIZE = 824;
 const CENTER = VIEWBOX_SIZE / 2;
 const RADII = Object.freeze({
   center: 190,
   mainInner: 196,
   mainOuter: 295,
-  mainRelation: 276,
+  mainRelation: 281,
   journey: 298,
   subInner: 301,
   subOuter: 382,
-  subRelation: 342,
+  subRelation: 398,
 });
 
 function svgElement(name, attributes = {}) {
@@ -248,6 +248,39 @@ function relationForPlanet(context, planetNumber) {
   );
 }
 
+
+function getMainRelationAngle(segment) {
+  const midAngle = getMidAngle(segment.startAngle, segment.endAngle);
+  const offset = Math.min(6, Math.max(3.5, segment.angle * 0.18));
+  return midAngle + offset;
+}
+
+function createSubRelationLeader(relation, angle) {
+  if (!relation) return null;
+
+  const start = getLabelPosition(
+    CENTER,
+    CENTER,
+    RADII.subOuter + 1,
+    angle,
+  );
+  const end = getLabelPosition(
+    CENTER,
+    CENTER,
+    RADII.subRelation - 9,
+    angle,
+  );
+
+  return svgElement("line", {
+    x1: start.x,
+    y1: start.y,
+    x2: end.x,
+    y2: end.y,
+    class: `relation-marker-leader relation-marker-leader-${relation.status}`,
+    "aria-hidden": "true",
+  });
+}
+
 function bindInteractions(group, segment, handlers, relation = null) {
   const relationText = relation ? ` · ความสัมพันธ์${relation.labelTh}` : "";
   group.setAttribute("role", "button");
@@ -296,7 +329,7 @@ function createMainSegment(segment, handlers, context) {
     CENTER,
     CENTER,
     RADII.mainRelation,
-    getMidAngle(segment.startAngle, segment.endAngle),
+    getMainRelationAngle(segment),
   );
   const relationMarker = createRelationMarker(
     relation,
@@ -332,21 +365,24 @@ function createSubSegment(segment, index, handlers, context) {
     ),
     fill: mixWithWhite(segment.mainPlanet.color, lightRatio),
   });
+  const relationAngle = getMidAngle(segment.startAngle, segment.endAngle);
   const relationPosition = getLabelPosition(
     CENTER,
     CENTER,
     RADII.subRelation,
-    getMidAngle(segment.startAngle, segment.endAngle),
+    relationAngle,
   );
+  const relationLeader = createSubRelationLeader(relation, relationAngle);
   const relationMarker = createRelationMarker(
     relation,
     relationPosition,
-    segment.angle < 4.2 ? 7.5 : 9,
+    8,
     "sub",
   );
 
   bindInteractions(group, segment, handlers, relation);
   group.append(path);
+  if (relationLeader) group.append(relationLeader);
   if (relationMarker) group.append(relationMarker);
   return group;
 }

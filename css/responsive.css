@@ -57,7 +57,7 @@
 
   .side-stack {
     position: static;
-    grid-template-columns: minmax(0, 1.25fr) minmax(240px, 0.75fr);
+    grid-template-columns: 1fr;
   }
 
   .detail-card {
@@ -258,6 +258,7 @@
     display: none !important;
   }
 }
+
 
 @media (max-width: 560px) {
   .time-inputs {
