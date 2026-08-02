@@ -31,12 +31,12 @@
         <div class="brand-copy">
           <p class="eyebrow">โหราศาสตร์ไทย · วงจรตามสัดส่วนเวลา</p>
           <h1>พระเคราะห์เสวยอายุ</h1>
-          <p class="intro">คำนวณอายุและติดตามตำแหน่งบนวงจรพระเคราะห์ 108 ปี</p>
+          <p class="intro">คำนวณช่วงชีวิตจริง พร้อมคำพยากรณ์บนวงจรพระเคราะห์ 108 ปี</p>
         </div>
         <div class="header-actions">
           <span class="status-pill" aria-label="เวอร์ชัน 0.2.0">
             <span class="status-dot" aria-hidden="true"></span>
-            v0.2.0
+            v0.3.0
           </span>
           <button
             id="support-button"
@@ -107,6 +107,24 @@
               </div>
             </fieldset>
 
+            <fieldset class="date-fieldset time-fieldset">
+              <legend>เวลาเกิด</legend>
+              <div class="time-inputs">
+                <div class="field">
+                  <label for="birth-hour">ชั่วโมง</label>
+                  <select id="birth-hour" name="birthHour" required></select>
+                </div>
+                <span aria-hidden="true">:</span>
+                <div class="field">
+                  <label for="birth-minute">นาที</label>
+                  <select id="birth-minute" name="birthMinute" required></select>
+                </div>
+              </div>
+              <p id="leap-day-form-notice" class="leap-day-notice" hidden>
+                ผู้เกิดวันที่ 29 กุมภาพันธ์: ในปีที่ไม่มีวันที่ 29 กุมภาพันธ์ ระบบจะใช้วันที่ 28 กุมภาพันธ์ เวลาเดิมเป็นวันครบรอบชั่วคราว และกลับไปใช้วันที่ 29 กุมภาพันธ์ในปีอธิกสุรทิน
+              </p>
+            </fieldset>
+
             <fieldset class="date-fieldset target-fieldset">
               <legend>วันที่เป้าหมาย (พ.ศ.)</legend>
               <button id="today-button" class="text-button" type="button">ใช้วันนี้</button>
@@ -130,6 +148,17 @@
                     max="2800"
                     required
                   />
+                </div>
+              </div>
+              <div class="time-inputs target-time-inputs">
+                <div class="field">
+                  <label for="target-hour">ชั่วโมง</label>
+                  <select id="target-hour" name="targetHour" required></select>
+                </div>
+                <span aria-hidden="true">:</span>
+                <div class="field">
+                  <label for="target-minute">นาที</label>
+                  <select id="target-minute" name="targetMinute" required></select>
                 </div>
               </div>
             </fieldset>
@@ -240,7 +269,7 @@
       </main>
 
       <footer>
-        <p>พระเคราะห์เสวยอายุ · ข้อมูลจะเก็บไว้เฉพาะในอุปกรณ์นี้จนกว่าจะกดรีเซ็ต</p>
+        <p>พระเคราะห์เสวยอายุ · ข้อมูลและคำพยากรณ์จะเก็บและประมวลผลในอุปกรณ์นี้</p>
       </footer>
     </div>
 

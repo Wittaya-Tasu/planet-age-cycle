@@ -258,3 +258,13 @@
     display: none !important;
   }
 }
+
+@media (max-width: 560px) {
+  .time-inputs {
+    max-width: none;
+  }
+
+  .prediction-summary {
+    padding: 12px;
+  }
+}

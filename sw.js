@@ -1,4 +1,4 @@
-const CACHE_NAME = "planet-age-cycle-v0.2.0";
+const CACHE_NAME = "planet-age-cycle-v0.3.0";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -13,6 +13,18 @@ const APP_SHELL = [
   "./js/data/planets.js",
   "./js/data/durations.js",
   "./js/data/birth-days.js",
+  "./data/planets.json",
+  "./data/subperiods.json",
+  "./data/predictions.json",
+  "./data/day-planet-relations.json",
+  "./data/app-config.json",
+  "./data/ui-text.th.json",
+  "./js/data/loadData.js",
+  "./js/core/calendar.js",
+  "./js/core/calendarJourney.js",
+  "./js/core/periodCalculator.js",
+  "./js/core/predictionLookup.js",
+  "./js/core/relations.js",
   "./js/core/time.js",
   "./js/core/angles.js",
   "./js/core/age.js",

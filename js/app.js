@@ -1,30 +1,22 @@
 import { buildWheelModel } from "./core/angles.js";
-import {
-  calculateCalendarAge,
-  createCivilDate,
-  createJourneyState,
-} from "./core/age.js";
-import {
-  initializeBirthForm,
-  readProfileForm,
-  resetBirthForm,
-  setTargetToToday,
-  writeProfileForm,
-} from "./components/birth-form.js";
+import { calculateCalendarAge, createCivilDate } from "./core/age.js";
+import { bangkokPartsToEpochMs, buddhistToGregorian, formatThaiDateTime } from "./core/calendar.js";
+import { createCalendarJourneyState } from "./core/calendarJourney.js";
+import { findCurrentPeriod } from "./core/periodCalculator.js";
+import { getPrediction } from "./core/predictionLookup.js";
+import { decoratePeriodRelations } from "./core/relations.js";
+import { loadPlanetAgeData } from "./data/loadData.js";
+import { initializeBirthForm, readProfileForm, resetBirthForm, setTargetToToday, writeProfileForm } from "./components/birth-form.js";
 import { renderDetailPanel } from "./components/detail-panel.js";
 import { renderJourneySummary } from "./components/journey-summary.js";
 import { renderLegend } from "./components/legend.js";
 import { createTooltipController } from "./components/tooltip.js";
 import { renderWheel } from "./components/wheel.js";
 import { getBirthDay } from "./data/birth-days.js";
-import {
-  formatCalendarAge,
-  formatThaiDate,
-} from "./utils/format.js";
+import { formatCalendarAge, formatThaiDate } from "./utils/format.js";
 import { validateWheelModel } from "./utils/validation.js";
 
-const STORAGE_KEY = "planet-age-cycle-profile-v1";
-
+const STORAGE_KEY = "planet-age-cycle-profile-v2";
 const onboarding = document.querySelector("#onboarding");
 const appContent = document.querySelector("#app-content");
 const profileBar = document.querySelector("#profile-bar");
@@ -33,6 +25,7 @@ const profileTarget = document.querySelector("#profile-target");
 const birthForm = document.querySelector("#birth-form");
 const birthFormTitle = document.querySelector("#birth-form-title");
 const formError = document.querySelector("#form-error");
+const leapDayNotice = document.querySelector("#leap-day-form-notice");
 const cancelEditButton = document.querySelector("#cancel-edit-button");
 const editProfileButton = document.querySelector("#edit-profile-button");
 const resetButton = document.querySelector("#reset-button");
@@ -48,16 +41,40 @@ const errorBanner = document.querySelector("#validation-error");
 const installButton = document.querySelector("#install-button");
 
 let model;
+let datasets;
 let tooltip;
 let wheelController;
 let currentProfile = null;
 let currentJourney = null;
+let currentPeriodResult = null;
 let selectedSegment = null;
 let deferredInstallPrompt = null;
 
+function toCalculationProfile(profile) {
+  return {
+    birthDayType: profile.birthWeekday,
+    birth: {
+      yearBE: profile.birthDate.yearBe,
+      month: profile.birthDate.month,
+      day: profile.birthDate.day,
+      hour: profile.birthTime?.hour ?? 0,
+      minute: profile.birthTime?.minute ?? 0,
+    },
+  };
+}
+
+function targetEpoch(profile) {
+  return bangkokPartsToEpochMs({
+    year: buddhistToGregorian(profile.targetDate.yearBe),
+    month: profile.targetDate.month,
+    day: profile.targetDate.day,
+    hour: profile.targetTime?.hour ?? 12,
+    minute: profile.targetTime?.minute ?? 0,
+  });
+}
+
 function showValidationError(errors) {
-  const message = `ไม่สามารถวาดวงแหวนได้: ${errors.join(" · ")}`;
-  errorBanner.textContent = message;
+  errorBanner.textContent = `ไม่สามารถเริ่มระบบได้: ${errors.join(" · ")}`;
   errorBanner.hidden = false;
   console.error("[Planet Age Cycle Validation]", errors);
 }
@@ -69,20 +86,36 @@ function setFormError(message = "") {
 
 function updateLegendPressedState() {
   document.querySelectorAll(".legend-item").forEach((button) => {
-    button.setAttribute(
-      "aria-pressed",
-      String(button.dataset.segmentKey === selectedSegment?.key),
-    );
+    button.setAttribute("aria-pressed", String(button.dataset.segmentKey === selectedSegment?.key));
   });
+}
+
+function periodForSegment(segment) {
+  if (!currentPeriodResult || segment.type !== "sub") return null;
+  return currentPeriodResult.cycle.mainPeriods
+    .flatMap((main) => main.subperiods)
+    .find((period) => period.mainPlanet === segment.mainNumber && period.subPlanet === segment.subNumber) ?? null;
 }
 
 function selectSegment(segment) {
   if (!wheelController || !currentJourney) return;
-
   selectedSegment = segment ?? currentJourney.activeSub;
   wheelController.setSelected(selectedSegment);
+  const period = periodForSegment(selectedSegment);
+  const prediction = selectedSegment.type === "sub"
+    ? getPrediction(datasets.predictionsData, selectedSegment.mainNumber, selectedSegment.subNumber)
+    : null;
+  const relations = selectedSegment.type === "sub" && period
+    ? decoratePeriodRelations(datasets.relationsData, currentProfile.birthWeekday, period)
+    : null;
+
   renderDetailPanel(detailPanel, selectedSegment, {
     isCurrent: selectedSegment.key === currentJourney.activeSub.key,
+    period,
+    prediction,
+    mainRelation: relations?.mainRelation,
+    subRelation: relations?.subRelation,
+    uiText: datasets.uiText,
   });
   updateLegendPressedState();
   tooltip.hide();
@@ -97,6 +130,7 @@ function hideSupportingInfo() {
 function showInitialScreen() {
   currentProfile = null;
   currentJourney = null;
+  currentPeriodResult = null;
   selectedSegment = null;
   onboarding.hidden = false;
   appContent.hidden = true;
@@ -114,30 +148,27 @@ function renderProfile(profile) {
   const birthDate = createCivilDate(profile.birthDate);
   const targetDate = createCivilDate(profile.targetDate);
   const age = calculateCalendarAge(birthDate, targetDate);
-  const journey = createJourneyState(model, birthDay, age);
+  const targetMs = targetEpoch(profile);
+  const calculationProfile = toCalculationProfile(profile);
+  const periodResult = findCurrentPeriod(calculationProfile, targetMs, datasets);
+  const journey = createCalendarJourneyState(model, birthDay, periodResult, targetMs);
 
   currentProfile = profile;
   currentJourney = journey;
+  currentPeriodResult = periodResult;
   onboarding.hidden = true;
   appContent.hidden = false;
   profileBar.hidden = false;
   supportButton.hidden = false;
-  profileBirth.textContent =
-    `วัน${birthDay.label} · ${formatThaiDate(profile.birthDate)}`;
-  profileTarget.textContent =
-    `${formatThaiDate(profile.targetDate)} · อายุ ${formatCalendarAge(age)}`;
+  profileBirth.textContent = `วัน${birthDay.label} · ${formatThaiDate(profile.birthDate)} · ${String(profile.birthTime.hour).padStart(2, "0")}:${String(profile.birthTime.minute).padStart(2, "0")} น.`;
+  profileTarget.textContent = `${formatThaiDateTime(targetMs)} · อายุ ${formatCalendarAge(age)}`;
 
-  wheelController = renderWheel(
-    wheelContainer,
-    model,
-    {
-      onSelect: selectSegment,
-      onPreview: (segment, source) => tooltip.show(segment, source),
-      onPointerMove: (event) => tooltip.move(event),
-      onPreviewEnd: () => tooltip.hide(),
-    },
-    { age, birthDay, journey },
-  );
+  wheelController = renderWheel(wheelContainer, model, {
+    onSelect: selectSegment,
+    onPreview: (segment, source) => tooltip.show(segment, source),
+    onPointerMove: (event) => tooltip.move(event),
+    onPreviewEnd: () => tooltip.hide(),
+  }, { age: periodResult.currentAge, birthDay, journey });
 
   renderJourneySummary(journeySummary, journey);
   selectSegment(journey.activeSub);
@@ -146,7 +177,6 @@ function renderProfile(profile) {
 
 function showEditScreen() {
   if (!currentProfile) return;
-
   writeProfileForm(birthForm, currentProfile);
   birthFormTitle.textContent = "แก้ไขข้อมูลวันเกิด";
   cancelEditButton.hidden = false;
@@ -159,11 +189,7 @@ function showEditScreen() {
 }
 
 function cancelEdit() {
-  if (!currentProfile) {
-    showInitialScreen();
-    return;
-  }
-
+  if (!currentProfile) return showInitialScreen();
   onboarding.hidden = true;
   appContent.hidden = false;
   profileBar.hidden = false;
@@ -176,52 +202,41 @@ function saveProfile(profile) {
 }
 
 function loadSavedProfile() {
-  const rawProfile = localStorage.getItem(STORAGE_KEY);
-  if (!rawProfile) return null;
-
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return null;
   try {
-    const profile = JSON.parse(rawProfile);
-    getBirthDay(profile.birthWeekday);
-    const birthDate = createCivilDate(profile.birthDate);
-    const targetDate = createCivilDate(profile.targetDate);
-    calculateCalendarAge(birthDate, targetDate);
+    const profile = JSON.parse(raw);
+    if (!profile.birthTime) profile.birthTime = { hour: 0, minute: 0 };
+    if (!profile.targetTime) profile.targetTime = { hour: 12, minute: 0 };
     return profile;
   } catch (error) {
-    console.warn("ข้อมูลที่บันทึกไว้ไม่สมบูรณ์ จึงกลับสู่หน้าเริ่มต้น", error);
     localStorage.removeItem(STORAGE_KEY);
     return null;
   }
 }
 
-function initializeApp() {
+async function initializeApp() {
   try {
-    model = buildWheelModel();
+    [datasets, model] = await Promise.all([loadPlanetAgeData("./data"), Promise.resolve(buildWheelModel())]);
     const validation = validateWheelModel(model);
-
-    if (!validation.valid) {
-      showValidationError(validation.errors);
-      return;
-    }
-
-    console.info("[Planet Age Cycle Validation] ผ่าน", validation.summary);
+    if (!validation.valid) return showValidationError(validation.errors);
     tooltip = createTooltipController(tooltipElement);
     initializeBirthForm(birthForm);
     renderLegend(legendContainer, model.mainSegments, selectSegment);
-
-    const savedProfile = loadSavedProfile();
-    if (savedProfile) {
-      renderProfile(savedProfile);
-    } else {
-      showInitialScreen();
-    }
+    const saved = loadSavedProfile();
+    saved ? renderProfile(saved) : showInitialScreen();
   } catch (error) {
     showValidationError([error instanceof Error ? error.message : String(error)]);
   }
 }
 
+birthForm.addEventListener("change", () => {
+  const isLeapBirth = Number(birthForm.elements.birthDay.value) === 29 && Number(birthForm.elements.birthMonth.value) === 2;
+  leapDayNotice.hidden = !isLeapBirth;
+});
+
 birthForm.addEventListener("submit", (event) => {
   event.preventDefault();
-
   try {
     const profile = readProfileForm(birthForm);
     saveProfile(profile);
@@ -233,13 +248,9 @@ birthForm.addEventListener("submit", (event) => {
   }
 });
 
-todayButton.addEventListener("click", () => {
-  setTargetToToday(birthForm);
-});
-
+todayButton.addEventListener("click", () => setTargetToToday(birthForm));
 editProfileButton.addEventListener("click", showEditScreen);
 cancelEditButton.addEventListener("click", cancelEdit);
-
 resetButton.addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   wheelContainer.replaceChildren();
@@ -248,28 +259,17 @@ resetButton.addEventListener("click", () => {
   showInitialScreen();
   onboarding.scrollIntoView({ block: "start" });
 });
-
 supportButton.addEventListener("click", () => {
-  const shouldOpen = supportingInfo.hidden;
-  supportingInfo.hidden = !shouldOpen;
-  supportButton.setAttribute("aria-expanded", String(shouldOpen));
-  supportButton.textContent = shouldOpen ? "ซ่อนข้อมูลประกอบ" : "ข้อมูลประกอบ";
-
-  if (shouldOpen) {
-    supportingInfo.scrollIntoView({ block: "start" });
-  }
+  const open = supportingInfo.hidden;
+  supportingInfo.hidden = !open;
+  supportButton.setAttribute("aria-expanded", String(open));
+  supportButton.textContent = open ? "ซ่อนข้อมูลประกอบ" : "ข้อมูลประกอบ";
 });
 
 document.addEventListener("click", (event) => {
   if (!currentJourney || !selectedSegment) return;
-
-  const interactiveTarget = event.target.closest(
-    ".wheel-segment, .legend-item, .detail-card, .journey-summary, button, input, select",
-  );
-
-  if (!interactiveTarget) {
-    selectSegment(currentJourney.activeSub);
-  }
+  const target = event.target.closest(".wheel-segment, .legend-item, .detail-card, .journey-summary, button, input, select");
+  if (!target) selectSegment(currentJourney.activeSub);
 });
 
 window.addEventListener("beforeinstallprompt", (event) => {
@@ -277,27 +277,19 @@ window.addEventListener("beforeinstallprompt", (event) => {
   deferredInstallPrompt = event;
   installButton.hidden = false;
 });
-
 installButton.addEventListener("click", async () => {
   if (!deferredInstallPrompt) return;
-
   deferredInstallPrompt.prompt();
   await deferredInstallPrompt.userChoice;
   deferredInstallPrompt = null;
   installButton.hidden = true;
 });
-
 window.addEventListener("appinstalled", () => {
   deferredInstallPrompt = null;
   installButton.hidden = true;
 });
-
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch((error) => {
-      console.warn("ลงทะเบียนโหมดออฟไลน์ไม่สำเร็จ", error);
-    });
-  });
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(console.warn));
 }
 
 initializeApp();

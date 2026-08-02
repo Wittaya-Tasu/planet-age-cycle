@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.1.0",
+  "cycleYears": 108,
+  "cycleAngleDegrees": 360,
+  "sequence": [
+    1,
+    2,
+    3,
+    4,
+    7,
+    5,
+    8,
+    6
+  ],
+  "planets": [
+    {
+      "number": 1,
+      "slug": "sun",
+      "nameTh": "พระอาทิตย์",
+      "years": 6,
+      "weight": 6,
+      "mainAngleDegrees": 20.0,
+      "mainSharePercent": 5.555555555555555,
+      "color": "#D62828"
+    },
+    {
+      "number": 2,
+      "slug": "moon",
+      "nameTh": "พระจันทร์",
+      "years": 15,
+      "weight": 15,
+      "mainAngleDegrees": 50.0,
+      "mainSharePercent": 13.88888888888889,
+      "color": "#F4C430"
+    },
+    {
+      "number": 3,
+      "slug": "mars",
+      "nameTh": "พระอังคาร",
+      "years": 8,
+      "weight": 8,
+      "mainAngleDegrees": 26.666666666666668,
+      "mainSharePercent": 7.407407407407407,
+      "color": "#F57C00"
+    },
+    {
+      "number": 4,
+      "slug": "mercury",
+      "nameTh": "พระพุธ",
+      "years": 17,
+      "weight": 17,
+      "mainAngleDegrees": 56.666666666666664,
+      "mainSharePercent": 15.74074074074074,
+      "color": "#3A913F"
+    },
+    {
+      "number": 7,
+      "slug": "saturn",
+      "nameTh": "พระเสาร์",
+      "years": 10,
+      "weight": 10,
+      "mainAngleDegrees": 33.333333333333336,
+      "mainSharePercent": 9.25925925925926,
+      "color": "#7446A6"
+    },
+    {
+      "number": 5,
+      "slug": "jupiter",
+      "nameTh": "พระพฤหัสฯ",
+      "years": 19,
+      "weight": 19,
+      "mainAngleDegrees": 63.333333333333336,
+      "mainSharePercent": 17.59259259259259,
+      "color": "#B8860B"
+    },
+    {
+      "number": 8,
+      "slug": "rahu",
+      "nameTh": "พระราหู",
+      "years": 12,
+      "weight": 12,
+      "mainAngleDegrees": 40.0,
+      "mainSharePercent": 11.11111111111111,
+      "color": "#202124"
+    },
+    {
+      "number": 6,
+      "slug": "venus",
+      "nameTh": "พระศุกร์",
+      "years": 21,
+      "weight": 21,
+      "mainAngleDegrees": 70.0,
+      "mainSharePercent": 19.444444444444443,
+      "color": "#1565C0"
+    }
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.1.0",
+  "unspecifiedBehavior": "hide",
+  "birthDayTypes": [
+    {
+      "id": "sunday",
+      "labelTh": "วันอาทิตย์",
+      "startPlanet": 1,
+      "weekday": 0
+    },
+    {
+      "id": "monday",
+      "labelTh": "วันจันทร์",
+      "startPlanet": 2,
+      "weekday": 1
+    },
+    {
+      "id": "tuesday",
+      "labelTh": "วันอังคาร",
+      "startPlanet": 3,
+      "weekday": 2
+    },
+    {
+      "id": "wednesday-day",
+      "labelTh": "วันพุธกลางวัน",
+      "startPlanet": 4,
+      "weekday": 3
+    },
+    {
+      "id": "wednesday-night",
+      "labelTh": "วันพุธกลางคืน",
+      "startPlanet": 8,
+      "weekday": 3
+    },
+    {
+      "id": "thursday",
+      "labelTh": "วันพฤหัสบดี",
+      "startPlanet": 5,
+      "weekday": 4
+    },
+    {
+      "id": "friday",
+      "labelTh": "วันศุกร์",
+      "startPlanet": 6,
+      "weekday": 5
+    },
+    {
+      "id": "saturday",
+      "labelTh": "วันเสาร์",
+      "startPlanet": 7,
+      "weekday": 6
+    }
+  ],
+  "relations": {
+    "sunday": {
+      "good": [
+        5
+      ],
+      "bad": [
+        3
+      ]
+    },
+    "monday": {
+      "good": [
+        4
+      ],
+      "bad": [
+        5
+      ]
+    },
+    "tuesday": {
+      "good": [
+        6
+      ],
+      "bad": [
+        1
+      ]
+    },
+    "wednesday-day": {
+      "good": [],
+      "bad": []
+    },
+    "wednesday-night": {
+      "good": [
+        7
+      ],
+      "bad": []
+    },
+    "thursday": {
+      "good": [
+        1
+      ],
+      "bad": []
+    },
+    "friday": {
+      "good": [
+        3
+      ],
+      "bad": [
+        7
+      ]
+    },
+    "saturday": {
+      "good": [],
+      "bad": [
+        6
+      ]
+    }
+  },
+  "displayRules": {
+    "good": {
+      "symbol": "positive",
+      "labelTh": "ดี"
+    },
+    "bad": {
+      "symbol": "warning",
+      "labelTh": "ไม่ดี"
+    },
+    "unspecified": {
+      "symbol": null,
+      "labelTh": null,
+      "visible": false
+    }
+  }
+}

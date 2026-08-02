@@ -1,0 +1,1111 @@
+{
+  "schemaVersion": "1.1.0",
+  "timeUnitRules": {
+    "monthsPerYear": 12,
+    "daysPerMonth": 30,
+    "astroMinutesPerDay": 60,
+    "astroMinutesPerYear": 21600
+  },
+  "formula": {
+    "astroMinutes": "mainYears * subPlanetWeight * 200",
+    "subAngleDegrees": "mainAngleDegrees * subPlanetWeight / 108"
+  },
+  "mainPeriods": [
+    {
+      "mainPlanet": 1,
+      "mainYears": 6,
+      "mainAngleDegrees": 20.0,
+      "subSequence": [
+        1,
+        2,
+        3,
+        4,
+        7,
+        5,
+        8,
+        6
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 1,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์เสวยอายุตัวเอง",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 1.1111111111111112,
+          "astroDuration": {
+            "years": 0,
+            "months": 4,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 7200
+        },
+        {
+          "mainPlanet": 1,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์แทรกพระอาทิตย์",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 2.7777777777777777,
+          "astroDuration": {
+            "years": 0,
+            "months": 10,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 18000
+        },
+        {
+          "mainPlanet": 1,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารแทรกพระอาทิตย์",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 1.4814814814814814,
+          "astroDuration": {
+            "years": 0,
+            "months": 5,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 9600
+        },
+        {
+          "mainPlanet": 1,
+          "subPlanet": 4,
+          "titleTh": "พระพุธแทรกพระอาทิตย์",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 3.1481481481481484,
+          "astroDuration": {
+            "years": 0,
+            "months": 11,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 20400
+        },
+        {
+          "mainPlanet": 1,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์แทรกพระอาทิตย์",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 1.8518518518518519,
+          "astroDuration": {
+            "years": 0,
+            "months": 6,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 12000
+        },
+        {
+          "mainPlanet": 1,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯแทรกพระอาทิตย์",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 3.5185185185185186,
+          "astroDuration": {
+            "years": 1,
+            "months": 0,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 22800
+        },
+        {
+          "mainPlanet": 1,
+          "subPlanet": 8,
+          "titleTh": "พระราหูแทรกพระอาทิตย์",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 2.2222222222222223,
+          "astroDuration": {
+            "years": 0,
+            "months": 8,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 14400
+        },
+        {
+          "mainPlanet": 1,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์แทรกพระอาทิตย์",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 3.888888888888889,
+          "astroDuration": {
+            "years": 1,
+            "months": 2,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 25200
+        }
+      ]
+    },
+    {
+      "mainPlanet": 2,
+      "mainYears": 15,
+      "mainAngleDegrees": 50.0,
+      "subSequence": [
+        2,
+        3,
+        4,
+        7,
+        5,
+        8,
+        6,
+        1
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 2,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์เสวยอายุตัวเอง",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 6.944444444444445,
+          "astroDuration": {
+            "years": 2,
+            "months": 1,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 45000
+        },
+        {
+          "mainPlanet": 2,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารแทรกพระจันทร์",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 3.7037037037037037,
+          "astroDuration": {
+            "years": 1,
+            "months": 1,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 24000
+        },
+        {
+          "mainPlanet": 2,
+          "subPlanet": 4,
+          "titleTh": "พระพุธแทรกพระจันทร์",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 7.87037037037037,
+          "astroDuration": {
+            "years": 2,
+            "months": 4,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 51000
+        },
+        {
+          "mainPlanet": 2,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์แทรกพระจันทร์",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 4.62962962962963,
+          "astroDuration": {
+            "years": 1,
+            "months": 4,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 30000
+        },
+        {
+          "mainPlanet": 2,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯแทรกพระจันทร์",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 8.796296296296296,
+          "astroDuration": {
+            "years": 2,
+            "months": 7,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 57000
+        },
+        {
+          "mainPlanet": 2,
+          "subPlanet": 8,
+          "titleTh": "พระราหูแทรกพระจันทร์",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 5.555555555555555,
+          "astroDuration": {
+            "years": 1,
+            "months": 8,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 36000
+        },
+        {
+          "mainPlanet": 2,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์แทรกพระจันทร์",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 9.722222222222221,
+          "astroDuration": {
+            "years": 2,
+            "months": 11,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 63000
+        },
+        {
+          "mainPlanet": 2,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์แทรกพระจันทร์",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 2.7777777777777777,
+          "astroDuration": {
+            "years": 0,
+            "months": 10,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 18000
+        }
+      ]
+    },
+    {
+      "mainPlanet": 3,
+      "mainYears": 8,
+      "mainAngleDegrees": 26.666666666666668,
+      "subSequence": [
+        3,
+        4,
+        7,
+        5,
+        8,
+        6,
+        1,
+        2
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 3,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารเสวยอายุตัวเอง",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 1.9753086419753088,
+          "astroDuration": {
+            "years": 0,
+            "months": 7,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 12800
+        },
+        {
+          "mainPlanet": 3,
+          "subPlanet": 4,
+          "titleTh": "พระพุธแทรกพระอังคาร",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 4.197530864197531,
+          "astroDuration": {
+            "years": 1,
+            "months": 3,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 27200
+        },
+        {
+          "mainPlanet": 3,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์แทรกพระอังคาร",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 2.469135802469136,
+          "astroDuration": {
+            "years": 0,
+            "months": 8,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 16000
+        },
+        {
+          "mainPlanet": 3,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯแทรกพระอังคาร",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 4.691358024691358,
+          "astroDuration": {
+            "years": 1,
+            "months": 4,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 30400
+        },
+        {
+          "mainPlanet": 3,
+          "subPlanet": 8,
+          "titleTh": "พระราหูแทรกพระอังคาร",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 2.962962962962963,
+          "astroDuration": {
+            "years": 0,
+            "months": 10,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 19200
+        },
+        {
+          "mainPlanet": 3,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์แทรกพระอังคาร",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 5.185185185185185,
+          "astroDuration": {
+            "years": 1,
+            "months": 6,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 33600
+        },
+        {
+          "mainPlanet": 3,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์แทรกพระอังคาร",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 1.4814814814814814,
+          "astroDuration": {
+            "years": 0,
+            "months": 5,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 9600
+        },
+        {
+          "mainPlanet": 3,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์แทรกพระอังคาร",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 3.7037037037037037,
+          "astroDuration": {
+            "years": 1,
+            "months": 1,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 24000
+        }
+      ]
+    },
+    {
+      "mainPlanet": 4,
+      "mainYears": 17,
+      "mainAngleDegrees": 56.666666666666664,
+      "subSequence": [
+        4,
+        7,
+        5,
+        8,
+        6,
+        1,
+        2,
+        3
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 4,
+          "subPlanet": 4,
+          "titleTh": "พระพุธเสวยอายุตัวเอง",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 8.919753086419753,
+          "astroDuration": {
+            "years": 2,
+            "months": 8,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 57800
+        },
+        {
+          "mainPlanet": 4,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์แทรกพระพุธ",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 5.246913580246913,
+          "astroDuration": {
+            "years": 1,
+            "months": 6,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 34000
+        },
+        {
+          "mainPlanet": 4,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯแทรกพระพุธ",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 9.969135802469134,
+          "astroDuration": {
+            "years": 2,
+            "months": 11,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 64600
+        },
+        {
+          "mainPlanet": 4,
+          "subPlanet": 8,
+          "titleTh": "พระราหูแทรกพระพุธ",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 6.296296296296297,
+          "astroDuration": {
+            "years": 1,
+            "months": 10,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 40800
+        },
+        {
+          "mainPlanet": 4,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์แทรกพระพุธ",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 11.018518518518519,
+          "astroDuration": {
+            "years": 3,
+            "months": 3,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 71400
+        },
+        {
+          "mainPlanet": 4,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์แทรกพระพุธ",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 3.1481481481481484,
+          "astroDuration": {
+            "years": 0,
+            "months": 11,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 20400
+        },
+        {
+          "mainPlanet": 4,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์แทรกพระพุธ",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 7.87037037037037,
+          "astroDuration": {
+            "years": 2,
+            "months": 4,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 51000
+        },
+        {
+          "mainPlanet": 4,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารแทรกพระพุธ",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 4.197530864197531,
+          "astroDuration": {
+            "years": 1,
+            "months": 3,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 27200
+        }
+      ]
+    },
+    {
+      "mainPlanet": 7,
+      "mainYears": 10,
+      "mainAngleDegrees": 33.333333333333336,
+      "subSequence": [
+        7,
+        5,
+        8,
+        6,
+        1,
+        2,
+        3,
+        4
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 7,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์เสวยอายุตัวเอง",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 3.08641975308642,
+          "astroDuration": {
+            "years": 0,
+            "months": 11,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 20000
+        },
+        {
+          "mainPlanet": 7,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯแทรกพระเสาร์",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 5.864197530864198,
+          "astroDuration": {
+            "years": 1,
+            "months": 9,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 38000
+        },
+        {
+          "mainPlanet": 7,
+          "subPlanet": 8,
+          "titleTh": "พระราหูแทรกพระเสาร์",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 3.7037037037037037,
+          "astroDuration": {
+            "years": 1,
+            "months": 1,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 24000
+        },
+        {
+          "mainPlanet": 7,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์แทรกพระเสาร์",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 6.481481481481482,
+          "astroDuration": {
+            "years": 1,
+            "months": 11,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 42000
+        },
+        {
+          "mainPlanet": 7,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์แทรกพระเสาร์",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 1.8518518518518519,
+          "astroDuration": {
+            "years": 0,
+            "months": 6,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 12000
+        },
+        {
+          "mainPlanet": 7,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์แทรกพระเสาร์",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 4.62962962962963,
+          "astroDuration": {
+            "years": 1,
+            "months": 4,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 30000
+        },
+        {
+          "mainPlanet": 7,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารแทรกพระเสาร์",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 2.469135802469136,
+          "astroDuration": {
+            "years": 0,
+            "months": 8,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 16000
+        },
+        {
+          "mainPlanet": 7,
+          "subPlanet": 4,
+          "titleTh": "พระพุธแทรกพระเสาร์",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 5.246913580246915,
+          "astroDuration": {
+            "years": 1,
+            "months": 6,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 34000
+        }
+      ]
+    },
+    {
+      "mainPlanet": 5,
+      "mainYears": 19,
+      "mainAngleDegrees": 63.333333333333336,
+      "subSequence": [
+        5,
+        8,
+        6,
+        1,
+        2,
+        3,
+        4,
+        7
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 5,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯเสวยอายุตัวเอง",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 11.141975308641976,
+          "astroDuration": {
+            "years": 3,
+            "months": 4,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 72200
+        },
+        {
+          "mainPlanet": 5,
+          "subPlanet": 8,
+          "titleTh": "พระราหูแทรกพระพฤหัสฯ",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 7.037037037037037,
+          "astroDuration": {
+            "years": 2,
+            "months": 1,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 45600
+        },
+        {
+          "mainPlanet": 5,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์แทรกพระพฤหัสฯ",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 12.314814814814815,
+          "astroDuration": {
+            "years": 3,
+            "months": 8,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 79800
+        },
+        {
+          "mainPlanet": 5,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์แทรกพระพฤหัสฯ",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 3.5185185185185186,
+          "astroDuration": {
+            "years": 1,
+            "months": 0,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 22800
+        },
+        {
+          "mainPlanet": 5,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์แทรกพระพฤหัสฯ",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 8.796296296296296,
+          "astroDuration": {
+            "years": 2,
+            "months": 7,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 57000
+        },
+        {
+          "mainPlanet": 5,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารแทรกพระพฤหัสฯ",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 4.691358024691358,
+          "astroDuration": {
+            "years": 1,
+            "months": 4,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 30400
+        },
+        {
+          "mainPlanet": 5,
+          "subPlanet": 4,
+          "titleTh": "พระพุธแทรกพระพฤหัสฯ",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 9.969135802469136,
+          "astroDuration": {
+            "years": 2,
+            "months": 11,
+            "days": 26,
+            "minutes": 40
+          },
+          "astroMinutes": 64600
+        },
+        {
+          "mainPlanet": 5,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์แทรกพระพฤหัสฯ",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 5.864197530864198,
+          "astroDuration": {
+            "years": 1,
+            "months": 9,
+            "days": 3,
+            "minutes": 20
+          },
+          "astroMinutes": 38000
+        }
+      ]
+    },
+    {
+      "mainPlanet": 8,
+      "mainYears": 12,
+      "mainAngleDegrees": 40.0,
+      "subSequence": [
+        8,
+        6,
+        1,
+        2,
+        3,
+        4,
+        7,
+        5
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 8,
+          "subPlanet": 8,
+          "titleTh": "พระราหูเสวยอายุตัวเอง",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 4.444444444444445,
+          "astroDuration": {
+            "years": 1,
+            "months": 4,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 28800
+        },
+        {
+          "mainPlanet": 8,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์แทรกพระราหู",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 7.777777777777778,
+          "astroDuration": {
+            "years": 2,
+            "months": 4,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 50400
+        },
+        {
+          "mainPlanet": 8,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์แทรกพระราหู",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 2.2222222222222223,
+          "astroDuration": {
+            "years": 0,
+            "months": 8,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 14400
+        },
+        {
+          "mainPlanet": 8,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์แทรกพระราหู",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 5.555555555555555,
+          "astroDuration": {
+            "years": 1,
+            "months": 8,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 36000
+        },
+        {
+          "mainPlanet": 8,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารแทรกพระราหู",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 2.962962962962963,
+          "astroDuration": {
+            "years": 0,
+            "months": 10,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 19200
+        },
+        {
+          "mainPlanet": 8,
+          "subPlanet": 4,
+          "titleTh": "พระพุธแทรกพระราหู",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 6.296296296296297,
+          "astroDuration": {
+            "years": 1,
+            "months": 10,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 40800
+        },
+        {
+          "mainPlanet": 8,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์แทรกพระราหู",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 3.7037037037037037,
+          "astroDuration": {
+            "years": 1,
+            "months": 1,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 24000
+        },
+        {
+          "mainPlanet": 8,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯแทรกพระราหู",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 7.037037037037037,
+          "astroDuration": {
+            "years": 2,
+            "months": 1,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 45600
+        }
+      ]
+    },
+    {
+      "mainPlanet": 6,
+      "mainYears": 21,
+      "mainAngleDegrees": 70.0,
+      "subSequence": [
+        6,
+        1,
+        2,
+        3,
+        4,
+        7,
+        5,
+        8
+      ],
+      "subperiods": [
+        {
+          "mainPlanet": 6,
+          "subPlanet": 6,
+          "titleTh": "พระศุกร์เสวยอายุตัวเอง",
+          "weight": 21,
+          "shareOfParentPercent": 19.444444444444443,
+          "angleDegrees": 13.61111111111111,
+          "astroDuration": {
+            "years": 4,
+            "months": 1,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 88200
+        },
+        {
+          "mainPlanet": 6,
+          "subPlanet": 1,
+          "titleTh": "พระอาทิตย์แทรกพระศุกร์",
+          "weight": 6,
+          "shareOfParentPercent": 5.555555555555555,
+          "angleDegrees": 3.888888888888889,
+          "astroDuration": {
+            "years": 1,
+            "months": 2,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 25200
+        },
+        {
+          "mainPlanet": 6,
+          "subPlanet": 2,
+          "titleTh": "พระจันทร์แทรกพระศุกร์",
+          "weight": 15,
+          "shareOfParentPercent": 13.88888888888889,
+          "angleDegrees": 9.722222222222221,
+          "astroDuration": {
+            "years": 2,
+            "months": 11,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 63000
+        },
+        {
+          "mainPlanet": 6,
+          "subPlanet": 3,
+          "titleTh": "พระอังคารแทรกพระศุกร์",
+          "weight": 8,
+          "shareOfParentPercent": 7.407407407407407,
+          "angleDegrees": 5.185185185185185,
+          "astroDuration": {
+            "years": 1,
+            "months": 6,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 33600
+        },
+        {
+          "mainPlanet": 6,
+          "subPlanet": 4,
+          "titleTh": "พระพุธแทรกพระศุกร์",
+          "weight": 17,
+          "shareOfParentPercent": 15.74074074074074,
+          "angleDegrees": 11.018518518518519,
+          "astroDuration": {
+            "years": 3,
+            "months": 3,
+            "days": 20,
+            "minutes": 0
+          },
+          "astroMinutes": 71400
+        },
+        {
+          "mainPlanet": 6,
+          "subPlanet": 7,
+          "titleTh": "พระเสาร์แทรกพระศุกร์",
+          "weight": 10,
+          "shareOfParentPercent": 9.25925925925926,
+          "angleDegrees": 6.481481481481482,
+          "astroDuration": {
+            "years": 1,
+            "months": 11,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 42000
+        },
+        {
+          "mainPlanet": 6,
+          "subPlanet": 5,
+          "titleTh": "พระพฤหัสฯแทรกพระศุกร์",
+          "weight": 19,
+          "shareOfParentPercent": 17.59259259259259,
+          "angleDegrees": 12.314814814814815,
+          "astroDuration": {
+            "years": 3,
+            "months": 8,
+            "days": 10,
+            "minutes": 0
+          },
+          "astroMinutes": 79800
+        },
+        {
+          "mainPlanet": 6,
+          "subPlanet": 8,
+          "titleTh": "พระราหูแทรกพระศุกร์",
+          "weight": 12,
+          "shareOfParentPercent": 11.11111111111111,
+          "angleDegrees": 7.777777777777778,
+          "astroDuration": {
+            "years": 2,
+            "months": 4,
+            "days": 0,
+            "minutes": 0
+          },
+          "astroMinutes": 50400
+        }
+      ]
+    }
+  ]
+}

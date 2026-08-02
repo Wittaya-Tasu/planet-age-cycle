@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "1.1.0",
+  "defaultLocale": "th-TH",
+  "supportedLocales": [
+    "th-TH"
+  ],
+  "timeZone": "Asia/Bangkok",
+  "timeZoneOffsetMinutes": 420,
+  "cycleAfter108Years": "repeat",
+  "calendarPolicy": {
+    "mainPeriod": "calendar-year-anniversary",
+    "subPeriod": "proportional-real-duration-within-parent",
+    "leapDayBirth": {
+      "policy": "clamp-to-february-28-in-non-leap-years",
+      "anchorToOriginalBirthDate": true,
+      "noticeTh": "ผู้เกิดวันที่ 29 กุมภาพันธ์: ในปีที่ไม่มีวันที่ 29 กุมภาพันธ์ ระบบจะใช้วันที่ 28 กุมภาพันธ์ เวลาเดิมเป็นวันครบรอบชั่วคราว และจะกลับไปใช้วันที่ 29 กุมภาพันธ์ในปีอธิกสุรทิน"
+    }
+  },
+  "predictionDisplay": {
+    "primaryFields": [
+      "titleTh",
+      "summaryTh",
+      "effects",
+      "severity"
+    ],
+    "detailsOnDemand": true,
+    "showEnglish": false
+  },
+  "features": {
+    "multipleProfiles": true,
+    "localStorageEngine": "IndexedDB",
+    "backupJson": true,
+    "importJson": true,
+    "timeline": true,
+    "calendarView": true,
+    "notifications": true,
+    "darkMode": true,
+    "pwa": true,
+    "installPrompt": true,
+    "english": false,
+    "aiExplanation": false
+  }
+}

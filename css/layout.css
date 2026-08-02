@@ -716,3 +716,117 @@ footer {
   background: #fff0f1;
   font-weight: 700;
 }
+
+/* v0.3.0 — เวลาเกิด คำพยากรณ์ และช่วงปฏิทินจริง */
+.time-fieldset {
+  gap: 10px;
+}
+
+.time-inputs {
+  display: grid;
+  grid-template-columns: minmax(90px, 1fr) auto minmax(90px, 1fr);
+  align-items: end;
+  gap: 9px;
+  max-width: 280px;
+}
+
+.time-inputs > span {
+  padding-bottom: 12px;
+  color: var(--color-muted);
+  font-weight: 800;
+}
+
+.target-time-inputs {
+  margin-top: 10px;
+}
+
+.leap-day-notice {
+  margin-top: 8px;
+  padding: 11px 13px;
+  border: 1px solid rgba(182, 138, 58, 0.3);
+  border-radius: 12px;
+  color: #6c4a12;
+  background: rgba(255, 241, 199, 0.58);
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.compact-notice {
+  margin-top: 14px;
+}
+
+.period-date-list {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-line);
+}
+
+.prediction-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 16px;
+}
+
+.prediction-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.relation-good,
+.effect-good {
+  color: #1f603f;
+  background: rgba(46, 111, 78, 0.13);
+}
+
+.relation-bad,
+.effect-bad {
+  color: #8d1f28;
+  background: rgba(165, 29, 39, 0.12);
+}
+
+.effect-mixed {
+  color: #6b4d0b;
+  background: rgba(224, 173, 25, 0.2);
+}
+
+.prediction-summary {
+  margin-top: 16px;
+  padding: 14px;
+  border-left: 4px solid var(--detail-color, var(--color-accent));
+  border-radius: 0 12px 12px 0;
+  color: var(--color-ink);
+  background: rgba(255, 253, 249, 0.72);
+  line-height: 1.75;
+}
+
+.prediction-detail-section {
+  margin-top: 16px;
+}
+
+.prediction-detail-section h3 {
+  margin-bottom: 7px;
+  color: var(--color-accent);
+  font-size: 0.9rem;
+}
+
+.prediction-detail-section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+.prediction-disclaimer {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-line);
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
