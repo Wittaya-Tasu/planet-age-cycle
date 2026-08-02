@@ -6,6 +6,7 @@ import {
   mixWithWhite,
   polarToCartesian,
 } from "../core/geometry.js";
+import { getRelationBadge } from "../core/relations.js";
 import { getSegmentAriaLabel } from "../utils/format.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -15,9 +16,11 @@ const RADII = Object.freeze({
   center: 190,
   mainInner: 196,
   mainOuter: 295,
+  mainRelation: 276,
   journey: 298,
   subInner: 301,
   subOuter: 382,
+  subRelation: 342,
 });
 
 function svgElement(name, attributes = {}) {
@@ -151,72 +154,105 @@ function createJourneyOverlay(journey) {
   const currentHalo = svgElement("circle", {
     cx: currentPosition.x,
     cy: currentPosition.y,
-    r: 10,
+    r: 14,
     class: "journey-current-halo",
   });
-  const currentDot = svgElement("circle", {
-    cx: currentPosition.x,
-    cy: currentPosition.y,
-    r: 5.5,
-    class: "journey-dot journey-current-dot",
+  const currentArrow = svgElement("path", {
+    d: "M -10 -7 L 10 0 L -10 7 Z",
+    transform: `translate(${currentPosition.x} ${currentPosition.y}) rotate(${journey.currentAngle + 90})`,
+    class: "journey-current-arrow",
   });
   const startTitle = svgElement("title");
   const currentTitle = svgElement("title");
 
   startTitle.textContent = `จุดเริ่มวัน${journey.birthDay.label}`;
   currentTitle.textContent =
-    `ตำแหน่งอายุ ${journey.age.years} ปี ${journey.age.months} เดือน ${journey.age.days} วัน`;
+    `ทิศทางและตำแหน่งอายุ ${journey.age.years} ปี ${journey.age.months} เดือน ${journey.age.days} วัน`;
   startDot.append(startTitle);
-  currentDot.append(currentTitle);
-  group.append(path, startDot, currentHalo, currentDot);
+  currentArrow.append(currentTitle);
+  group.append(path, startDot, currentHalo, currentArrow);
 
   return group;
 }
 
-function createMainLabel(segment) {
+function createMainLabel(segment, birthDay) {
   const midAngle = getMidAngle(segment.startAngle, segment.endAngle);
   const position = getLabelPosition(CENTER, CENTER, 247, midAngle);
-  const text = svgElement("text", {
+  const group = svgElement("g", {
+    class: "main-label-group",
+    "aria-hidden": "true",
+  });
+  const numberY = position.y - 3;
+
+  if (segment.mainNumber === birthDay.planetNumber) {
+    group.append(
+      svgElement("circle", {
+        cx: position.x,
+        cy: numberY - 10,
+        r: 20,
+        class: "birth-start-ring",
+      }),
+    );
+  }
+
+  const number = svgElement("text", {
     x: position.x,
-    y: position.y - 3,
-    class: "wheel-label",
+    y: numberY,
+    class: "wheel-label main-label-number",
     style: `--label-color: ${segment.mainPlanet.labelColor}`,
   });
-  const number = svgElement("tspan", {
+  const name = svgElement("text", {
     x: position.x,
-    dy: 0,
-    class: "main-label-number",
-  });
-  const name = svgElement("tspan", {
-    x: position.x,
-    dy: 18,
-    class: "main-label-name",
+    y: position.y + 16,
+    class: "wheel-label main-label-name",
+    style: `--label-color: ${segment.mainPlanet.labelColor}`,
   });
 
   number.textContent = segment.mainPlanet.number;
   name.textContent = segment.mainPlanet.shortName;
-  text.append(number, name);
-  return text;
+  group.append(number, name);
+  return group;
 }
 
-function createSubLabel(segment) {
-  const midAngle = getMidAngle(segment.startAngle, segment.endAngle);
-  const position = getLabelPosition(CENTER, CENTER, 342, midAngle);
+function createRelationMarker(relation, position, size, variant) {
+  if (!relation) return null;
+
+  const group = svgElement("g", {
+    class: `relation-marker relation-marker-${relation.status} relation-marker-${variant}`,
+    transform: `translate(${position.x} ${position.y})`,
+    "aria-hidden": "true",
+  });
+  const shape = svgElement("circle", {
+    cx: 0,
+    cy: 0,
+    r: size,
+    class: "relation-marker-shape",
+  });
   const text = svgElement("text", {
-    x: position.x,
-    y: position.y + 5,
-    class: "wheel-label sub-label",
-    style: `--label-color: ${segment.mainPlanet.labelColor}`,
+    x: 0,
+    y: relation.status === "good" ? 5 : 5,
+    class: "relation-marker-text",
   });
 
-  text.textContent = segment.subPlanet.number;
-  return text;
+  text.textContent = relation.status === "good" ? "✓" : "!";
+  group.append(shape, text);
+  return group;
 }
 
-function bindInteractions(group, segment, handlers) {
+function relationForPlanet(context, planetNumber) {
+  if (!context.relationsData || !context.birthDayType) return null;
+  return getRelationBadge(
+    context.relationsData,
+    context.birthDayType,
+    planetNumber,
+  );
+}
+
+function bindInteractions(group, segment, handlers, relation = null) {
+  const relationText = relation ? ` · ความสัมพันธ์${relation.labelTh}` : "";
   group.setAttribute("role", "button");
   group.setAttribute("tabindex", "0");
-  group.setAttribute("aria-label", getSegmentAriaLabel(segment));
+  group.setAttribute("aria-label", `${getSegmentAriaLabel(segment)}${relationText}`);
   group.setAttribute("aria-pressed", "false");
   group.dataset.segmentKey = segment.key;
 
@@ -237,9 +273,11 @@ function bindInteractions(group, segment, handlers) {
   });
 }
 
-function createMainSegment(segment, handlers, journey) {
+function createMainSegment(segment, handlers, context) {
+  const { journey, birthDay } = context;
   const currentClass =
     segment.key === journey.activeMain.key ? " is-current-main" : "";
+  const relation = relationForPlanet(context, segment.mainNumber);
   const group = svgElement("g", {
     class: `wheel-segment main-segment${currentClass}`,
   });
@@ -254,16 +292,31 @@ function createMainSegment(segment, handlers, journey) {
     ),
     fill: segment.mainPlanet.color,
   });
+  const relationPosition = getLabelPosition(
+    CENTER,
+    CENTER,
+    RADII.mainRelation,
+    getMidAngle(segment.startAngle, segment.endAngle),
+  );
+  const relationMarker = createRelationMarker(
+    relation,
+    relationPosition,
+    11,
+    "main",
+  );
 
-  bindInteractions(group, segment, handlers);
-  group.append(path, createMainLabel(segment));
+  bindInteractions(group, segment, handlers, relation);
+  group.append(path, createMainLabel(segment, birthDay));
+  if (relationMarker) group.append(relationMarker);
   return group;
 }
 
-function createSubSegment(segment, index, handlers, journey) {
+function createSubSegment(segment, index, handlers, context) {
+  const { journey } = context;
   const tightClass = segment.angle < 4.2 ? " is-tight" : "";
   const currentClass =
     segment.key === journey.activeSub.key ? " is-current-sub" : "";
+  const relation = relationForPlanet(context, segment.subNumber);
   const group = svgElement("g", {
     class: `wheel-segment sub-segment${tightClass}${currentClass}`,
   });
@@ -279,9 +332,22 @@ function createSubSegment(segment, index, handlers, journey) {
     ),
     fill: mixWithWhite(segment.mainPlanet.color, lightRatio),
   });
+  const relationPosition = getLabelPosition(
+    CENTER,
+    CENTER,
+    RADII.subRelation,
+    getMidAngle(segment.startAngle, segment.endAngle),
+  );
+  const relationMarker = createRelationMarker(
+    relation,
+    relationPosition,
+    segment.angle < 4.2 ? 7.5 : 9,
+    "sub",
+  );
 
-  bindInteractions(group, segment, handlers);
-  group.append(path, createSubLabel(segment));
+  bindInteractions(group, segment, handlers, relation);
+  group.append(path);
+  if (relationMarker) group.append(relationMarker);
   return group;
 }
 
@@ -300,13 +366,13 @@ export function renderWheel(container, model, handlers, context) {
 
   title.textContent = "วงแหวนพระเคราะห์เสวยอายุ";
   description.textContent =
-    `จุดเริ่มวัน${birthDay.label} เส้นประแสดงการเดินทางตามอายุ ` +
+    `จุดเริ่มวัน${birthDay.label} เส้นประและลูกศรแสดงการเดินทางตามอายุ ` +
     `${age.years} ปี ${age.months} เดือน ${age.days} วัน`;
 
   model.mainSegments.forEach((segment) => {
-    mainGroup.append(createMainSegment(segment, handlers, journey));
+    mainGroup.append(createMainSegment(segment, handlers, context));
     segment.subSegments.forEach((subSegment, index) => {
-      subGroup.append(createSubSegment(subSegment, index, handlers, journey));
+      subGroup.append(createSubSegment(subSegment, index, handlers, context));
     });
   });
 

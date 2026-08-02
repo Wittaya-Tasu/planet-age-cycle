@@ -1,7 +1,6 @@
 import {
   formatDuration,
   formatMainDuration,
-  formatPercentage,
   getSegmentTitle,
 } from "../utils/format.js";
 
@@ -12,8 +11,8 @@ function setContent(element, segment) {
   title.textContent = getSegmentTitle(segment);
   detail.textContent =
     segment.type === "main"
-      ? `แถบหลัก · ${formatMainDuration(segment.mainPlanet.years)} · ${formatPercentage(segment.percentageOfCycle)} ของวงจร`
-      : `${formatDuration(segment.duration)} · ${formatPercentage(segment.percentageOfMain)} ของแถบหลัก`;
+      ? `แถบหลัก · ${formatMainDuration(segment.mainPlanet.years)}`
+      : formatDuration(segment.duration);
 
   element.replaceChildren(title, detail);
 }

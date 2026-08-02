@@ -6,6 +6,7 @@ import { validateWheelModel } from "../js/utils/validation.js";
 import { loadPlanetAgeData } from "../js/data/loadData.js";
 import { buildCycle, findCurrentPeriod, validateCycleGeometry } from "../js/core/periodCalculator.js";
 import { bangkokPartsToEpochMs, birthdayAnniversaryEpochMs } from "../js/core/calendar.js";
+import { getPlanetRelation } from "../js/core/relations.js";
 
 const model = buildWheelModel();
 const validation = validateWheelModel(model);
@@ -30,6 +31,12 @@ assert.equal(datasets.predictionsData.predictions.find((p) => p.id === "4-3").so
 assert.equal(datasets.predictionsData.predictions.find((p) => p.id === "4-3").sourceDuration.minutes, 20);
 assert.equal(datasets.relationsData.unspecifiedBehavior, "hide");
 
+assert.equal(getPlanetRelation(datasets.relationsData, "sunday", 5), "good");
+assert.equal(getPlanetRelation(datasets.relationsData, "sunday", 3), "bad");
+assert.equal(getPlanetRelation(datasets.relationsData, "sunday", 2), null);
+assert.equal(getPlanetRelation(datasets.relationsData, "wednesday-night", 7), "good");
+assert.equal(getPlanetRelation(datasets.relationsData, "saturday", 6), "bad");
+
 const profile = {
   birthDayType: "saturday",
   birth: { yearBE: 2527, month: 4, day: 21, hour: 1, minute: 49 },
@@ -53,11 +60,30 @@ assert.ok(result.current.startEpochMs <= target && target < result.current.endEp
 assert.ok(result.next);
 
 const sw = await readFile(`${root}sw.js`, "utf8");
-assert.match(sw, /planet-age-cycle-v0\.3\.0/);
+assert.match(sw, /planet-age-cycle-v0\.4\.0/);
 assert.match(sw, /data\/predictions\.json/);
+assert.match(sw, /js\/core\/exportImage\.js/);
+
+
+const wheelSource = await readFile(`${root}js/components/wheel.js`, "utf8");
+const tooltipSource = await readFile(`${root}js/components/tooltip.js`, "utf8");
+const detailSource = await readFile(`${root}js/components/detail-panel.js`, "utf8");
+const indexSource = await readFile(`${root}index.html`, "utf8");
+const exportSource = await readFile(`${root}js/core/exportImage.js`, "utf8");
+
+assert.doesNotMatch(wheelSource, /text\.textContent\s*=\s*segment\.subPlanet\.number/);
+assert.match(wheelSource, /relation-marker/);
+assert.match(wheelSource, /birth-start-ring/);
+assert.match(wheelSource, /journey-current-arrow/);
+assert.doesNotMatch(tooltipSource, /formatPercentage/);
+assert.doesNotMatch(detailSource, /สัดส่วนในแถบหลัก/);
+assert.match(indexSource, /id="save-image-button"/);
+assert.match(exportSource, /saveDashboardImage/);
 
 console.log("✓ วงแหวน 8 แถบหลักและ 64 แถบย่อยถูกต้อง");
 console.log("✓ คำพยากรณ์ 64 ช่องและข้อมูลพระอังคารแทรกพระพุธถูกต้อง");
 console.log("✓ ปฏิทินจริงและนโยบาย 29 กุมภาพันธ์ถูกต้อง");
 console.log("✓ แถบย่อยปิดพอดีกับแถบหลักทุกกลุ่ม");
-console.log("✓ Offline cache v0.3.0 ครบข้อมูลคำพยากรณ์");
+console.log("✓ สัญลักษณ์ดี/ไม่ดี จุดเริ่ม และลูกศรแสดงผลตามข้อกำหนด");
+console.log("✓ Tooltip และแผงรายละเอียดไม่แสดงสัดส่วนที่ตัดออก");
+console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.4.0 พร้อมใช้งาน");

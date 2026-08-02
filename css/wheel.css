@@ -105,6 +105,52 @@
   display: none;
 }
 
+
+.main-label-group,
+.relation-marker {
+  pointer-events: none;
+}
+
+.birth-start-ring {
+  fill: none;
+  stroke: #fffdf8;
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 1px 2px rgba(30, 20, 15, 0.75));
+}
+
+.relation-marker-shape {
+  stroke: #fffdf8;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 2px 3px rgba(42, 27, 18, 0.28));
+}
+
+.relation-marker-good .relation-marker-shape {
+  fill: #248653;
+}
+
+.relation-marker-bad .relation-marker-shape {
+  fill: #b4232e;
+}
+
+.relation-marker-text {
+  fill: #fff;
+  stroke: none;
+  text-anchor: middle;
+  font-family: "Sarabun", sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.relation-marker-sub .relation-marker-text {
+  font-size: 12px;
+}
+
+.relation-marker-sub.relation-marker-bad .relation-marker-text {
+  font-size: 13px;
+}
+
 .center-disc {
   fill: #fffaf1;
   stroke: rgba(111, 29, 27, 0.15);
@@ -189,10 +235,12 @@
   stroke: none;
 }
 
-.journey-current-dot {
+.journey-current-arrow {
   fill: var(--color-journey);
   stroke: #fffaf1;
-  stroke-width: 2;
+  stroke-width: 1.8;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 2px 3px rgba(53, 31, 17, 0.35));
 }
 

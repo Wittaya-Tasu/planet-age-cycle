@@ -4,6 +4,7 @@ import { bangkokPartsToEpochMs, buddhistToGregorian, formatThaiDateTime } from "
 import { createCalendarJourneyState } from "./core/calendarJourney.js";
 import { findCurrentPeriod } from "./core/periodCalculator.js";
 import { getPrediction } from "./core/predictionLookup.js";
+import { saveDashboardImage } from "./core/exportImage.js";
 import { decoratePeriodRelations } from "./core/relations.js";
 import { loadPlanetAgeData } from "./data/loadData.js";
 import { initializeBirthForm, readProfileForm, resetBirthForm, setTargetToToday, writeProfileForm } from "./components/birth-form.js";
@@ -27,6 +28,7 @@ const birthFormTitle = document.querySelector("#birth-form-title");
 const formError = document.querySelector("#form-error");
 const leapDayNotice = document.querySelector("#leap-day-form-notice");
 const cancelEditButton = document.querySelector("#cancel-edit-button");
+const saveImageButton = document.querySelector("#save-image-button");
 const editProfileButton = document.querySelector("#edit-profile-button");
 const resetButton = document.querySelector("#reset-button");
 const todayButton = document.querySelector("#today-button");
@@ -168,7 +170,13 @@ function renderProfile(profile) {
     onPreview: (segment, source) => tooltip.show(segment, source),
     onPointerMove: (event) => tooltip.move(event),
     onPreviewEnd: () => tooltip.hide(),
-  }, { age: periodResult.currentAge, birthDay, journey });
+  }, {
+    age: periodResult.currentAge,
+    birthDay,
+    journey,
+    relationsData: datasets.relationsData,
+    birthDayType: currentProfile.birthWeekday,
+  });
 
   renderJourneySummary(journeySummary, journey);
   selectSegment(journey.activeSub);
@@ -249,6 +257,29 @@ birthForm.addEventListener("submit", (event) => {
 });
 
 todayButton.addEventListener("click", () => setTargetToToday(birthForm));
+saveImageButton.addEventListener("click", async () => {
+  if (!currentProfile || !currentJourney) return;
+
+  const originalText = saveImageButton.textContent;
+  saveImageButton.disabled = true;
+  saveImageButton.textContent = "กำลังสร้างภาพ…";
+
+  try {
+    await saveDashboardImage({
+      wheelContainer,
+      journeySummary,
+      detailPanel,
+      profileBirthText: profileBirth.textContent,
+      profileTargetText: profileTarget.textContent,
+    });
+  } catch (error) {
+    console.error("[Save Dashboard Image]", error);
+    window.alert(error instanceof Error ? error.message : "ไม่สามารถบันทึกภาพได้");
+  } finally {
+    saveImageButton.disabled = false;
+    saveImageButton.textContent = originalText;
+  }
+});
 editProfileButton.addEventListener("click", showEditScreen);
 cancelEditButton.addEventListener("click", cancelEdit);
 resetButton.addEventListener("click", () => {

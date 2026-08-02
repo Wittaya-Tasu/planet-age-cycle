@@ -327,7 +327,25 @@
 
 .profile-actions {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 7px;
+}
+
+.save-image-button {
+  border-color: rgba(46, 111, 78, 0.24);
+  color: var(--color-success);
+  background: rgba(242, 252, 246, 0.82);
+}
+
+.save-image-button:hover {
+  border-color: rgba(46, 111, 78, 0.42);
+  background: #f3fff8;
+}
+
+.save-image-button:disabled {
+  cursor: wait;
+  opacity: 0.62;
 }
 
 .visualization-layout {

@@ -72,7 +72,6 @@ export function renderDetailPanel(container, segment = null, options = {}) {
       createRow("แถบหลัก", segment.mainPlanet.name),
       createRow("แถบย่อย", segment.subPlanet.name),
       createRow("ระยะเวลา", formatDuration(segment.duration)),
-      createRow("สัดส่วนในแถบหลัก", formatPercentage(segment.percentageOfMain)),
     );
   }
 

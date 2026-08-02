@@ -3,7 +3,7 @@
   "language": "th",
   "source": {
     "fileName": "เสวยอายุ(1).docx",
-    "contentEntriesFound": 63,
+    "contentEntriesFound": 64,
     "expectedEntries": 64
   },
   "normalization": {
@@ -22,9 +22,7 @@
       "พระอังคารเสวยอายุตัวเองที่ซ้ำท้ายหมวดพระจันทร์",
       "พระเสาร์เสวยอายุตัวเองและพระพฤหัสแทรกพระเสาร์ที่ซ้ำท้ายหมวดพระพุธ"
     ],
-    "missingSourceEntries": [
-      "8-4 พระพุธแทรกพระราหู"
-    ],
+    "missingSourceEntries": [],
     "effectValues": [
       "good",
       "bad",
@@ -1880,25 +1878,33 @@
       "mainPlanet": 8,
       "subPlanet": 4,
       "titleTh": "พระพุธแทรกพระราหู",
+      "sourceHeading": "พระพุธแทรกพระราหู",
       "sourceDuration": {
         "years": 1,
         "months": 10,
         "days": 20,
         "minutes": 0
       },
-      "contentStatus": "missing-source",
-      "effect": "unknown",
-      "effects": [],
-      "severity": null,
-      "severityMethod": null,
-      "summaryTh": null,
-      "sourceSummaryTh": null,
+      "contentStatus": "source-transcribed",
+      "effect": "mixed",
+      "effects": [
+        "good",
+        "bad"
+      ],
+      "severity": "medium",
+      "severityMethod": "manual-reviewed",
+      "summaryTh": "จะได้ลาภเงินทอง แต่ภายหลังศัตรูจะใส่โทษกล่าวโทษ และจะเสียทรัพย์",
+      "sourceSummaryTh": "จะได้ลาภเงินทอง แต่ภายหลังศัตรูจะใส่โทษกล่าวโทษ และจะเสียทรัพย์",
       "details": {
-        "prediction": [],
+        "prediction": [
+          "จะได้ลาภเงินทอง แต่ภายหลังศัตรูจะใส่โทษกล่าวโทษ และจะเสียทรัพย์"
+        ],
         "caution": [],
         "luck": [],
         "luckDirection": [],
-        "remedy": []
+        "remedy": [
+          "บูชาพระพุธกับพระราหูจะบรรเทาลง"
+        ]
       }
     },
     {
