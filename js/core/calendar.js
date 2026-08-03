@@ -167,6 +167,39 @@ export function calendarDifference(startEpochMs, endEpochMs) {
   return { years, months, days, hours, minutes };
 }
 
+
+export const THAI_MONTH_ABBREVIATIONS = Object.freeze([
+  "ม.ค.",
+  "ก.พ.",
+  "มี.ค.",
+  "เม.ย.",
+  "พ.ค.",
+  "มิ.ย.",
+  "ก.ค.",
+  "ส.ค.",
+  "ก.ย.",
+  "ต.ค.",
+  "พ.ย.",
+  "ธ.ค.",
+]);
+
+export function formatThaiShortDateTime(
+  epochMs,
+  { includeTime = true } = {},
+) {
+  const parts = epochMsToBangkokParts(epochMs);
+  const dateText =
+    `${parts.day} ` +
+    `${THAI_MONTH_ABBREVIATIONS[parts.month - 1]} ` +
+    `${gregorianToBuddhist(parts.year)}`;
+
+  if (!includeTime) return dateText;
+
+  const hour = String(parts.hour).padStart(2, "0");
+  const minute = String(parts.minute).padStart(2, "0");
+  return `${dateText} ${hour}:${minute} น.`;
+}
+
 export function formatThaiDateTime(epochMs, { includeTime = true } = {}) {
   const options = {
     timeZone: "Asia/Bangkok",

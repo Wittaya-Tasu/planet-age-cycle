@@ -1,6 +1,11 @@
 import { buildWheelModel } from "./core/angles.js";
 import { calculateCalendarAge, createCivilDate } from "./core/age.js";
-import { bangkokPartsToEpochMs, buddhistToGregorian, formatThaiDateTime } from "./core/calendar.js";
+import {
+  bangkokPartsToEpochMs,
+  buddhistToGregorian,
+  calendarDifference,
+  formatThaiDateTime,
+} from "./core/calendar.js";
 import { createCalendarJourneyState } from "./core/calendarJourney.js";
 import { findCurrentPeriod } from "./core/periodCalculator.js";
 import { getPrediction } from "./core/predictionLookup.js";
@@ -104,6 +109,8 @@ function selectSegment(segment) {
   selectedSegment = segment ?? currentJourney.activeSub;
   wheelController.setSelected(selectedSegment);
   const period = periodForSegment(selectedSegment);
+  const isCurrent =
+    selectedSegment.key === currentJourney.activeSub.key;
   const prediction = selectedSegment.type === "sub"
     ? getPrediction(datasets.predictionsData, selectedSegment.mainNumber, selectedSegment.subNumber)
     : null;
@@ -111,9 +118,25 @@ function selectSegment(segment) {
     ? decoratePeriodRelations(datasets.relationsData, currentProfile.birthWeekday, period)
     : null;
 
+  const progress =
+    isCurrent && period
+      ? {
+          fraction: currentJourney.subProgress,
+          elapsed: calendarDifference(
+            period.startEpochMs,
+            currentJourney.targetEpochMs,
+          ),
+          remaining: calendarDifference(
+            currentJourney.targetEpochMs,
+            period.endEpochMs,
+          ),
+        }
+      : null;
+
   renderDetailPanel(detailPanel, selectedSegment, {
-    isCurrent: selectedSegment.key === currentJourney.activeSub.key,
+    isCurrent,
     period,
+    progress,
     prediction,
     mainRelation: relations?.mainRelation,
     subRelation: relations?.subRelation,
@@ -152,8 +175,31 @@ function renderProfile(profile) {
   const age = calculateCalendarAge(birthDate, targetDate);
   const targetMs = targetEpoch(profile);
   const calculationProfile = toCalculationProfile(profile);
-  const periodResult = findCurrentPeriod(calculationProfile, targetMs, datasets);
-  const journey = createCalendarJourneyState(model, birthDay, periodResult, targetMs);
+  const periodResult = findCurrentPeriod(
+    calculationProfile,
+    targetMs,
+    datasets,
+  );
+
+  const profileModel = buildWheelModel(
+    birthDay.planetNumber,
+  );
+  const profileValidation = validateWheelModel(
+    profileModel,
+  );
+  if (!profileValidation.valid) {
+    throw new Error(
+      profileValidation.errors.join(" · "),
+    );
+  }
+
+  model = profileModel;
+  const journey = createCalendarJourneyState(
+    model,
+    birthDay,
+    periodResult,
+    targetMs,
+  );
 
   currentProfile = profile;
   currentJourney = journey;
@@ -164,6 +210,12 @@ function renderProfile(profile) {
   supportButton.hidden = false;
   profileBirth.textContent = `วัน${birthDay.label} · ${formatThaiDate(profile.birthDate)} · ${String(profile.birthTime.hour).padStart(2, "0")}:${String(profile.birthTime.minute).padStart(2, "0")} น.`;
   profileTarget.textContent = `${formatThaiDateTime(targetMs)} · อายุ ${formatCalendarAge(age)}`;
+
+  renderLegend(
+    legendContainer,
+    model.mainSegments,
+    selectSegment,
+  );
 
   wheelController = renderWheel(wheelContainer, model, {
     onSelect: selectSegment,

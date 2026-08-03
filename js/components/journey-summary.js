@@ -1,4 +1,7 @@
-import { formatThaiDateTime, formatDurationTh } from "../core/calendar.js";
+import {
+  formatDurationTh,
+  formatThaiShortDateTime,
+} from "../core/calendar.js";
 
 function createSummaryRow(label, value) {
   const row = document.createElement("div");
@@ -27,8 +30,8 @@ export function renderJourneySummary(container, journey) {
 
   rows.append(
     createSummaryRow("แถบหลัก", journey.activeMain.mainPlanet.name),
-    createSummaryRow("เริ่มช่วงนี้", formatThaiDateTime(periodResult.current.startEpochMs)),
-    createSummaryRow("สิ้นสุดช่วงนี้", formatThaiDateTime(periodResult.current.endEpochMs)),
+    createSummaryRow("เริ่มช่วงนี้", formatThaiShortDateTime(periodResult.current.startEpochMs)),
+    createSummaryRow("สิ้นสุดช่วงนี้", formatThaiShortDateTime(periodResult.current.endEpochMs)),
     createSummaryRow("เวลาที่เหลือ", formatDurationTh(periodResult.remaining)),
     createSummaryRow("ช่วงถัดไป", periodResult.next.titleTh),
   );

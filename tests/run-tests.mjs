@@ -5,7 +5,11 @@ import { buildWheelModel } from "../js/core/angles.js";
 import { validateWheelModel } from "../js/utils/validation.js";
 import { loadPlanetAgeData } from "../js/data/loadData.js";
 import { buildCycle, findCurrentPeriod, validateCycleGeometry } from "../js/core/periodCalculator.js";
-import { bangkokPartsToEpochMs, birthdayAnniversaryEpochMs } from "../js/core/calendar.js";
+import {
+  bangkokPartsToEpochMs,
+  birthdayAnniversaryEpochMs,
+  formatThaiShortDateTime,
+} from "../js/core/calendar.js";
 import {
   getActiveSegmentRelationBadge,
   getPlanetRelation,
@@ -16,6 +20,20 @@ const validation = validateWheelModel(model);
 assert.equal(validation.valid, true, validation.errors.join("\n"));
 assert.equal(model.mainSegments.length, 8);
 assert.equal(model.subSegments.length, 64);
+
+assert.deepEqual(
+  buildWheelModel(7).mainSegments.map(
+    (segment) => segment.mainNumber,
+  ),
+  [7, 5, 8, 6, 1, 2, 3, 4],
+);
+assert.equal(buildWheelModel(7).mainSegments[0].startAngle, -90);
+assert.deepEqual(
+  buildWheelModel(6).mainSegments.map(
+    (segment) => segment.mainNumber,
+  ),
+  [6, 1, 2, 3, 4, 7, 5, 8],
+);
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const readJson = async (name) => JSON.parse(await readFile(`${root}data/${name}`, "utf8"));
@@ -128,7 +146,7 @@ assert.ok(result.current.startEpochMs <= target && target < result.current.endEp
 assert.ok(result.next);
 
 const sw = await readFile(`${root}sw.js`, "utf8");
-assert.match(sw, /planet-age-cycle-v0\.4\.2/);
+assert.match(sw, /planet-age-cycle-v0\.5\.0/);
 assert.match(sw, /data\/predictions\.json/);
 assert.match(sw, /js\/core\/exportImage\.js/);
 
@@ -138,10 +156,16 @@ const tooltipSource = await readFile(`${root}js/components/tooltip.js`, "utf8");
 const detailSource = await readFile(`${root}js/components/detail-panel.js`, "utf8");
 const indexSource = await readFile(`${root}index.html`, "utf8");
 const exportSource = await readFile(`${root}js/core/exportImage.js`, "utf8");
+const appSource = await readFile(`${root}js/app.js`, "utf8");
+const summarySource = await readFile(
+  `${root}js/components/journey-summary.js`,
+  "utf8",
+);
+const layoutSource = await readFile(`${root}css/layout.css`, "utf8");
 
 assert.doesNotMatch(wheelSource, /text\.textContent\s*=\s*segment\.subPlanet\.number/);
 assert.match(wheelSource, /relation-marker/);
-assert.match(wheelSource, /birth-start-ring/);
+assert.doesNotMatch(wheelSource, /birth-start-ring/);
 assert.match(wheelSource, /journey-current-arrow/);
 assert.match(wheelSource, /subRelation:\s*398/);
 assert.match(wheelSource, /relation-marker-leader/);
@@ -156,12 +180,36 @@ assert.match(detailSource, /options\.period && !isCurrentSub/);
 assert.match(indexSource, /id="save-image-button"/);
 assert.ok(indexSource.indexOf('id="journey-summary"') < indexSource.indexOf('id="detail-panel"'));
 assert.match(exportSource, /saveDashboardImage/);
+assert.match(
+  appSource,
+  /buildWheelModel\(\s*birthDay\.planetNumber/,
+);
+assert.match(summarySource, /formatThaiShortDateTime/);
+assert.match(detailSource, /period-progress/);
+assert.doesNotMatch(
+  detailSource,
+  /options\.prediction\.summaryTh/,
+);
+assert.match(layoutSource, /period-progress-elapsed/);
+assert.match(layoutSource, /background:\s*#2873b8/);
+assert.equal(
+  formatThaiShortDateTime(
+    bangkokPartsToEpochMs({
+      year: 2026,
+      month: 5,
+      day: 18,
+      hour: 9,
+      minute: 5,
+    }),
+  ),
+  "18 พ.ค. 2569 09:05 น.",
+);
 
-console.log("✓ วงแหวน 8 แถบหลักและ 64 แถบย่อยถูกต้อง");
+console.log("✓ วงล้อหมุนให้พระเคราะห์วันเกิดเริ่มที่ 12 นาฬิกา");
 console.log("✓ คำพยากรณ์ 64 ช่องและข้อมูลพระอังคารแทรกพระพุธถูกต้อง");
 console.log("✓ ปฏิทินจริงและนโยบาย 29 กุมภาพันธ์ถูกต้อง");
 console.log("✓ แถบย่อยปิดพอดีกับแถบหลักทุกกลุ่ม");
 console.log("✓ สัญลักษณ์ดี/ไม่ดีแสดงเฉพาะแถบหลักและแถบย่อยของอายุปัจจุบัน");
 console.log("✓ Tooltip และแผงรายละเอียดไม่แสดงสัดส่วนที่ตัดออก");
-console.log("✓ ตำแหน่งสัญลักษณ์และลำดับกล่องข้อมูล v0.4.2 ถูกต้อง");
-console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.4.2 พร้อมใช้งาน");
+console.log("✓ เดือนแบบย่อและแถบความคืบหน้าช่วงปัจจุบันถูกต้อง");
+console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.5.0 พร้อมใช้งาน");

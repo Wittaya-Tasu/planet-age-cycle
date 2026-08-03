@@ -44,6 +44,10 @@ export function createCalendarJourneyState(model, birthDay, periodResult, target
     activeSub,
     yearsInsideMain: 0,
     yearsInsideSub: 0,
+    targetEpochMs,
+    subProgress,
+    elapsedSubperiodMs: elapsedMs,
+    subperiodDurationMs: durationMs,
     periodResult,
     startReferenceAngle: START_ANGLE,
   });

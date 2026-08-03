@@ -175,7 +175,7 @@ function createJourneyOverlay(journey) {
   return group;
 }
 
-function createMainLabel(segment, birthDay) {
+function createMainLabel(segment) {
   const midAngle = getMidAngle(segment.startAngle, segment.endAngle);
   const position = getLabelPosition(CENTER, CENTER, 247, midAngle);
   const group = svgElement("g", {
@@ -183,17 +183,6 @@ function createMainLabel(segment, birthDay) {
     "aria-hidden": "true",
   });
   const numberY = position.y - 3;
-
-  if (segment.mainNumber === birthDay.planetNumber) {
-    group.append(
-      svgElement("circle", {
-        cx: position.x,
-        cy: numberY - 10,
-        r: 20,
-        class: "birth-start-ring",
-      }),
-    );
-  }
 
   const number = svgElement("text", {
     x: position.x,
@@ -309,7 +298,7 @@ function bindInteractions(group, segment, handlers, relation = null) {
 }
 
 function createMainSegment(segment, handlers, context) {
-  const { journey, birthDay } = context;
+  const { journey } = context;
   const currentClass =
     segment.key === journey.activeMain.key ? " is-current-main" : "";
   const relation = relationForActiveSegment(
@@ -345,7 +334,7 @@ function createMainSegment(segment, handlers, context) {
   );
 
   bindInteractions(group, segment, handlers, relation);
-  group.append(path, createMainLabel(segment, birthDay));
+  group.append(path, createMainLabel(segment));
   if (relationMarker) group.append(relationMarker);
   return group;
 }

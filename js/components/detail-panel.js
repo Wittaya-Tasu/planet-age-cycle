@@ -1,5 +1,8 @@
 import { formatDuration, formatMainDuration, formatPercentage, getSegmentTitle } from "../utils/format.js";
-import { formatThaiDateTime } from "../core/calendar.js";
+import {
+  formatDurationTh,
+  formatThaiDateTime,
+} from "../core/calendar.js";
 
 function createRow(label, value) {
   const wrapper = document.createElement("div");
@@ -33,6 +36,48 @@ function detailsSection(titleText, values) {
   });
   section.append(title, list);
   return section;
+}
+
+
+function createPeriodProgress(progress) {
+  const fraction = Math.max(
+    0,
+    Math.min(1, Number(progress?.fraction) || 0),
+  );
+  const wrapper = document.createElement("section");
+  const track = document.createElement("div");
+  const elapsedBar = document.createElement("div");
+  const labels = document.createElement("div");
+  const elapsedLabel = document.createElement("span");
+  const remainingLabel = document.createElement("span");
+
+  wrapper.className = "period-progress";
+  track.className = "period-progress-track";
+  elapsedBar.className = "period-progress-elapsed";
+  labels.className = "period-progress-labels";
+
+  track.setAttribute("role", "progressbar");
+  track.setAttribute(
+    "aria-label",
+    "เวลาที่ผ่านไปในช่วงปัจจุบัน",
+  );
+  track.setAttribute("aria-valuemin", "0");
+  track.setAttribute("aria-valuemax", "100");
+  track.setAttribute(
+    "aria-valuenow",
+    String(Math.round(fraction * 100)),
+  );
+
+  elapsedBar.style.width = `${fraction * 100}%`;
+  elapsedLabel.textContent =
+    `ผ่านแล้ว ${formatDurationTh(progress.elapsed)}`;
+  remainingLabel.textContent =
+    `เหลือ ${formatDurationTh(progress.remaining)}`;
+
+  track.append(elapsedBar);
+  labels.append(elapsedLabel, remainingLabel);
+  wrapper.append(track, labels);
+  return wrapper;
 }
 
 function renderEmpty(container) {
@@ -84,7 +129,17 @@ export function renderDetailPanel(container, segment = null, options = {}) {
     );
   }
 
-  const nodes = [eyebrow, title, subtitle, colorLine, list];
+  const timingVisual =
+    isCurrentSub && options.progress
+      ? createPeriodProgress(options.progress)
+      : colorLine;
+  const nodes = [
+    eyebrow,
+    title,
+    subtitle,
+    timingVisual,
+    list,
+  ];
 
   if (options.period && !isCurrentSub) {
     const dates = document.createElement("dl");
@@ -108,11 +163,6 @@ export function renderDetailPanel(container, segment = null, options = {}) {
   if (badgeRow.childElementCount) nodes.push(badgeRow);
 
   if (options.prediction) {
-    const summary = document.createElement("p");
-    summary.className = "prediction-summary";
-    summary.textContent = options.prediction.summaryTh || options.uiText.missingPrediction;
-    nodes.push(summary);
-
     const sections = [
       detailsSection("คำพยากรณ์", options.prediction.details?.prediction),
       detailsSection("ข้อควรระวัง", options.prediction.details?.caution),

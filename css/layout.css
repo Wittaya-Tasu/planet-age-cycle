@@ -483,6 +483,43 @@
   background: var(--detail-color, var(--color-accent));
 }
 
+
+.period-progress {
+  margin: 18px 0;
+}
+
+.period-progress-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #d9dde3;
+  box-shadow:
+    inset 0 1px 2px rgba(39, 45, 55, 0.16);
+}
+
+.period-progress-elapsed {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #2873b8;
+  transition: width 280ms ease;
+}
+
+.period-progress-labels {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 7px;
+  color: var(--color-muted);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+.period-progress-labels span:last-child {
+  text-align: right;
+}
+
 .detail-list {
   display: grid;
   gap: 0;
@@ -813,15 +850,6 @@ footer {
   background: rgba(224, 173, 25, 0.2);
 }
 
-.prediction-summary {
-  margin-top: 16px;
-  padding: 14px;
-  border-left: 4px solid var(--detail-color, var(--color-accent));
-  border-radius: 0 12px 12px 0;
-  color: var(--color-ink);
-  background: rgba(255, 253, 249, 0.72);
-  line-height: 1.75;
-}
 
 .prediction-detail-section {
   margin-top: 16px;

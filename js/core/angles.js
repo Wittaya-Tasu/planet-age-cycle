@@ -18,29 +18,44 @@ export function calculateSubAngle(mainAngle, subPlanetWeight) {
   return (mainAngle * subPlanetWeight) / TOTAL_CYCLE_YEARS;
 }
 
-export function buildWheelModel() {
+export function buildWheelModel(
+  startPlanet = PLANET_SEQUENCE[0],
+) {
+  const mainSequence = rotateSequence(
+    PLANET_SEQUENCE,
+    Number(startPlanet),
+  );
+
   let currentMainAngle = START_ANGLE;
   let currentMainYear = 0;
 
-  const mainSegments = PLANET_SEQUENCE.map((mainNumber, mainIndex) => {
+  const mainSegments = mainSequence.map((mainNumber, mainIndex) => {
     const mainPlanet = getPlanet(mainNumber);
     const mainAngle = calculateMainAngle(mainPlanet.years);
     const mainStartAngle = currentMainAngle;
     const mainStartYear = currentMainYear;
     const mainEndYear = mainStartYear + mainPlanet.years;
     const mainEndAngle =
-      mainIndex === PLANET_SEQUENCE.length - 1
+      mainIndex === mainSequence.length - 1
         ? START_ANGLE + FULL_CIRCLE
         : mainStartAngle + mainAngle;
-    const subSequence = rotateSequence(PLANET_SEQUENCE, mainNumber);
+    const subSequence = rotateSequence(
+      PLANET_SEQUENCE,
+      mainNumber,
+    );
 
     let currentSubAngle = mainStartAngle;
     let currentSubYear = mainStartYear;
+
     const subSegments = subSequence.map((subNumber, subIndex) => {
       const subPlanet = getPlanet(subNumber);
-      const subAngle = calculateSubAngle(mainAngle, subPlanet.years);
+      const subAngle = calculateSubAngle(
+        mainAngle,
+        subPlanet.years,
+      );
       const subDurationYears =
-        (mainPlanet.years * subPlanet.years) / TOTAL_CYCLE_YEARS;
+        (mainPlanet.years * subPlanet.years) /
+        TOTAL_CYCLE_YEARS;
       const subStartAngle = currentSubAngle;
       const subStartYear = currentSubYear;
       const subEndAngle =
@@ -68,9 +83,16 @@ export function buildWheelModel() {
         startYear: subStartYear,
         endYear: subEndYear,
         durationYears: subEndYear - subStartYear,
-        duration: calculateSubDuration(mainPlanet.years, subPlanet.years),
-        percentageOfMain: (subPlanet.years / TOTAL_CYCLE_YEARS) * 100,
-        percentageOfCycle: ((subEndAngle - subStartAngle) / FULL_CIRCLE) * 100,
+        duration: calculateSubDuration(
+          mainPlanet.years,
+          subPlanet.years,
+        ),
+        percentageOfMain:
+          (subPlanet.years / TOTAL_CYCLE_YEARS) * 100,
+        percentageOfCycle:
+          ((subEndAngle - subStartAngle) /
+            FULL_CIRCLE) *
+          100,
       });
     });
 
@@ -87,14 +109,21 @@ export function buildWheelModel() {
       angle: mainEndAngle - mainStartAngle,
       startYear: mainStartYear,
       endYear: mainEndYear,
-      percentageOfCycle: (mainPlanet.years / TOTAL_CYCLE_YEARS) * 100,
+      percentageOfCycle:
+        (mainPlanet.years / TOTAL_CYCLE_YEARS) * 100,
       subSegments: Object.freeze(subSegments),
     });
   });
 
   return Object.freeze({
+    startPlanet: Number(startPlanet),
+    mainSequence,
     mainSegments: Object.freeze(mainSegments),
-    subSegments: Object.freeze(mainSegments.flatMap((segment) => segment.subSegments)),
+    subSegments: Object.freeze(
+      mainSegments.flatMap(
+        (segment) => segment.subSegments,
+      ),
+    ),
     planets: PLANETS,
   });
 }
