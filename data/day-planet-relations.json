@@ -1,11 +1,11 @@
 {
-  "schemaVersion": "1.2.0",
+  "schemaVersion": "1.3.0",
   "unspecifiedBehavior": "hide",
   "displayScope": {
-    "mode": "current-period-only",
-    "main": "active-main-only",
-    "sub": "active-sub-only",
-    "noteTh": "แสดงสัญลักษณ์เฉพาะแถบหลักและแถบย่อยที่ตรงกับอายุปัจจุบัน ไม่แสดงบนช่วงอดีตหรืออนาคต แม้ดาวนั้นจะอยู่ในตารางความสัมพันธ์"
+    "mode": "all-periods",
+    "main": "all-matching-main-segments",
+    "sub": "all-matching-sub-segments",
+    "noteTh": "แสดงสัญลักษณ์ทุกช่วงที่มีความสัมพันธ์ดีหรือไม่ดีตามวันเกิด ทั้งแถบหลักและแถบย่อย เพื่อให้เห็นล่วงหน้าทั้งวงจร"
   },
   "birthDayTypes": [
     {

@@ -173,6 +173,16 @@
     padding: 14px 8px 13px;
   }
 
+  .view-switch {
+    width: fit-content;
+    margin-left: 7px;
+  }
+
+  .timeline-container {
+    padding-right: 2px;
+    padding-left: 2px;
+  }
+
   .wheel-card > .section-heading {
     padding: 3px 7px 0;
   }

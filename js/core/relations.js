@@ -17,6 +17,17 @@ export function getRelationBadge(relationsData, birthDayType, planetNumber) {
   };
 }
 
+export function getSegmentRelationBadge(
+  relationsData,
+  birthDayType,
+  segment,
+) {
+  if (!segment) return null;
+  const planetNumber =
+    segment.type === "main" ? segment.mainNumber : segment.subNumber;
+  return getRelationBadge(relationsData, birthDayType, planetNumber);
+}
+
 export function getActiveSegmentRelationBadge(
   relationsData,
   birthDayType,
@@ -27,10 +38,7 @@ export function getActiveSegmentRelationBadge(
     return null;
   }
 
-  const planetNumber =
-    segment.type === "main" ? segment.mainNumber : segment.subNumber;
-
-  return getRelationBadge(relationsData, birthDayType, planetNumber);
+  return getSegmentRelationBadge(relationsData, birthDayType, segment);
 }
 
 export function decoratePeriodRelations(relationsData, birthDayType, period) {

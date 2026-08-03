@@ -16,6 +16,7 @@ import { initializeBirthForm, readProfileForm, resetBirthForm, setTargetToToday,
 import { renderDetailPanel } from "./components/detail-panel.js";
 import { renderJourneySummary } from "./components/journey-summary.js";
 import { renderLegend } from "./components/legend.js";
+import { renderTimeline } from "./components/timeline.js";
 import { createTooltipController } from "./components/tooltip.js";
 import { renderWheel } from "./components/wheel.js";
 import { getBirthDay } from "./data/birth-days.js";
@@ -40,6 +41,11 @@ const todayButton = document.querySelector("#today-button");
 const supportButton = document.querySelector("#support-button");
 const supportingInfo = document.querySelector("#supporting-info");
 const wheelContainer = document.querySelector("#wheel-container");
+const timelineContainer = document.querySelector("#timeline-container");
+const wheelStage = document.querySelector("#wheel-stage");
+const timelineStage = document.querySelector("#timeline-stage");
+const wheelViewButton = document.querySelector("#view-wheel-button");
+const timelineViewButton = document.querySelector("#view-timeline-button");
 const detailPanel = document.querySelector("#detail-panel");
 const journeySummary = document.querySelector("#journey-summary");
 const legendContainer = document.querySelector("#legend");
@@ -51,11 +57,13 @@ let model;
 let datasets;
 let tooltip;
 let wheelController;
+let timelineController;
 let currentProfile = null;
 let currentJourney = null;
 let currentPeriodResult = null;
 let selectedSegment = null;
 let deferredInstallPrompt = null;
+let currentView = "wheel";
 
 function toCalculationProfile(profile) {
   return {
@@ -105,9 +113,10 @@ function periodForSegment(segment) {
 }
 
 function selectSegment(segment) {
-  if (!wheelController || !currentJourney) return;
+  if (!currentJourney) return;
   selectedSegment = segment ?? currentJourney.activeSub;
-  wheelController.setSelected(selectedSegment);
+  wheelController?.setSelected(selectedSegment);
+  timelineController?.setSelected(selectedSegment);
   const period = periodForSegment(selectedSegment);
   const isCurrent =
     selectedSegment.key === currentJourney.activeSub.key;
@@ -152,6 +161,21 @@ function hideSupportingInfo() {
   supportButton.textContent = "ข้อมูลประกอบ";
 }
 
+function setVisualizationMode(mode) {
+  currentView = mode === "timeline" ? "timeline" : "wheel";
+  const isWheel = currentView === "wheel";
+  wheelStage.hidden = !isWheel;
+  timelineStage.hidden = isWheel;
+  wheelViewButton?.setAttribute("aria-pressed", String(isWheel));
+  timelineViewButton?.setAttribute("aria-pressed", String(!isWheel));
+  wheelViewButton?.classList.toggle("is-active", isWheel);
+  timelineViewButton?.classList.toggle("is-active", !isWheel);
+
+  if (!isWheel) {
+    window.requestAnimationFrame(() => timelineController?.scrollToCurrent());
+  }
+}
+
 function showInitialScreen() {
   currentProfile = null;
   currentJourney = null;
@@ -166,6 +190,8 @@ function showInitialScreen() {
   setFormError();
   resetBirthForm(birthForm);
   hideSupportingInfo();
+  wheelContainer.replaceChildren();
+  timelineContainer.replaceChildren();
 }
 
 function renderProfile(profile) {
@@ -217,22 +243,37 @@ function renderProfile(profile) {
     selectSegment,
   );
 
-  wheelController = renderWheel(wheelContainer, model, {
+  const interactionHandlers = {
     onSelect: selectSegment,
     onPreview: (segment, source) => tooltip.show(segment, source),
     onPointerMove: (event) => tooltip.move(event),
     onPreviewEnd: () => tooltip.hide(),
-  }, {
+  };
+  const interactionContext = {
     age: periodResult.currentAge,
     birthDay,
     journey,
     relationsData: datasets.relationsData,
     birthDayType: currentProfile.birthWeekday,
-  });
+  };
+
+  wheelController = renderWheel(
+    wheelContainer,
+    model,
+    interactionHandlers,
+    interactionContext,
+  );
+  timelineController = renderTimeline(
+    timelineContainer,
+    model,
+    interactionHandlers,
+    interactionContext,
+  );
 
   renderJourneySummary(journeySummary, journey);
   selectSegment(journey.activeSub);
   hideSupportingInfo();
+  setVisualizationMode(currentView);
 }
 
 function showEditScreen() {
@@ -283,6 +324,7 @@ async function initializeApp() {
     tooltip = createTooltipController(tooltipElement);
     initializeBirthForm(birthForm);
     renderLegend(legendContainer, model.mainSegments, selectSegment);
+    setVisualizationMode(currentView);
     const saved = loadSavedProfile();
     saved ? renderProfile(saved) : showInitialScreen();
   } catch (error) {
@@ -318,7 +360,8 @@ saveImageButton.addEventListener("click", async () => {
 
   try {
     await saveDashboardImage({
-      wheelContainer,
+      visualizationContainer: currentView === "timeline" ? timelineContainer : wheelContainer,
+      visualizationMode: currentView,
       journeySummary,
       detailPanel,
       profileBirthText: profileBirth.textContent,
@@ -337,6 +380,7 @@ cancelEditButton.addEventListener("click", cancelEdit);
 resetButton.addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   wheelContainer.replaceChildren();
+  timelineContainer.replaceChildren();
   detailPanel.replaceChildren();
   journeySummary.replaceChildren();
   showInitialScreen();
@@ -349,9 +393,12 @@ supportButton.addEventListener("click", () => {
   supportButton.textContent = open ? "ซ่อนข้อมูลประกอบ" : "ข้อมูลประกอบ";
 });
 
+wheelViewButton?.addEventListener("click", () => setVisualizationMode("wheel"));
+timelineViewButton?.addEventListener("click", () => setVisualizationMode("timeline"));
+
 document.addEventListener("click", (event) => {
   if (!currentJourney || !selectedSegment) return;
-  const target = event.target.closest(".wheel-segment, .legend-item, .detail-card, .journey-summary, button, input, select");
+  const target = event.target.closest(".wheel-segment, .timeline-segment, .legend-item, .detail-card, .journey-summary, button, input, select");
   if (!target) selectSegment(currentJourney.activeSub);
 });
 

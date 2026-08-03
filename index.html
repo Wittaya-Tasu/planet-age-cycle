@@ -34,9 +34,9 @@
           <p class="intro">คำนวณช่วงชีวิตจริง พร้อมคำพยากรณ์บนวงจรพระเคราะห์ 108 ปี</p>
         </div>
         <div class="header-actions">
-          <span class="status-pill" aria-label="เวอร์ชัน 0.5.0">
+          <span class="status-pill" aria-label="เวอร์ชัน 0.6.0">
             <span class="status-dot" aria-hidden="true"></span>
-            v0.5.0
+            v0.6.0
           </span>
           <button
             id="support-button"
@@ -191,7 +191,7 @@
               id="save-image-button"
               class="secondary-button compact-button save-image-button"
               type="button"
-              title="บันทึกวงแหวนและข้อมูลสรุปเป็นไฟล์ PNG"
+              title="บันทึกภาพวงล้อหรือ Timeline แนวนอนเป็นไฟล์ PNG"
             >
               บันทึกภาพ
             </button>
@@ -218,10 +218,25 @@
                 </div>
               </div>
 
-              <div id="wheel-container" class="wheel-container" aria-live="polite"></div>
+              <div class="view-switch" role="group" aria-label="เลือกรูปแบบการแสดงผล">
+                <button id="view-wheel-button" class="view-switch-button is-active" type="button" aria-pressed="true">
+                  วงล้อ
+                </button>
+                <button id="view-timeline-button" class="view-switch-button" type="button" aria-pressed="false">
+                  Timeline
+                </button>
+              </div>
+
+              <div id="wheel-stage" class="visual-stage">
+                <div id="wheel-container" class="wheel-container" aria-live="polite"></div>
+              </div>
+
+              <div id="timeline-stage" class="visual-stage timeline-stage" hidden>
+                <div id="timeline-container" class="timeline-container" aria-live="polite"></div>
+              </div>
 
               <p class="interaction-hint">
-                ตำแหน่ง 12 นาฬิกาคือพระเคราะห์ประจำวันเกิด · ลูกศรคืออายุปัจจุบัน · ✓/! แสดงเฉพาะช่วงปัจจุบัน
+                ตำแหน่ง 12 นาฬิกาคือพระเคราะห์ประจำวันเกิด · ลูกศรคืออายุปัจจุบัน · ✓/! แสดงล่วงหน้าทุกช่วงที่สัมพันธ์ดีหรือไม่ดี · Timeline เลื่อนแนวนอนได้
               </p>
             </article>
 

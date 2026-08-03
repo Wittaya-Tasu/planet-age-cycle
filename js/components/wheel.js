@@ -6,7 +6,7 @@ import {
   mixWithWhite,
   polarToCartesian,
 } from "../core/geometry.js";
-import { getActiveSegmentRelationBadge } from "../core/relations.js";
+import { getSegmentRelationBadge } from "../core/relations.js";
 import { getSegmentAriaLabel } from "../utils/format.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
@@ -16,7 +16,7 @@ const RADII = Object.freeze({
   center: 190,
   mainInner: 196,
   mainOuter: 295,
-  mainRelation: 281,
+  mainRelation: 218,
   journey: 298,
   subInner: 301,
   subOuter: 382,
@@ -219,7 +219,7 @@ function createRelationMarker(relation, position, size, variant) {
   });
   const text = svgElement("text", {
     x: 0,
-    y: relation.status === "good" ? 5 : 5,
+    y: 5,
     class: "relation-marker-text",
   });
 
@@ -228,22 +228,14 @@ function createRelationMarker(relation, position, size, variant) {
   return group;
 }
 
-function relationForActiveSegment(context, segment, activeSegment) {
+function relationForSegment(context, segment) {
   if (!context.relationsData || !context.birthDayType) return null;
 
-  return getActiveSegmentRelationBadge(
+  return getSegmentRelationBadge(
     context.relationsData,
     context.birthDayType,
     segment,
-    activeSegment,
   );
-}
-
-
-function getMainRelationAngle(segment) {
-  const midAngle = getMidAngle(segment.startAngle, segment.endAngle);
-  const offset = Math.min(6, Math.max(3.5, segment.angle * 0.18));
-  return midAngle + offset;
 }
 
 function createSubRelationLeader(relation, angle) {
@@ -301,10 +293,9 @@ function createMainSegment(segment, handlers, context) {
   const { journey } = context;
   const currentClass =
     segment.key === journey.activeMain.key ? " is-current-main" : "";
-  const relation = relationForActiveSegment(
+  const relation = relationForSegment(
     context,
     segment,
-    journey.activeMain,
   );
   const group = svgElement("g", {
     class: `wheel-segment main-segment${currentClass}`,
@@ -324,7 +315,7 @@ function createMainSegment(segment, handlers, context) {
     CENTER,
     CENTER,
     RADII.mainRelation,
-    getMainRelationAngle(segment),
+    getMidAngle(segment.startAngle, segment.endAngle),
   );
   const relationMarker = createRelationMarker(
     relation,
@@ -344,10 +335,9 @@ function createSubSegment(segment, index, handlers, context) {
   const tightClass = segment.angle < 4.2 ? " is-tight" : "";
   const currentClass =
     segment.key === journey.activeSub.key ? " is-current-sub" : "";
-  const relation = relationForActiveSegment(
+  const relation = relationForSegment(
     context,
     segment,
-    journey.activeSub,
   );
   const group = svgElement("g", {
     class: `wheel-segment sub-segment${tightClass}${currentClass}`,

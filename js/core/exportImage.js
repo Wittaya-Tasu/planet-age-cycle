@@ -113,8 +113,8 @@ function inlineSvgStyles(sourceSvg, clonedSvg) {
 async function svgToImage(svg) {
   const clone = svg.cloneNode(true);
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  clone.setAttribute("width", "800");
-  clone.setAttribute("height", "800");
+  clone.setAttribute("width", svg.viewBox.baseVal.width || 800);
+  clone.setAttribute("height", svg.viewBox.baseVal.height || 800);
   inlineSvgStyles(svg, clone);
 
   const source = new XMLSerializer().serializeToString(clone);
@@ -126,7 +126,7 @@ async function svgToImage(svg) {
     image.decoding = "async";
     const loaded = new Promise((resolve, reject) => {
       image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("ไม่สามารถแปลงวงแหวนเป็นรูปภาพได้"));
+      image.onerror = () => reject(new Error("ไม่สามารถแปลงผังเป็นรูปภาพได้"));
     });
     image.src = url;
     return await loaded;
@@ -204,7 +204,7 @@ function downloadBlob(blob, filename) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
 }
 
-function buildFilename(now = new Date()) {
+function buildFilename(now = new Date(), visualizationMode = "wheel") {
   const parts = [
     now.getFullYear(),
     String(now.getMonth() + 1).padStart(2, "0"),
@@ -213,30 +213,10 @@ function buildFilename(now = new Date()) {
     String(now.getHours()).padStart(2, "0"),
     String(now.getMinutes()).padStart(2, "0"),
   ];
-  return `planet-age-cycle-${parts.join("")}.png`;
+  return `planet-age-cycle-${visualizationMode}-${parts.join("")}.png`;
 }
 
-export async function saveDashboardImage({
-  wheelContainer,
-  journeySummary,
-  detailPanel,
-  profileBirthText,
-  profileTargetText,
-}) {
-  const svg = wheelContainer.querySelector("svg");
-  if (!svg) throw new Error("ยังไม่มีวงแหวนสำหรับบันทึกภาพ");
-
-  if (document.fonts?.ready) await document.fonts.ready;
-  const wheelImage = await svgToImage(svg);
-  const canvas = document.createElement("canvas");
-  canvas.width = EXPORT_WIDTH;
-  canvas.height = EXPORT_HEIGHT;
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("อุปกรณ์นี้ไม่รองรับการสร้างรูปภาพ");
-
-  context.fillStyle = BACKGROUND;
-  context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
-
+function drawHeader(context, profileBirthText, profileTargetText, visualizationMode) {
   context.fillStyle = ACCENT;
   context.font = '800 27px "Sarabun", sans-serif';
   context.fillText("โหราศาสตร์ไทย · วงจรตามสัดส่วนเวลา", 64, 60);
@@ -248,8 +228,19 @@ export async function saveDashboardImage({
   context.fillText(profileBirthText, 64, 169);
   context.fillText(profileTargetText, 64, 207);
 
+  const chipText = visualizationMode === "timeline" ? "มุมมอง: Timeline แนวนอน" : "มุมมอง: วงล้อ";
+  context.font = '800 21px "Sarabun", sans-serif';
+  const chipWidth = context.measureText(chipText).width + 40;
+  context.fillStyle = "rgba(111, 29, 27, 0.10)";
+  roundedRect(context, EXPORT_WIDTH - chipWidth - 48, 42, chipWidth, 42, 21);
+  context.fill();
+  context.fillStyle = ACCENT;
+  context.fillText(chipText, EXPORT_WIDTH - chipWidth - 28, 70);
+}
+
+function drawWheelLayout(context, visualImage, journeySummary, detailPanel) {
   drawCard(context, 42, 238, 870, 870);
-  context.drawImage(wheelImage, 72, 268, 810, 810);
+  context.drawImage(visualImage, 72, 268, 810, 810);
 
   const cardX = 946;
   const cardWidth = 612;
@@ -279,47 +270,99 @@ export async function saveDashboardImage({
   cursorY += 16;
   drawRows(context, journeyRows, cardX + 32, cursorY, cardWidth - 64, 5);
 
-  drawCard(context, cardX, 658, cardWidth, 450);
+  drawDetailCard(context, detailPanel, cardX, 658, cardWidth, 450, 4);
+}
+
+function drawDetailCard(context, detailPanel, x, y, width, height, rowLimit = 4) {
+  drawCard(context, x, y, width, height);
   const detailEyebrow = detailPanel.querySelector(".detail-eyebrow")?.textContent?.trim() ?? "รายละเอียด";
   const detailTitle = detailPanel.querySelector("h2")?.textContent?.trim() ?? "รายละเอียดช่วง";
   const detailRows = extractRows(detailPanel, ".detail-row", "dt", "dd");
   const badges = [...detailPanel.querySelectorAll(".prediction-badge")];
-  const summary = detailPanel.querySelector(".prediction-summary")?.textContent?.trim() ?? "";
 
   context.fillStyle = ACCENT;
   context.font = '800 22px "Sarabun", sans-serif';
-  context.fillText(detailEyebrow, cardX + 32, 704);
+  context.fillText(detailEyebrow, x + 32, y + 46);
   context.fillStyle = INK;
   context.font = '800 31px "Sarabun", sans-serif';
-  cursorY = drawWrappedText(
+  let cursorY = drawWrappedText(
     context,
     detailTitle,
-    cardX + 32,
-    748,
-    cardWidth - 64,
+    x + 32,
+    y + 90,
+    width - 64,
     39,
     2,
   );
   cursorY += 12;
-  cursorY = drawRows(context, detailRows, cardX + 32, cursorY, cardWidth - 64, 4);
+  cursorY = drawRows(context, detailRows, x + 32, cursorY, width - 64, rowLimit);
 
   if (badges.length) {
-    drawBadges(context, badges, cardX + 32, cursorY + 8);
-    cursorY += 56;
+    drawBadges(context, badges, x + 32, cursorY + 8);
   }
+}
 
-  if (summary) {
-    context.fillStyle = MUTED;
-    context.font = '500 22px "Sarabun", sans-serif';
-    drawWrappedText(
-      context,
-      summary,
-      cardX + 32,
-      cursorY + 12,
-      cardWidth - 64,
-      32,
-      5,
-    );
+function drawTimelineLayout(context, visualImage, journeySummary, detailPanel) {
+  drawCard(context, 42, 238, 1516, 420);
+  context.drawImage(visualImage, 74, 274, 1452, 348);
+
+  const journeyRows = extractRows(
+    journeySummary,
+    ".journey-summary-row",
+    "span",
+    "strong",
+  );
+  const journeyTitle = journeySummary.querySelector("h2")?.textContent?.trim() ?? "ช่วงชีวิตปัจจุบัน";
+
+  drawCard(context, 42, 690, 742, 418);
+  context.fillStyle = ACCENT;
+  context.font = '800 22px "Sarabun", sans-serif';
+  context.fillText("ช่วงชีวิตปัจจุบัน", 74, 734);
+  context.fillStyle = INK;
+  context.font = '800 31px "Sarabun", sans-serif';
+  let cursorY = drawWrappedText(
+    context,
+    journeyTitle,
+    74,
+    778,
+    678,
+    39,
+    2,
+  );
+  cursorY += 12;
+  drawRows(context, journeyRows, 74, cursorY, 678, 5);
+
+  drawDetailCard(context, detailPanel, 816, 690, 742, 418, 5);
+}
+
+export async function saveDashboardImage({
+  visualizationContainer,
+  visualizationMode,
+  journeySummary,
+  detailPanel,
+  profileBirthText,
+  profileTargetText,
+}) {
+  const svg = visualizationContainer.querySelector("svg");
+  if (!svg) throw new Error("ยังไม่มีผังสำหรับบันทึกภาพ");
+
+  if (document.fonts?.ready) await document.fonts.ready;
+  const visualImage = await svgToImage(svg);
+  const canvas = document.createElement("canvas");
+  canvas.width = EXPORT_WIDTH;
+  canvas.height = EXPORT_HEIGHT;
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("อุปกรณ์นี้ไม่รองรับการสร้างรูปภาพ");
+
+  context.fillStyle = BACKGROUND;
+  context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+
+  drawHeader(context, profileBirthText, profileTargetText, visualizationMode);
+
+  if (visualizationMode === "timeline") {
+    drawTimelineLayout(context, visualImage, journeySummary, detailPanel);
+  } else {
+    drawWheelLayout(context, visualImage, journeySummary, detailPanel);
   }
 
   context.fillStyle = MUTED;
@@ -331,5 +374,5 @@ export async function saveDashboardImage({
   );
 
   const blob = await canvasToBlob(canvas);
-  downloadBlob(blob, buildFilename());
+  downloadBlob(blob, buildFilename(new Date(), visualizationMode));
 }

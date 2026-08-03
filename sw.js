@@ -1,4 +1,4 @@
-const CACHE_NAME = "planet-age-cycle-v0.5.0";
+const CACHE_NAME = "planet-age-cycle-v0.6.0";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -32,6 +32,7 @@ const APP_SHELL = [
   "./js/core/sequence.js",
   "./js/core/geometry.js",
   "./js/components/wheel.js",
+  "./js/components/timeline.js",
   "./js/components/tooltip.js",
   "./js/components/legend.js",
   "./js/components/detail-panel.js",

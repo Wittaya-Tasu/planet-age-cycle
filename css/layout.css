@@ -876,3 +876,222 @@ footer {
   font-size: 0.76rem;
   line-height: 1.6;
 }
+
+
+.view-switch {
+  display: inline-flex;
+  gap: 8px;
+  margin: 6px 0 6px 4px;
+  padding: 6px;
+  border: 1px solid rgba(89, 63, 43, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.86);
+}
+
+.view-switch-button {
+  min-height: 40px;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--color-muted);
+  background: transparent;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.view-switch-button.is-active {
+  color: #fff;
+  background: var(--color-accent);
+  box-shadow: 0 8px 18px rgba(111, 29, 27, 0.16);
+}
+
+.visual-stage {
+  width: 100%;
+}
+
+.timeline-stage {
+  padding-top: 10px;
+}
+
+.timeline-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: clamp(8px, 1.4vw, 18px) auto 8px;
+  padding: 0 6px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(111, 29, 27, 0.25) rgba(111, 29, 27, 0.06);
+}
+
+.timeline-container::-webkit-scrollbar {
+  height: 10px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: rgba(111, 29, 27, 0.06);
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(111, 29, 27, 0.28);
+}
+
+.planet-timeline {
+  display: block;
+  width: max(100%, 1200px);
+  min-width: 1200px;
+  height: auto;
+  font-family: "Sarabun", sans-serif;
+}
+
+.timeline-backdrop {
+  fill: #fbf7ef;
+  stroke: rgba(99, 72, 50, 0.12);
+  stroke-width: 1;
+}
+
+.timeline-main-number,
+.timeline-main-name,
+.timeline-sub-number {
+  pointer-events: none;
+  fill: var(--label-color, #fff);
+  text-anchor: middle;
+  paint-order: stroke;
+  stroke: rgba(26, 19, 15, 0.24);
+  stroke-width: 2.2px;
+  stroke-linejoin: round;
+}
+
+.timeline-main-number {
+  font-size: 27px;
+  font-weight: 900;
+}
+
+.timeline-main-name {
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.timeline-sub-number {
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.timeline-segment {
+  cursor: pointer;
+  transition: filter 180ms ease, opacity 180ms ease;
+}
+
+.timeline-segment rect {
+  stroke: #fffaf0;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.timeline-segment:hover,
+.timeline-segment:focus,
+.timeline-segment.is-selected {
+  filter: brightness(1.04) drop-shadow(0 5px 8px rgba(53, 31, 17, 0.18));
+}
+
+.timeline-segment:focus {
+  outline: none;
+}
+
+.timeline-segment.is-selected rect {
+  stroke: #ffffff;
+  stroke-width: 3;
+}
+
+.timeline-main.is-current-main rect {
+  stroke: #ffe7aa;
+  stroke-width: 3;
+}
+
+.timeline-sub.is-current-sub rect {
+  stroke: var(--color-accent-dark);
+  stroke-width: 4;
+}
+
+.timeline-axis-line {
+  stroke: rgba(99, 72, 50, 0.35);
+  stroke-width: 2;
+}
+
+.timeline-axis-tick {
+  stroke: rgba(99, 72, 50, 0.32);
+  stroke-width: 2;
+}
+
+.timeline-axis-label,
+.timeline-axis-caption {
+  fill: var(--color-muted);
+  font-family: "Sarabun", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-anchor: middle;
+}
+
+.timeline-axis-caption-start {
+  text-anchor: start;
+}
+
+.timeline-axis-label-end {
+  text-anchor: end;
+}
+
+.timeline-current-line {
+  stroke: var(--color-journey);
+  stroke-width: 4;
+  stroke-dasharray: 6 7;
+}
+
+.timeline-current-arrow {
+  fill: var(--color-journey);
+  stroke: #fffaf1;
+  stroke-width: 1.6;
+}
+
+.timeline-current-chip {
+  fill: rgba(255, 236, 181, 0.82);
+  stroke: rgba(142, 103, 33, 0.2);
+  stroke-width: 1;
+}
+
+.timeline-current-text {
+  fill: var(--color-accent-dark);
+  font-family: "Sarabun", sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+  text-anchor: middle;
+}
+
+.timeline-relation,
+.timeline-relation-text,
+.timeline-relation-shape {
+  pointer-events: none;
+}
+
+.timeline-relation-shape {
+  stroke: #fffdf8;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 2px 3px rgba(42, 27, 18, 0.24));
+}
+
+.timeline-relation-good .timeline-relation-shape {
+  fill: #248653;
+}
+
+.timeline-relation-bad .timeline-relation-shape {
+  fill: #b4232e;
+}
+
+.timeline-relation-text {
+  fill: #fff;
+  text-anchor: middle;
+  font-family: "Sarabun", sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+}
