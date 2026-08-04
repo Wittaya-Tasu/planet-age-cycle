@@ -171,9 +171,6 @@ function setVisualizationMode(mode) {
   wheelViewButton?.classList.toggle("is-active", isWheel);
   timelineViewButton?.classList.toggle("is-active", !isWheel);
 
-  if (!isWheel) {
-    window.requestAnimationFrame(() => timelineController?.scrollToCurrent());
-  }
 }
 
 function showInitialScreen() {

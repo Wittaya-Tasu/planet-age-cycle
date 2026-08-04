@@ -939,43 +939,81 @@ footer {
 
 .planet-timeline {
   display: block;
-  width: max(100%, 1200px);
-  min-width: 1200px;
+  width: max(100%, 1040px);
+  min-width: 1040px;
   height: auto;
   font-family: "Sarabun", sans-serif;
 }
 
 .timeline-backdrop {
-  fill: #fbf7ef;
+  fill: #f7f1e8;
   stroke: rgba(99, 72, 50, 0.12);
   stroke-width: 1;
 }
 
-.timeline-main-number,
-.timeline-main-name,
-.timeline-sub-number {
-  pointer-events: none;
-  fill: var(--label-color, #fff);
-  text-anchor: middle;
-  paint-order: stroke;
-  stroke: rgba(26, 19, 15, 0.24);
-  stroke-width: 2.2px;
-  stroke-linejoin: round;
+.timeline-header-label {
+  fill: var(--color-muted);
+  font-family: "Sarabun", sans-serif;
+  font-size: 18px;
+  font-weight: 800;
 }
 
-.timeline-main-number {
+.timeline-header-left {
+  text-anchor: start;
+}
+
+.timeline-row-surface {
+  fill: rgba(255, 253, 249, 0.95);
+  stroke: rgba(99, 72, 50, 0.12);
+  stroke-width: 1;
+}
+
+.timeline-row-background.is-current-row .timeline-row-surface {
+  fill: #fffaf0;
+  stroke: rgba(111, 29, 27, 0.34);
+  stroke-width: 2;
+}
+
+.timeline-row-order {
+  fill: rgba(116, 107, 101, 0.64);
+  font-family: "Sarabun", sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  text-anchor: start;
+}
+
+.timeline-planet-chip {
+  stroke: #fffaf0;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 3px 5px rgba(53, 31, 17, 0.16));
+}
+
+.timeline-planet-number {
+  fill: var(--label-color, #fff);
+  stroke: rgba(26, 19, 15, 0.22);
+  stroke-width: 2px;
+  paint-order: stroke;
+  font-family: "Sarabun", sans-serif;
   font-size: 27px;
   font-weight: 900;
+  text-anchor: middle;
 }
 
-.timeline-main-name {
-  font-size: 13px;
-  font-weight: 760;
+.timeline-planet-name {
+  fill: var(--color-ink);
+  font-family: "Sarabun", sans-serif;
+  font-size: 23px;
+  font-weight: 850;
+  text-anchor: start;
 }
 
-.timeline-sub-number {
-  font-size: 15px;
-  font-weight: 900;
+.timeline-planet-duration {
+  fill: var(--color-muted);
+  font-family: "Sarabun", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  text-anchor: start;
 }
 
 .timeline-segment {
@@ -1014,48 +1052,77 @@ footer {
   stroke-width: 4;
 }
 
-.timeline-axis-line {
-  stroke: rgba(99, 72, 50, 0.35);
-  stroke-width: 2;
-}
-
-.timeline-axis-tick {
-  stroke: rgba(99, 72, 50, 0.32);
-  stroke-width: 2;
-}
-
-.timeline-axis-label,
-.timeline-axis-caption {
-  fill: var(--color-muted);
+.timeline-main-label,
+.timeline-main-end-label,
+.timeline-sub-number {
+  pointer-events: none;
+  fill: var(--label-color, #fff);
+  paint-order: stroke;
+  stroke: rgba(26, 19, 15, 0.24);
+  stroke-width: 2.1px;
+  stroke-linejoin: round;
   font-family: "Sarabun", sans-serif;
-  font-size: 13px;
-  font-weight: 700;
-  text-anchor: middle;
 }
 
-.timeline-axis-caption-start {
+.timeline-main-label {
+  font-size: 16px;
+  font-weight: 800;
   text-anchor: start;
 }
 
-.timeline-axis-label-end {
+.timeline-main-end-label {
+  font-size: 14px;
+  font-weight: 800;
   text-anchor: end;
+}
+
+.timeline-sub-number {
+  font-size: 15px;
+  font-weight: 900;
+  text-anchor: middle;
+}
+
+.timeline-age-label {
+  fill: var(--color-accent);
+  font-family: "Sarabun", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  text-anchor: start;
+}
+
+.timeline-age-value {
+  fill: var(--color-ink);
+  font-family: "Sarabun", sans-serif;
+  font-size: 22px;
+  font-weight: 850;
+  text-anchor: start;
+}
+
+.timeline-age-exact {
+  fill: var(--color-muted);
+  font-family: "Sarabun", sans-serif;
+  font-size: 13px;
+  font-weight: 650;
+  text-anchor: start;
 }
 
 .timeline-current-line {
   stroke: var(--color-journey);
   stroke-width: 4;
   stroke-dasharray: 6 7;
+  vector-effect: non-scaling-stroke;
 }
 
 .timeline-current-arrow {
   fill: var(--color-journey);
   stroke: #fffaf1;
   stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
 }
 
 .timeline-current-chip {
-  fill: rgba(255, 236, 181, 0.82);
-  stroke: rgba(142, 103, 33, 0.2);
+  fill: rgba(255, 236, 181, 0.93);
+  stroke: rgba(142, 103, 33, 0.24);
   stroke-width: 1;
 }
 
@@ -1067,6 +1134,7 @@ footer {
   text-anchor: middle;
 }
 
+.timeline-relation-overlay,
 .timeline-relation,
 .timeline-relation-text,
 .timeline-relation-shape {
@@ -1077,7 +1145,7 @@ footer {
   stroke: #fffdf8;
   stroke-width: 2;
   vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 2px 3px rgba(42, 27, 18, 0.24));
+  filter: drop-shadow(0 2px 3px rgba(42, 27, 18, 0.28));
 }
 
 .timeline-relation-good .timeline-relation-shape {
@@ -1094,4 +1162,8 @@ footer {
   font-family: "Sarabun", sans-serif;
   font-size: 14px;
   font-weight: 900;
+}
+
+.timeline-relation-sub .timeline-relation-text {
+  font-size: 12px;
 }

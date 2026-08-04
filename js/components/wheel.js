@@ -16,7 +16,8 @@ const RADII = Object.freeze({
   center: 190,
   mainInner: 196,
   mainOuter: 295,
-  mainRelation: 218,
+  // อยู่ในวงกลมชั้นในและแตะขอบด้านในของแถบหลัก
+  mainRelation: 180,
   journey: 298,
   subInner: 301,
   subOuter: 382,
@@ -203,12 +204,24 @@ function createMainLabel(segment) {
   return group;
 }
 
+function relationForSegment(context, segment) {
+  if (!context.relationsData || !context.birthDayType) return null;
+
+  return getSegmentRelationBadge(
+    context.relationsData,
+    context.birthDayType,
+    segment,
+  );
+}
+
 function createRelationMarker(relation, position, size, variant) {
   if (!relation) return null;
 
   const group = svgElement("g", {
     class: `relation-marker relation-marker-${relation.status} relation-marker-${variant}`,
     transform: `translate(${position.x} ${position.y})`,
+    "data-relation-status": relation.status,
+    "data-relation-variant": variant,
     "aria-hidden": "true",
   });
   const shape = svgElement("circle", {
@@ -226,16 +239,6 @@ function createRelationMarker(relation, position, size, variant) {
   text.textContent = relation.status === "good" ? "✓" : "!";
   group.append(shape, text);
   return group;
-}
-
-function relationForSegment(context, segment) {
-  if (!context.relationsData || !context.birthDayType) return null;
-
-  return getSegmentRelationBadge(
-    context.relationsData,
-    context.birthDayType,
-    segment,
-  );
 }
 
 function createSubRelationLeader(relation, angle) {
@@ -293,10 +296,7 @@ function createMainSegment(segment, handlers, context) {
   const { journey } = context;
   const currentClass =
     segment.key === journey.activeMain.key ? " is-current-main" : "";
-  const relation = relationForSegment(
-    context,
-    segment,
-  );
+  const relation = relationForSegment(context, segment);
   const group = svgElement("g", {
     class: `wheel-segment main-segment${currentClass}`,
   });
@@ -311,22 +311,9 @@ function createMainSegment(segment, handlers, context) {
     ),
     fill: segment.mainPlanet.color,
   });
-  const relationPosition = getLabelPosition(
-    CENTER,
-    CENTER,
-    RADII.mainRelation,
-    getMidAngle(segment.startAngle, segment.endAngle),
-  );
-  const relationMarker = createRelationMarker(
-    relation,
-    relationPosition,
-    11,
-    "main",
-  );
 
   bindInteractions(group, segment, handlers, relation);
   group.append(path, createMainLabel(segment));
-  if (relationMarker) group.append(relationMarker);
   return group;
 }
 
@@ -335,10 +322,7 @@ function createSubSegment(segment, index, handlers, context) {
   const tightClass = segment.angle < 4.2 ? " is-tight" : "";
   const currentClass =
     segment.key === journey.activeSub.key ? " is-current-sub" : "";
-  const relation = relationForSegment(
-    context,
-    segment,
-  );
+  const relation = relationForSegment(context, segment);
   const group = svgElement("g", {
     class: `wheel-segment sub-segment${tightClass}${currentClass}`,
   });
@@ -354,26 +338,76 @@ function createSubSegment(segment, index, handlers, context) {
     ),
     fill: mixWithWhite(segment.mainPlanet.color, lightRatio),
   });
-  const relationAngle = getMidAngle(segment.startAngle, segment.endAngle);
-  const relationPosition = getLabelPosition(
-    CENTER,
-    CENTER,
-    RADII.subRelation,
-    relationAngle,
-  );
-  const relationLeader = createSubRelationLeader(relation, relationAngle);
-  const relationMarker = createRelationMarker(
-    relation,
-    relationPosition,
-    8,
-    "sub",
-  );
 
   bindInteractions(group, segment, handlers, relation);
   group.append(path);
-  if (relationLeader) group.append(relationLeader);
-  if (relationMarker) group.append(relationMarker);
   return group;
+}
+
+export function collectWheelRelationMarkers(model, context) {
+  const markers = [];
+
+  model.mainSegments.forEach((mainSegment) => {
+    const mainRelation = relationForSegment(context, mainSegment);
+    if (mainRelation) {
+      markers.push({
+        segment: mainSegment,
+        relation: mainRelation,
+        variant: "main",
+        angle: getMidAngle(mainSegment.startAngle, mainSegment.endAngle),
+      });
+    }
+
+    mainSegment.subSegments.forEach((subSegment) => {
+      const subRelation = relationForSegment(context, subSegment);
+      if (subRelation) {
+        markers.push({
+          segment: subSegment,
+          relation: subRelation,
+          variant: "sub",
+          angle: getMidAngle(subSegment.startAngle, subSegment.endAngle),
+        });
+      }
+    });
+  });
+
+  return markers;
+}
+
+function createRelationOverlay(model, context) {
+  const overlay = svgElement("g", {
+    class: "relation-overlay",
+    "data-layer": "relations",
+    "aria-hidden": "true",
+  });
+
+  collectWheelRelationMarkers(model, context).forEach((item) => {
+    if (item.variant === "main") {
+      const position = getLabelPosition(
+        CENTER,
+        CENTER,
+        RADII.mainRelation,
+        item.angle,
+      );
+      overlay.append(
+        createRelationMarker(item.relation, position, 11, "main"),
+      );
+      return;
+    }
+
+    const position = getLabelPosition(
+      CENTER,
+      CENTER,
+      RADII.subRelation,
+      item.angle,
+    );
+    const leader = createSubRelationLeader(item.relation, item.angle);
+    const marker = createRelationMarker(item.relation, position, 8, "sub");
+    if (leader) overlay.append(leader);
+    if (marker) overlay.append(marker);
+  });
+
+  return overlay;
 }
 
 export function renderWheel(container, model, handlers, context) {
@@ -401,6 +435,7 @@ export function renderWheel(container, model, handlers, context) {
     });
   });
 
+  // วาง relation overlay เป็นชั้นสุดท้าย เพื่อให้ทั้ง ✓ และ ! ไม่ถูกแถบอื่นบัง
   svg.append(
     title,
     description,
@@ -409,6 +444,7 @@ export function renderWheel(container, model, handlers, context) {
     subGroup,
     createJourneyOverlay(journey),
     createCenter(age, birthDay),
+    createRelationOverlay(model, context),
   );
   container.replaceChildren(svg);
 

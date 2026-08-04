@@ -1,15 +1,21 @@
 import { getSegmentRelationBadge } from "../core/relations.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
-const VIEWBOX_WIDTH = 2400;
-const VIEWBOX_HEIGHT = 360;
-const PADDING_X = 58;
-const TRACK_WIDTH = VIEWBOX_WIDTH - PADDING_X * 2;
-const MAIN_Y = 84;
-const MAIN_HEIGHT = 66;
-const SUB_Y = 176;
-const SUB_HEIGHT = 82;
-const AXIS_Y = 282;
+const VIEWBOX_WIDTH = 1680;
+const HEADER_HEIGHT = 70;
+const ROW_HEIGHT = 122;
+const ROW_GAP = 14;
+const FOOTER_HEIGHT = 26;
+const VIEWBOX_HEIGHT =
+  HEADER_HEIGHT + ROW_HEIGHT * 8 + ROW_GAP * 7 + FOOTER_HEIGHT;
+
+const LABEL_X = 34;
+const LABEL_WIDTH = 190;
+const BAR_X = 250;
+const MAX_BAR_WIDTH = 1020;
+const AGE_X = 1300;
+const AGE_WIDTH = 340;
+const MAX_MAIN_YEARS = 21;
 
 function svgElement(name, attributes = {}) {
   const element = document.createElementNS(SVG_NS, name);
@@ -35,6 +41,22 @@ function mixWithWhite(hex, ratio) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
+function formatAge(years) {
+  const rounded = Math.round(years * 1000000) / 1000000;
+  if (Number.isInteger(rounded)) return `${rounded} ปี`;
+
+  const wholeYears = Math.floor(rounded);
+  const totalMonths = (rounded - wholeYears) * 12;
+  const wholeMonths = Math.floor(totalMonths + 1e-8);
+  const totalDays = (totalMonths - wholeMonths) * 30;
+  const wholeDays = Math.round(totalDays);
+  const parts = [];
+  if (wholeYears) parts.push(`${wholeYears} ปี`);
+  if (wholeMonths) parts.push(`${wholeMonths} เดือน`);
+  if (wholeDays) parts.push(`${wholeDays} วัน`);
+  return parts.join(" ") || "0 ปี";
+}
+
 function durationText(segment) {
   if (segment.type === "main") {
     return `${segment.mainPlanet.years} ปี`;
@@ -50,9 +72,7 @@ function durationText(segment) {
 }
 
 function getSegmentTitle(segment) {
-  if (segment.type === "main") {
-    return `${segment.mainPlanet.name}`;
-  }
+  if (segment.type === "main") return segment.mainPlanet.name;
   if (segment.mainNumber === segment.subNumber) {
     return `${segment.subPlanet.name}เสวยอายุตัวเอง`;
   }
@@ -65,27 +85,13 @@ function getSegmentAriaLabel(segment, relation) {
   return `${typeText} ${getSegmentTitle(segment)} · ${durationText(segment)}${relationText}`;
 }
 
-function createRelationMarker(relation, x, y, variant = "sub") {
-  if (!relation) return null;
-  const group = svgElement("g", {
-    class: `timeline-relation timeline-relation-${relation.status} timeline-relation-${variant}`,
-    transform: `translate(${x} ${y})`,
-    "aria-hidden": "true",
-  });
-  const circle = svgElement("circle", {
-    cx: 0,
-    cy: 0,
-    r: variant === "main" ? 12 : 10,
-    class: "timeline-relation-shape",
-  });
-  const text = svgElement("text", {
-    x: 0,
-    y: 5,
-    class: "timeline-relation-text",
-  });
-  text.textContent = relation.status === "good" ? "✓" : "!";
-  group.append(circle, text);
-  return group;
+function relationForSegment(context, segment) {
+  if (!context.relationsData || !context.birthDayType) return null;
+  return getSegmentRelationBadge(
+    context.relationsData,
+    context.birthDayType,
+    segment,
+  );
 }
 
 function bindInteractions(group, segment, handlers, relation = null) {
@@ -112,175 +118,390 @@ function bindInteractions(group, segment, handlers, relation = null) {
   });
 }
 
-function createMainSegment(segment, handlers, context) {
-  const currentClass = segment.key === context.journey.activeMain.key ? " is-current-main" : "";
-  const relation = getSegmentRelationBadge(context.relationsData, context.birthDayType, segment);
+function createHeader() {
   const group = svgElement("g", {
-    class: `timeline-segment timeline-main${currentClass}`,
+    class: "timeline-row-header",
+    "aria-hidden": "true",
   });
-  const x = PADDING_X + (segment.startYear / 108) * TRACK_WIDTH;
-  const width = ((segment.endYear - segment.startYear) / 108) * TRACK_WIDTH;
-  const rect = svgElement("rect", {
-    x,
-    y: MAIN_Y,
-    width,
-    height: MAIN_HEIGHT,
-    rx: 16,
-    ry: 16,
-    fill: segment.mainPlanet.color,
+  const planet = svgElement("text", {
+    x: LABEL_X,
+    y: 43,
+    class: "timeline-header-label timeline-header-left",
   });
-  const number = svgElement("text", {
-    x: x + width / 2,
-    y: MAIN_Y + 28,
-    class: "timeline-main-number",
-    style: `--label-color: ${segment.mainPlanet.labelColor}`,
+  const bars = svgElement("text", {
+    x: BAR_X,
+    y: 43,
+    class: "timeline-header-label timeline-header-left",
   });
-  const name = svgElement("text", {
-    x: x + width / 2,
-    y: MAIN_Y + 49,
-    class: "timeline-main-name",
-    style: `--label-color: ${segment.mainPlanet.labelColor}`,
+  const age = svgElement("text", {
+    x: AGE_X,
+    y: 43,
+    class: "timeline-header-label timeline-header-left",
   });
-  number.textContent = segment.mainPlanet.number;
-  name.textContent = segment.mainPlanet.shortName;
-  bindInteractions(group, segment, handlers, relation);
-  group.append(rect, number);
-  if (width > 92) group.append(name);
 
-  if (relation) {
-    const marker = createRelationMarker(relation, x + width / 2, MAIN_Y + 16, "main");
-    if (marker) group.append(marker);
-  }
-
+  planet.textContent = "ลำดับพระเคราะห์";
+  bars.textContent = "แถบหลักและแถบย่อยตามสัดส่วนเวลา";
+  age.textContent = "ช่วงอายุ";
+  group.append(planet, bars, age);
   return group;
 }
 
-function createSubSegment(segment, index, handlers, context) {
-  const currentClass = segment.key === context.journey.activeSub.key ? " is-current-sub" : "";
-  const relation = getSegmentRelationBadge(context.relationsData, context.birthDayType, segment);
+function createRowBackground(index, y, isCurrent) {
   const group = svgElement("g", {
-    class: `timeline-segment timeline-sub${currentClass}`,
+    class: `timeline-row-background${isCurrent ? " is-current-row" : ""}`,
+    "aria-hidden": "true",
   });
-  const x = PADDING_X + (segment.startYear / 108) * TRACK_WIDTH;
-  const width = ((segment.endYear - segment.startYear) / 108) * TRACK_WIDTH;
   const rect = svgElement("rect", {
-    x,
-    y: SUB_Y,
+    x: 14,
+    y,
+    width: VIEWBOX_WIDTH - 28,
+    height: ROW_HEIGHT,
+    rx: 22,
+    ry: 22,
+    class: "timeline-row-surface",
+  });
+  const order = svgElement("text", {
+    x: 22,
+    y: y + 24,
+    class: "timeline-row-order",
+  });
+  order.textContent = String(index + 1);
+  group.append(rect, order);
+  return group;
+}
+
+function createPlanetLabel(segment, rowY) {
+  const group = svgElement("g", {
+    class: "timeline-planet-label",
+    "aria-hidden": "true",
+  });
+  const chip = svgElement("circle", {
+    cx: LABEL_X + 35,
+    cy: rowY + 61,
+    r: 31,
+    fill: segment.mainPlanet.color,
+    class: "timeline-planet-chip",
+  });
+  const number = svgElement("text", {
+    x: LABEL_X + 35,
+    y: rowY + 69,
+    class: "timeline-planet-number",
+    style: `--label-color: ${segment.mainPlanet.labelColor}`,
+  });
+  const name = svgElement("text", {
+    x: LABEL_X + 78,
+    y: rowY + 51,
+    class: "timeline-planet-name",
+  });
+  const duration = svgElement("text", {
+    x: LABEL_X + 78,
+    y: rowY + 77,
+    class: "timeline-planet-duration",
+  });
+
+  number.textContent = segment.mainPlanet.number;
+  name.textContent = segment.mainPlanet.shortName;
+  duration.textContent = `${segment.mainPlanet.years} ปี`;
+  group.append(chip, number, name, duration);
+  return group;
+}
+
+function getBarWidth(mainSegment) {
+  return (mainSegment.mainPlanet.years / MAX_MAIN_YEARS) * MAX_BAR_WIDTH;
+}
+
+function createMainSegment(segment, handlers, context, rowY) {
+  const isCurrent = segment.key === context.journey.activeMain.key;
+  const relation = relationForSegment(context, segment);
+  const group = svgElement("g", {
+    class: `timeline-segment timeline-main${isCurrent ? " is-current-main" : ""}`,
+  });
+  const width = getBarWidth(segment);
+  const y = rowY + 19;
+  const rect = svgElement("rect", {
+    x: BAR_X,
+    y,
     width,
-    height: SUB_HEIGHT,
+    height: 39,
     rx: 12,
     ry: 12,
-    fill: mixWithWhite(segment.mainPlanet.color, 0.08 + (index % 4) * 0.085),
+    fill: segment.mainPlanet.color,
+  });
+  const label = svgElement("text", {
+    x: BAR_X + 16,
+    y: y + 26,
+    class: "timeline-main-label",
+    style: `--label-color: ${segment.mainPlanet.labelColor}`,
+  });
+  const endCap = svgElement("text", {
+    x: BAR_X + width - 12,
+    y: y + 26,
+    class: "timeline-main-end-label",
+    style: `--label-color: ${segment.mainPlanet.labelColor}`,
+  });
+
+  label.textContent = "แถบหลัก";
+  endCap.textContent = `${segment.mainPlanet.years} ปี`;
+  bindInteractions(group, segment, handlers, relation);
+  group.append(rect, label);
+  if (width > 160) group.append(endCap);
+  return group;
+}
+
+function createSubSegment(segment, index, handlers, context, mainSegment, rowY) {
+  const isCurrent = segment.key === context.journey.activeSub.key;
+  const relation = relationForSegment(context, segment);
+  const group = svgElement("g", {
+    class: `timeline-segment timeline-sub${isCurrent ? " is-current-sub" : ""}`,
+  });
+  const mainWidth = getBarWidth(mainSegment);
+  const x =
+    BAR_X +
+    ((segment.startYear - mainSegment.startYear) /
+      mainSegment.mainPlanet.years) *
+      mainWidth;
+  const width =
+    ((segment.endYear - segment.startYear) /
+      mainSegment.mainPlanet.years) *
+      mainWidth;
+  const y = rowY + 68;
+  const rect = svgElement("rect", {
+    x,
+    y,
+    width,
+    height: 35,
+    rx: 8,
+    ry: 8,
+    fill: mixWithWhite(
+      segment.mainPlanet.color,
+      0.08 + (index % 4) * 0.085,
+    ),
   });
   const label = svgElement("text", {
     x: x + width / 2,
-    y: SUB_Y + SUB_HEIGHT / 2 + 6,
+    y: y + 24,
     class: "timeline-sub-number",
     style: `--label-color: ${segment.mainPlanet.labelColor}`,
   });
+
   label.textContent = segment.subPlanet.number;
   bindInteractions(group, segment, handlers, relation);
   group.append(rect);
   if (width > 24) group.append(label);
-  if (relation) {
-    const marker = createRelationMarker(relation, x + width / 2, SUB_Y + 15, "sub");
-    if (marker) group.append(marker);
-  }
   return group;
 }
 
-function createAxis(model) {
+function createAgeRange(mainSegment, rowY) {
   const group = svgElement("g", {
-    class: "timeline-axis",
+    class: "timeline-age-range",
     "aria-hidden": "true",
   });
-  const line = svgElement("line", {
-    x1: PADDING_X,
-    y1: AXIS_Y,
-    x2: PADDING_X + TRACK_WIDTH,
-    y2: AXIS_Y,
-    class: "timeline-axis-line",
+  const label = svgElement("text", {
+    x: AGE_X,
+    y: rowY + 45,
+    class: "timeline-age-label",
   });
-  group.append(line);
-
-  const start = svgElement("text", {
-    x: PADDING_X,
-    y: AXIS_Y + 26,
-    class: "timeline-axis-caption timeline-axis-caption-start",
+  const value = svgElement("text", {
+    x: AGE_X,
+    y: rowY + 75,
+    class: "timeline-age-value",
   });
-  start.textContent = "เริ่มต้น";
-  group.append(start);
-
-  model.mainSegments.forEach((segment) => {
-    const x = PADDING_X + (segment.startYear / 108) * TRACK_WIDTH;
-    const tick = svgElement("line", {
-      x1: x,
-      y1: AXIS_Y - 7,
-      x2: x,
-      y2: AXIS_Y + 7,
-      class: "timeline-axis-tick",
-    });
-    const label = svgElement("text", {
-      x,
-      y: AXIS_Y + 24,
-      class: "timeline-axis-label",
-    });
-    label.textContent = `${segment.startYear} ปี`;
-    group.append(tick, label);
+  const exact = svgElement("text", {
+    x: AGE_X,
+    y: rowY + 99,
+    class: "timeline-age-exact",
   });
 
-  const endX = PADDING_X + TRACK_WIDTH;
-  const endTick = svgElement("line", {
-    x1: endX,
-    y1: AXIS_Y - 7,
-    x2: endX,
-    y2: AXIS_Y + 7,
-    class: "timeline-axis-tick",
-  });
-  const endLabel = svgElement("text", {
-    x: endX,
-    y: AXIS_Y + 24,
-    class: "timeline-axis-label timeline-axis-label-end",
-  });
-  endLabel.textContent = "108 ปี";
-  group.append(endTick, endLabel);
+  label.textContent = "ช่วงอายุ";
+  value.textContent =
+    `${formatAge(mainSegment.startYear)} – ${formatAge(mainSegment.endYear)}`;
+  exact.textContent =
+    `เริ่ม ${formatAge(mainSegment.startYear)} · สิ้นสุด ${formatAge(mainSegment.endYear)}`;
+  group.append(label, value, exact);
   return group;
 }
 
-function createCurrentMarker(journey) {
-  const x = PADDING_X + (journey.progressAngle / 360) * TRACK_WIDTH;
+function createRelationMarker(relation, x, y, variant) {
+  if (!relation) return null;
+  const group = svgElement("g", {
+    class: `timeline-relation timeline-relation-${relation.status} timeline-relation-${variant}`,
+    transform: `translate(${x} ${y})`,
+    "data-relation-status": relation.status,
+    "data-relation-variant": variant,
+    "aria-hidden": "true",
+  });
+  const circle = svgElement("circle", {
+    cx: 0,
+    cy: 0,
+    r: variant === "main" ? 11 : 9,
+    class: "timeline-relation-shape",
+  });
+  const text = svgElement("text", {
+    x: 0,
+    y: 5,
+    class: "timeline-relation-text",
+  });
+  text.textContent = relation.status === "good" ? "✓" : "!";
+  group.append(circle, text);
+  return group;
+}
+
+export function collectTimelineRelationMarkers(model, context) {
+  const markers = [];
+
+  model.mainSegments.forEach((mainSegment, rowIndex) => {
+    const rowY = HEADER_HEIGHT + rowIndex * (ROW_HEIGHT + ROW_GAP);
+    const mainWidth = getBarWidth(mainSegment);
+    const mainRelation = relationForSegment(context, mainSegment);
+    if (mainRelation) {
+      markers.push({
+        segment: mainSegment,
+        relation: mainRelation,
+        variant: "main",
+        x: BAR_X + mainWidth / 2,
+        y: rowY + 38,
+      });
+    }
+
+    mainSegment.subSegments.forEach((subSegment) => {
+      const relation = relationForSegment(context, subSegment);
+      if (!relation) return;
+      markers.push({
+        segment: subSegment,
+        relation,
+        variant: "sub",
+        x:
+          BAR_X +
+          (((subSegment.startYear + subSegment.endYear) / 2 -
+            mainSegment.startYear) /
+            mainSegment.mainPlanet.years) *
+            mainWidth,
+        y: rowY + 78,
+      });
+    });
+  });
+
+  return markers;
+}
+
+function createRelationOverlay(model, context) {
+  const overlay = svgElement("g", {
+    class: "timeline-relation-overlay",
+    "data-layer": "relations",
+    "aria-hidden": "true",
+  });
+
+  collectTimelineRelationMarkers(model, context).forEach((item) => {
+    const marker = createRelationMarker(
+      item.relation,
+      item.x,
+      item.y,
+      item.variant,
+    );
+    if (marker) overlay.append(marker);
+  });
+
+  return overlay;
+}
+
+function createCurrentMarker(model, context) {
+  const activeMainIndex = model.mainSegments.findIndex(
+    (segment) => segment.key === context.journey.activeMain.key,
+  );
+  if (activeMainIndex < 0) return null;
+
+  const mainSegment = model.mainSegments[activeMainIndex];
+  const rowY = HEADER_HEIGHT + activeMainIndex * (ROW_HEIGHT + ROW_GAP);
+  const mainWidth = getBarWidth(mainSegment);
+  const rawCycleYear =
+    clamp(context.journey.progressAngle / 360, 0, 1) * 108;
+  const cycleYear =
+    rawCycleYear >= 108 - 1e-8 && mainSegment.startYear === 0
+      ? 0
+      : rawCycleYear;
+  const fraction = clamp(
+    (cycleYear - mainSegment.startYear) /
+      mainSegment.mainPlanet.years,
+    0,
+    1,
+  );
+  const x = BAR_X + fraction * mainWidth;
   const group = svgElement("g", {
     class: "timeline-current-marker",
     "aria-hidden": "true",
   });
   const line = svgElement("line", {
     x1: x,
-    y1: 44,
+    y1: rowY + 12,
     x2: x,
-    y2: SUB_Y + SUB_HEIGHT + 18,
+    y2: rowY + 111,
     class: "timeline-current-line",
   });
   const arrow = svgElement("path", {
-    d: `M ${x - 9} 48 L ${x + 9} 48 L ${x} 64 Z`,
+    d: `M ${x - 9} ${rowY + 10} L ${x + 9} ${rowY + 10} L ${x} ${rowY + 25} Z`,
     class: "timeline-current-arrow",
   });
-  const badge = svgElement("rect", {
-    x: x - 72,
-    y: 10,
-    width: 144,
-    height: 26,
+  const chipWidth = 188;
+  const chipX = clamp(
+    x - chipWidth / 2,
+    BAR_X,
+    BAR_X + mainWidth - chipWidth,
+  );
+  const chip = svgElement("rect", {
+    x: chipX,
+    y: rowY - 12,
+    width: chipWidth,
+    height: 27,
     rx: 13,
     ry: 13,
     class: "timeline-current-chip",
   });
   const text = svgElement("text", {
-    x,
-    y: 28,
+    x: chipX + chipWidth / 2,
+    y: rowY + 7,
     class: "timeline-current-text",
   });
-  text.textContent = `อายุปัจจุบัน ${journey.age.years} ปี ${journey.age.months} เดือน`;
-  group.append(line, badge, text, arrow);
-  return { group, x };
+  text.textContent =
+    `อายุปัจจุบัน ${context.journey.age.years} ปี ${context.journey.age.months} เดือน`;
+  group.append(line, chip, text, arrow);
+  return group;
+}
+
+function createTimelineRow(mainSegment, rowIndex, handlers, context) {
+  const rowY = HEADER_HEIGHT + rowIndex * (ROW_HEIGHT + ROW_GAP);
+  const row = svgElement("g", {
+    class: `timeline-row${
+      mainSegment.key === context.journey.activeMain.key
+        ? " is-current-row"
+        : ""
+    }`,
+    "data-row-index": rowIndex,
+    "data-main-number": mainSegment.mainNumber,
+  });
+
+  row.append(
+    createRowBackground(
+      rowIndex,
+      rowY,
+      mainSegment.key === context.journey.activeMain.key,
+    ),
+    createPlanetLabel(mainSegment, rowY),
+    createMainSegment(mainSegment, handlers, context, rowY),
+  );
+  mainSegment.subSegments.forEach((subSegment, index) => {
+    row.append(
+      createSubSegment(
+        subSegment,
+        index,
+        handlers,
+        context,
+        mainSegment,
+        rowY,
+      ),
+    );
+  });
+  row.append(createAgeRange(mainSegment, rowY));
+  return row;
 }
 
 export function renderTimeline(container, model, handlers, context) {
@@ -292,49 +513,43 @@ export function renderTimeline(container, model, handlers, context) {
   });
   const title = svgElement("title", { id: "timeline-svg-title" });
   const description = svgElement("desc", { id: "timeline-svg-description" });
-  const bg = svgElement("rect", {
-    x: 10,
-    y: 10,
-    width: VIEWBOX_WIDTH - 20,
-    height: VIEWBOX_HEIGHT - 20,
-    rx: 26,
-    ry: 26,
+  const backdrop = svgElement("rect", {
+    x: 4,
+    y: 4,
+    width: VIEWBOX_WIDTH - 8,
+    height: VIEWBOX_HEIGHT - 8,
+    rx: 28,
+    ry: 28,
     class: "timeline-backdrop",
   });
-  const mainGroup = svgElement("g", { "data-track": "main" });
-  const subGroup = svgElement("g", { "data-track": "sub" });
-
-  title.textContent = "Timeline พระเคราะห์เสวยอายุ";
-  description.textContent =
-    `แสดงลำดับแถบหลักและแถบย่อยตามเวลา เริ่มที่วัน${context.birthDay.label} และตำแหน่งอายุปัจจุบัน ${context.journey.age.years} ปี ${context.journey.age.months} เดือน ${context.journey.age.days} วัน`;
-
-  model.mainSegments.forEach((segment) => {
-    mainGroup.append(createMainSegment(segment, handlers, context));
-    segment.subSegments.forEach((subSegment, index) => {
-      subGroup.append(createSubSegment(subSegment, index, handlers, context));
-    });
+  const rows = svgElement("g", {
+    class: "timeline-rows",
+    "data-layout": "one-main-period-per-row",
   });
 
-  const currentMarker = createCurrentMarker(context.journey);
+  title.textContent = "Timeline พระเคราะห์เสวยอายุแบบแยกแถว";
+  description.textContent =
+    `แสดงพระเคราะห์หลัก 8 ช่วงเป็น 8 แถว เริ่มจากวัน${context.birthDay.label} ` +
+    `แต่ละแถวมีแถบหลัก แถบย่อยตามสัดส่วนเวลา และช่วงอายุเริ่มถึงสิ้นสุด`;
 
+  model.mainSegments.forEach((mainSegment, rowIndex) => {
+    rows.append(
+      createTimelineRow(mainSegment, rowIndex, handlers, context),
+    );
+  });
+
+  const currentMarker = createCurrentMarker(model, context);
   svg.append(
     title,
     description,
-    bg,
-    createAxis(model),
-    mainGroup,
-    subGroup,
-    currentMarker.group,
+    backdrop,
+    createHeader(),
+    rows,
   );
+  if (currentMarker) svg.append(currentMarker);
+  // วางเครื่องหมายความสัมพันธ์เป็นชั้นสุดท้าย เพื่อให้ทั้ง ✓ และ ! มองเห็นครบ
+  svg.append(createRelationOverlay(model, context));
   container.replaceChildren(svg);
-
-  const scrollToCurrent = () => {
-    const viewportWidth = container.clientWidth;
-    const svgWidth = svg.getBoundingClientRect().width || container.scrollWidth || viewportWidth;
-    const scaledX = (currentMarker.x / VIEWBOX_WIDTH) * svgWidth;
-    const target = clamp(scaledX - viewportWidth / 2, 0, Math.max(0, container.scrollWidth - viewportWidth));
-    container.scrollTo({ left: target, behavior: "smooth" });
-  };
 
   return {
     setSelected(segment) {
@@ -351,6 +566,7 @@ export function renderTimeline(container, model, handlers, context) {
         selected.setAttribute("aria-pressed", "true");
       }
     },
-    scrollToCurrent,
+    // ตั้งใจไม่เลื่อนอัตโนมัติ เพื่อให้ผู้ใช้เห็นลำดับตั้งแต่ดาวเกิดแถวแรก
+    scrollToCurrent() {},
   };
 }

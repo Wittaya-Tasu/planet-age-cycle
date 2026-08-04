@@ -14,6 +14,8 @@ import {
   getPlanetRelation,
   getSegmentRelationBadge,
 } from "../js/core/relations.js";
+import { collectWheelRelationMarkers } from "../js/components/wheel.js";
+import { collectTimelineRelationMarkers } from "../js/components/timeline.js";
 const model = buildWheelModel();
 const validation = validateWheelModel(model);
 assert.equal(validation.valid, true, validation.errors.join("\n"));
@@ -120,6 +122,44 @@ assert.equal(
   ).status,
   "bad",
 );
+
+const relationMarkerContext = (birthDayType) => ({
+  relationsData: datasets.relationsData,
+  birthDayType,
+});
+const countMarkers = (markers, status) =>
+  markers.filter((item) => item.relation.status === status).length;
+
+const sundayWheelMarkers = collectWheelRelationMarkers(
+  model,
+  relationMarkerContext("sunday"),
+);
+const sundayTimelineMarkers = collectTimelineRelationMarkers(
+  model,
+  relationMarkerContext("sunday"),
+);
+assert.equal(sundayWheelMarkers.length, 18);
+assert.equal(countMarkers(sundayWheelMarkers, "good"), 9);
+assert.equal(countMarkers(sundayWheelMarkers, "bad"), 9);
+assert.equal(sundayTimelineMarkers.length, 18);
+assert.equal(countMarkers(sundayTimelineMarkers, "good"), 9);
+assert.equal(countMarkers(sundayTimelineMarkers, "bad"), 9);
+
+const thursdayWheelMarkers = collectWheelRelationMarkers(
+  model,
+  relationMarkerContext("thursday"),
+);
+assert.equal(thursdayWheelMarkers.length, 9);
+assert.equal(countMarkers(thursdayWheelMarkers, "good"), 9);
+assert.equal(countMarkers(thursdayWheelMarkers, "bad"), 0);
+
+const fridayTimelineMarkers = collectTimelineRelationMarkers(
+  model,
+  relationMarkerContext("friday"),
+);
+assert.equal(fridayTimelineMarkers.length, 18);
+assert.equal(countMarkers(fridayTimelineMarkers, "good"), 9);
+assert.equal(countMarkers(fridayTimelineMarkers, "bad"), 9);
 const profile = {
   birthDayType: "saturday",
   birth: { yearBE: 2527, month: 4, day: 21, hour: 1, minute: 49 },
@@ -140,7 +180,7 @@ const result = findCurrentPeriod(profile, target, datasets);
 assert.ok(result.current.startEpochMs <= target && target < result.current.endEpochMs);
 assert.ok(result.next);
 const sw = await readFile(`${root}sw.js`, "utf8");
-assert.match(sw, /planet-age-cycle-v0\.6\.0/);
+assert.match(sw, /planet-age-cycle-v0\.7\.0/);
 assert.match(sw, /js\/core\/exportImage\.js/);
 assert.match(sw, /js\/components\/timeline\.js/);
 const wheelSource = await readFile(`${root}js/components/wheel.js`, "utf8");
@@ -159,8 +199,17 @@ assert.doesNotMatch(wheelSource, /text\.textContent\s*=\s*segment\.subPlanet\.nu
 assert.match(wheelSource, /relation-marker/);
 assert.doesNotMatch(wheelSource, /birth-start-ring/);
 assert.match(wheelSource, /journey-current-arrow/);
-assert.match(wheelSource, /mainRelation: 218/);
+assert.match(wheelSource, /mainRelation: 180/);
 assert.match(wheelSource, /getSegmentRelationBadge/);
+assert.match(wheelSource, /collectWheelRelationMarkers/);
+assert.match(wheelSource, /data-layer": "relations"/);
+const wheelAppendSource = wheelSource.slice(
+  wheelSource.lastIndexOf("svg.append("),
+);
+assert.ok(
+  wheelAppendSource.indexOf("createCenter(age, birthDay)") <
+    wheelAppendSource.indexOf("createRelationOverlay(model, context)"),
+);
 assert.doesNotMatch(tooltipSource, /formatPercentage/);
 assert.doesNotMatch(detailSource, /สัดส่วนในแถบหลัก/);
 assert.match(detailSource, /คำพยากรณ์และรายละเอียด/);
@@ -170,11 +219,24 @@ assert.match(indexSource, /id="view-wheel-button"/);
 assert.match(indexSource, /id="view-timeline-button"/);
 assert.match(exportSource, /visualizationMode/);
 assert.match(exportSource, /Timeline แนวนอน/);
+assert.match(exportSource, /EXPORT_TIMELINE_HEIGHT = 2070/);
 assert.match(appSource, /renderTimeline/);
 assert.match(appSource, /setVisualizationMode/);
+assert.doesNotMatch(appSource, /requestAnimationFrame\(\(\) => timelineController\?\.scrollToCurrent/);
 assert.match(summarySource, /formatThaiShortDateTime/);
 assert.match(layoutSource, /timeline-container/);
 assert.match(layoutSource, /view-switch/);
+assert.match(layoutSource, /timeline-row-surface/);
+assert.match(timelineSource, /one-main-period-per-row/);
+assert.match(timelineSource, /createAgeRange/);
+assert.match(timelineSource, /MAX_MAIN_YEARS = 21/);
+assert.match(timelineSource, /collectTimelineRelationMarkers/);
+assert.doesNotMatch(timelineSource, /createAxis/);
+assert.doesNotMatch(indexSource, /class="interaction-hint"/);
+assert.doesNotMatch(
+  indexSource,
+  /ตำแหน่ง 12 นาฬิกาคือพระเคราะห์ประจำวันเกิด/,
+);
 assert.equal(
   formatThaiShortDateTime(
     bangkokPartsToEpochMs({
@@ -191,7 +253,7 @@ console.log("✓ วงล้อหมุนให้พระเคราะห
 console.log("✓ คำพยากรณ์ 64 ช่องและข้อมูลพระอังคารแทรกพระพุธถูกต้อง");
 console.log("✓ ปฏิทินจริงและนโยบาย 29 กุมภาพันธ์ถูกต้อง");
 console.log("✓ แถบย่อยปิดพอดีกับแถบหลักทุกกลุ่ม");
-console.log("✓ สัญลักษณ์ดี/ไม่ดีแสดงล่วงหน้าทั้งแถบหลักและแถบย่อย");
-console.log("✓ เพิ่มมุมมอง Timeline แนวนอนและปุ่มสลับมุมมองแล้ว");
+console.log("✓ สัญลักษณ์ดีและไม่ดีแสดงครบตามวันเกิด ทั้งวงล้อและ Timeline");
+console.log("✓ Timeline แยกพระเคราะห์หลักเป็น 8 แถวและแสดงช่วงอายุครบ");
 console.log("✓ เดือนแบบย่อและแถบความคืบหน้าช่วงปัจจุบันยังถูกต้อง");
-console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.6.0 พร้อมใช้งาน");
+console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.7.0 พร้อมใช้งาน");

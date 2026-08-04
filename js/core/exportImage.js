@@ -1,5 +1,6 @@
 const EXPORT_WIDTH = 1600;
-const EXPORT_HEIGHT = 1180;
+const EXPORT_WHEEL_HEIGHT = 1180;
+const EXPORT_TIMELINE_HEIGHT = 2070;
 const BACKGROUND = "#f3eee5";
 const SURFACE = "#fffdf9";
 const INK = "#29221e";
@@ -302,9 +303,20 @@ function drawDetailCard(context, detailPanel, x, y, width, height, rowLimit = 4)
   }
 }
 
+function drawImageContain(context, image, x, y, width, height) {
+  const sourceWidth = image.naturalWidth || image.width || width;
+  const sourceHeight = image.naturalHeight || image.height || height;
+  const scale = Math.min(width / sourceWidth, height / sourceHeight);
+  const drawWidth = sourceWidth * scale;
+  const drawHeight = sourceHeight * scale;
+  const drawX = x + (width - drawWidth) / 2;
+  const drawY = y + (height - drawHeight) / 2;
+  context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
+}
+
 function drawTimelineLayout(context, visualImage, journeySummary, detailPanel) {
-  drawCard(context, 42, 238, 1516, 420);
-  context.drawImage(visualImage, 74, 274, 1452, 348);
+  drawCard(context, 42, 238, 1516, 1080);
+  drawImageContain(context, visualImage, 68, 264, 1464, 1028);
 
   const journeyRows = extractRows(
     journeySummary,
@@ -312,27 +324,29 @@ function drawTimelineLayout(context, visualImage, journeySummary, detailPanel) {
     "span",
     "strong",
   );
-  const journeyTitle = journeySummary.querySelector("h2")?.textContent?.trim() ?? "ช่วงชีวิตปัจจุบัน";
+  const journeyTitle =
+    journeySummary.querySelector("h2")?.textContent?.trim() ??
+    "ช่วงชีวิตปัจจุบัน";
 
-  drawCard(context, 42, 690, 742, 418);
+  drawCard(context, 42, 1350, 742, 640);
   context.fillStyle = ACCENT;
   context.font = '800 22px "Sarabun", sans-serif';
-  context.fillText("ช่วงชีวิตปัจจุบัน", 74, 734);
+  context.fillText("ช่วงชีวิตปัจจุบัน", 74, 1394);
   context.fillStyle = INK;
   context.font = '800 31px "Sarabun", sans-serif';
   let cursorY = drawWrappedText(
     context,
     journeyTitle,
     74,
-    778,
+    1438,
     678,
     39,
     2,
   );
   cursorY += 12;
-  drawRows(context, journeyRows, 74, cursorY, 678, 5);
+  drawRows(context, journeyRows, 74, cursorY, 678, 6);
 
-  drawDetailCard(context, detailPanel, 816, 690, 742, 418, 5);
+  drawDetailCard(context, detailPanel, 816, 1350, 742, 640, 6);
 }
 
 export async function saveDashboardImage({
@@ -350,7 +364,10 @@ export async function saveDashboardImage({
   const visualImage = await svgToImage(svg);
   const canvas = document.createElement("canvas");
   canvas.width = EXPORT_WIDTH;
-  canvas.height = EXPORT_HEIGHT;
+  canvas.height =
+    visualizationMode === "timeline"
+      ? EXPORT_TIMELINE_HEIGHT
+      : EXPORT_WHEEL_HEIGHT;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("อุปกรณ์นี้ไม่รองรับการสร้างรูปภาพ");
 
@@ -370,7 +387,7 @@ export async function saveDashboardImage({
   context.fillText(
     "ข้อมูลตามหลักโหราศาสตร์ ใช้ประกอบการพิจารณา ไม่ใช่ข้อยืนยันเหตุการณ์",
     64,
-    1150,
+    canvas.height - 30,
   );
 
   const blob = await canvasToBlob(canvas);
