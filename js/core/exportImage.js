@@ -372,7 +372,7 @@ export async function saveDashboardImage({
   if (!context) throw new Error("อุปกรณ์นี้ไม่รองรับการสร้างรูปภาพ");
 
   context.fillStyle = BACKGROUND;
-  context.fillRect(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
+  context.fillRect(0, 0, EXPORT_WIDTH, canvas.height);
 
   drawHeader(context, profileBirthText, profileTargetText, visualizationMode);
 

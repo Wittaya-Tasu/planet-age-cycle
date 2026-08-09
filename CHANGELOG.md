@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.7.1 — Export image hotfix
+
+**วันที่:** 9 สิงหาคม 2569
+
+### แก้ไข
+
+- แก้ Error `EXPORT_HEIGHT is not defined` ที่ทำให้ปุ่มบันทึกภาพใช้งานไม่ได้
+- การสร้างพื้นหลัง Canvas เปลี่ยนไปอ้างอิง `canvas.height` ซึ่งรองรับทั้งภาพวงล้อและ Timeline
+- อัปเดต Offline Cache เป็น `planet-age-cycle-v0.7.1` เพื่อบังคับโหลดไฟล์ JavaScript ที่แก้ไขแล้ว
+
 ## v0.7.0 — Relation marker fix and row timeline
 
 **วันที่:** 4 สิงหาคม 2569
