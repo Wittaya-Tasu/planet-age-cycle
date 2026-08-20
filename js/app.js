@@ -1,8 +1,6 @@
 import { loadAppData } from "./data/loadData.js";
 import {
   calculateCalendarAge,
-  civilWeekday,
-  civilWeekdayName,
   compareCivilDates,
   currentBangkokDate,
   datePartsToEpoch,
@@ -46,7 +44,6 @@ const birthTime = document.querySelector("#birth-time");
 const birthTimeUnknown = document.querySelector("#birth-time-unknown");
 const targetDate = document.querySelector("#target-date");
 const formError = document.querySelector("#form-error");
-const formWarning = document.querySelector("#form-warning");
 const todayButton = document.querySelector("#today-button");
 const currentSummary = document.querySelector("#current-summary");
 const kalayokTable = document.querySelector("#kalayok-table");
@@ -78,11 +75,6 @@ function planetsByNumber() {
 function setError(message = "") {
   formError.textContent = message;
   formError.hidden = !message;
-}
-
-function setWarning(message = "") {
-  formWarning.textContent = message;
-  formWarning.hidden = !message;
 }
 
 function toInputDate(date) {
@@ -130,13 +122,6 @@ function writeProfile(profile) {
   targetDate.value = toInputDate(profile.targetDate);
 }
 
-function weekdayWarning(profile) {
-  const actual = civilWeekday(profile.birthDate);
-  const selected = BIRTH_DAY_META[profile.birthDayType];
-  if (actual === selected.weekday) return "";
-  return `วันที่ ${formatThaiDate(profile.birthDate)} ตามปฏิทินสุริยคติเป็นวัน${civilWeekdayName(profile.birthDate)} แต่เลือกวัน${selected.label} ระบบจะยึดวันเกิดที่ผู้ใช้เลือกเป็นดาวเริ่มต้น`;
-}
-
 function deriveState(profile) {
   const age = calculateCalendarAge(profile.birthDate, profile.targetDate);
   const pMap = planetsByNumber();
@@ -154,7 +139,7 @@ function deriveState(profile) {
   });
   if (!validateCycle(current.cycle)) throw new Error("โครงสร้างดาวแทรกไม่ปิดพอดีกับช่วงดาวเสวยหลัก");
   const birthEpoch = datePartsToEpoch(profile.birthDate, profile.birthTime, 12);
-  return { profile, age, birthPlanet, chulasakarat, kalayokMap, current, targetEpochMs, pMap, birthEpoch, weekdayWarning: weekdayWarning(profile) };
+  return { profile, age, birthPlanet, chulasakarat, kalayokMap, current, targetEpochMs, pMap, birthEpoch };
 }
 
 function visualContext() {
@@ -216,7 +201,7 @@ function renderDashboard(profile) {
 
   const timeText = formatTime(profile.birthTime);
   profileBirth.textContent = `เกิดวัน${BIRTH_DAY_META[profile.birthDayType].label} · ${formatThaiDate(profile.birthDate)} · ${timeText}`;
-  profileTarget.textContent = `คำนวณถึง ${formatThaiDate(profile.targetDate)} · อายุ ${formatAge(currentState.age)}${currentState.weekdayWarning ? ` · ${currentState.weekdayWarning}` : ""}`;
+  profileTarget.textContent = `คำนวณถึง ${formatThaiDate(profile.targetDate)} · อายุ ${formatAge(currentState.age)}`;
 
   renderCurrentSummary(currentSummary, {
     age: currentState.age,
@@ -265,7 +250,6 @@ form.addEventListener("submit", (event) => {
   try {
     const profile = readProfile();
     setError();
-    setWarning(weekdayWarning(profile));
     renderDashboard(profile);
   } catch (error) {
     setError(error instanceof Error ? error.message : String(error));
@@ -286,7 +270,6 @@ resetButton.addEventListener("click", () => {
   onboarding.hidden = false;
   initializeForm();
   setError();
-  setWarning();
 });
 
 viewWheel.addEventListener("click", () => setMode("wheel"));
@@ -300,7 +283,13 @@ saveImageButton.addEventListener("click", async () => {
   try {
     const container = currentMode === "wheel" ? wheelContainer : timelineContainer;
     const summary = `${currentState.pMap[currentState.current.main.planet].shortNameTh}เสวย · ${currentState.pMap[currentState.current.sub.subPlanet].shortNameTh}แทรก · อายุ ${formatAge(currentState.age)}`;
-    await saveVisualizationImage({ visualizationContainer: container, mode: currentMode, profileText: profileBirth.textContent, summaryText: summary });
+    await saveVisualizationImage({
+      visualizationContainer: container,
+      supplementaryContainer: currentMode === "wheel" ? subExplorer : null,
+      mode: currentMode,
+      profileText: profileBirth.textContent,
+      summaryText: summary,
+    });
   } catch (error) {
     alert(error instanceof Error ? error.message : String(error));
   } finally {

@@ -22,7 +22,7 @@ const COLORS = {
   unknownText: "#2F2C29",
   friend: "#17633E",
   enemy: "#8E2630",
-  relationLine: "#8A7566",
+  relationLine: "#9A897A",
 };
 
 function svg(name, attrs = {}) {
@@ -70,22 +70,35 @@ function createDashedRelations(model, context) {
   const group = svg("g", { class: "wheel-relation-lines", "aria-hidden": "true" });
   model.mainSegments.forEach((segment) => {
     const relation = getRelationship(context.relationshipsData, context.birthPlanet, segment.planet);
-    if (!relation.otherLabels?.length) return;
+    const items = relation.otherItems ?? [];
+    if (!items.length) return;
+
     const mid = (segment.startAngle + segment.endAngle) / 2;
-    const start = polar(R.center + 5, mid);
-    const end = polar(R.mainInner - 4, mid);
-    const label = polar(177, mid);
+    const startRadius = R.center + 10;
+    const endRadius = R.mainInner - 5;
+    const start = polar(startRadius, mid);
+    const end = polar(endRadius, mid);
     group.append(svg("line", {
       x1: start.x, y1: start.y, x2: end.x, y2: end.y,
-      stroke: COLORS.relationLine, "stroke-width": 1.5, "stroke-dasharray": "5 5",
+      stroke: COLORS.relationLine, "stroke-width": 1.35, "stroke-dasharray": "4 5",
     }));
-    const textValue = relation.otherLabels.join(" / ");
-    const width = Math.min(120, 14 + textValue.length * 7);
-    group.append(svg("rect", {
-      x: label.x - width / 2, y: label.y - 11, width, height: 21, rx: 10,
-      fill: "#FFFDF9", stroke: "#D9CEC4", "stroke-width": 1,
-    }));
-    group.append(createText(label.x, label.y + 4, textValue, "wheel-relation-label", "#655548"));
+
+    const labelStart = R.center + 24;
+    const labelEnd = R.mainInner - 18;
+    items.forEach((item, index) => {
+      const fraction = items.length === 1 ? 0.58 : index / Math.max(1, items.length - 1);
+      const radius = items.length === 1
+        ? labelStart + (labelEnd - labelStart) * fraction
+        : labelStart + (labelEnd - labelStart) * fraction;
+      const label = polar(radius, mid);
+      group.append(createText(
+        label.x,
+        label.y + 3,
+        item.shortLabelTh,
+        `wheel-relation-label wheel-relation-${item.tag}`,
+        item.color,
+      ));
+    });
   });
   return group;
 }
@@ -96,9 +109,12 @@ function createCenter(context) {
   const style = stateStyle(state);
   const planet = context.planetsByNumber[context.birthPlanet];
   const natureColor = planet.nature === "bapa" ? COLORS.badText : COLORS.goodText;
-  group.append(svg("circle", { cx: C, cy: C, r: R.center, fill: "#FFFCF7", stroke: "#D8CCC1", "stroke-width": 1.5 }));
-  group.append(svg("circle", { cx: C, cy: C - 6, r: 60, fill: "none", stroke: style.text, "stroke-width": 1.2, opacity: 0.55 }));
-  group.append(createText(C, C - 58, "ดาววันเกิด", "center-eyebrow", "#75695F"));
+
+  group.append(svg("circle", {
+    cx: C, cy: C, r: R.center,
+    fill: "#FFFCF7", stroke: "#D8CCC1", "stroke-width": 1.5,
+  }));
+  group.append(createText(C, C - 58, planet.nameTh, "center-eyebrow", "#75695F"));
   group.append(createText(C, C + 12, String(context.birthPlanet), "center-birth-number", style.text));
   group.append(createText(C + 54, C - 28, "✱", "center-nature-star", natureColor));
   group.append(createText(C, C + 50, planet.nature === "bapa" ? "บาปเคราะห์" : "ศุภเคราะห์", "center-nature-label", natureColor));
@@ -154,7 +170,12 @@ export function renderWheel(container, context, handlers) {
     group.append(createText(pos.x, pos.y + 8, String(segment.planet), "wheel-main-number", relation.primaryBadge ? "#FFFFFF" : style.text));
     group.append(createText(pos.x, pos.y + 30, state.displayNameTh, "wheel-position-name", style.text));
     group.addEventListener("click", () => handlers.onMainSelect(segment));
-    group.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); handlers.onMainSelect(segment); } });
+    group.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        handlers.onMainSelect(segment);
+      }
+    });
     mainGroup.append(group);
 
     segment.subSegments.forEach((sub) => {

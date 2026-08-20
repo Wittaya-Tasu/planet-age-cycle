@@ -1,7 +1,7 @@
 # PROJECT STATE — มหาทศา
 
-**Version:** `0.8.1`  
-**Status:** Hotfix + Calendar Engine พร้อมอัปเดตจาก v0.8.0
+**Version:** `0.8.2`  
+**Status:** UI refinement ต่อจาก v0.8.1
 
 ## Engine
 
@@ -15,30 +15,24 @@
 | ความสัมพันธ์ดาว 6 ประเภท | พร้อมใช้ |
 | Semantic meaning layer | เก็บใน knowledge แต่ยังไม่แสดง UI |
 
-## UI
+## UI v0.8.2
 
 | ส่วน | สถานะ |
 |---|---|
 | Font Sarabun | ใช้ทั้งระบบและ self-hosted |
-| Current summary แบบแบนยาว | พร้อมใช้ |
+| Header | เหลือชื่อ `มหาทศา` แบบกระชับ |
+| Warning วันสุริยคติไม่ตรงวันเลือก | ไม่แสดงใน UI |
+| Toolbar 3 ปุ่ม | อยู่แถวเดียวกันเสมอ |
+| Current summary | พร้อมใช้ |
 | ตารางมหาภูติกำเนิด | พร้อมใช้ |
-| วงกลม 108 ปี | แก้ blank-screen regression แล้ว |
+| วงกลม 108 ปี | พร้อมใช้ |
+| Center Wheel | แสดงชื่อพระเคราะห์วันเกิด + เลขวันเกิด ไม่มีวงเล็กด้านใน |
+| ความสัมพันธ์เส้นประ | label สั้นแบบสี ไม่มีกรอบข้อความยาว |
 | Timeline 8 แถว | พร้อมใช้ |
 | Expand main → sub timeline | พร้อมใช้ |
-| สีตามมหาภูติกำเนิด | พร้อมใช้ |
-| คู่มิตร/คู่ศัตรู badge | พร้อมใช้ |
-| ความสัมพันธ์อื่นแบบเส้น/label | พร้อมใช้ |
-| PNG Export | พร้อมใช้ และใช้ Sarabun |
-| PWA/Offline | cache `maha-thasa-v0.8.1` |
-
-## Calendar policy
-
-- ไม่เรียกเว็บไซต์ภายนอกขณะใช้งาน
-- วันเวลาเถลิงศกคำนวณจากเกณฑ์สุริยยาตร์
-- MyHora เป็น validation source ไม่ใช่ runtime dependency
-- เวลา MyHora/ตำราแบบท้องถิ่นกรุงเทพฯ UTC+06:42 แปลงเป็นเวลาไทยมาตรฐาน UTC+07:00 ก่อนเทียบกับเวลาเกิด
-- ไม่ทราบเวลาเกิด = `null`
-- หากไม่ทราบเวลาและเกิดตรงวันเถลิงศก ให้ผล จ.ศ. เป็นสองค่าที่เป็นไปได้
+| PNG Export Wheel | รวม Subperiod Explorer ด้านล่าง |
+| PNG Export Timeline | พร้อมใช้ |
+| PWA/Offline | cache `maha-thasa-v0.8.2` |
 
 ## Important invariant
 

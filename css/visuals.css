@@ -4,9 +4,17 @@
 .wheel-main-number { font-size: 27px; font-weight: 900; paint-order: stroke; stroke: rgba(255,255,255,.65); stroke-width: 1.4px; }
 .wheel-position-name { font-size: 11px; font-weight: 800; }
 .wheel-sub-number { font-size: 13px; font-weight: 900; }
-.wheel-relation-label { font-size: 9px; font-weight: 800; }
-.center-eyebrow { font-size: 13px; font-weight: 800; }
-.center-birth-number { font-size: 76px; font-weight: 900; }
+.wheel-relation-lines line { opacity: .82; }
+.wheel-relation-label {
+  font-size: 10px;
+  font-weight: 900;
+  paint-order: stroke;
+  stroke: #fffdf9;
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.center-eyebrow { font-size: 14px; font-weight: 800; }
+.center-birth-number { font-size: 82px; font-weight: 900; }
 .center-nature-star { font-size: 21px; font-weight: 900; }
 .center-nature-label { font-size: 13px; font-weight: 800; }
 .center-age { font-size: 14px; font-weight: 700; }
@@ -16,7 +24,8 @@
 .timeline-birth-star { font-size: 14px; font-weight: 900; }
 .timeline-position { font-size: 12px; font-weight: 900; }
 .timeline-years { font-size: 10px; font-weight: 700; }
-.timeline-relation-text { font-size: 10px; font-weight: 800; }
+.timeline-relation-text { font-size: 10px; font-weight: 900; paint-order: stroke; stroke: #fffdf9; stroke-width: 3px; }
+.timeline-relation-separator { font-size: 10px; font-weight: 800; }
 .timeline-age-label { font-size: 9px; font-weight: 700; }
 .timeline-age-value { font-size: 13px; font-weight: 850; }
 .timeline-sub-caption { font-size: 10px; font-weight: 800; }

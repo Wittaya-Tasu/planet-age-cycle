@@ -62,7 +62,7 @@ export function renderSubperiodExplorer(container, { mainPeriod, planetsByNumber
       create("div", "sub-detail-age", `อายุ ${formatAge(ageStart)} → ${formatAge(ageEnd)}`),
       create("div", "sub-detail-date", `${formatThaiDateShortFromEpoch(sub.startEpochMs, birthTimeKnown)} → ${formatThaiDateShortFromEpoch(sub.endEpochMs, birthTimeKnown)}`),
     );
-    if (relation.labels.length) item.append(create("div", "sub-detail-relation", relation.labels.join(" · ")));
+    if (relation.shortLabels.length) item.append(create("div", "sub-detail-relation", relation.shortLabels.join(" · ")));
     details.append(item);
   });
   section.append(details);

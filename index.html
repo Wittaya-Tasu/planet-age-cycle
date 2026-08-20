@@ -17,13 +17,11 @@
 </head>
 <body>
   <header class="site-header">
-    <div>
-      <p class="brand-kicker">โหราศาสตร์ไทย · มหาทักษา</p>
+    <div class="brand-block">
       <h1>มหาทศา</h1>
-      <p class="brand-subtitle">ดาวเสวยอายุ 108 ปี · กาลโยคมหาภูติกำเนิด · ความสัมพันธ์ของดาว</p>
     </div>
     <div class="header-actions">
-      <span class="version-badge">v0.8.1</span>
+      <span class="version-badge">v0.8.2</span>
       <button id="install-button" class="quiet-button" type="button" hidden>ติดตั้ง</button>
     </div>
   </header>
@@ -62,7 +60,6 @@
           <label class="field field-target"><span>วันที่ต้องการคำนวณอายุ</span><input id="target-date" type="date" required /></label>
         </div>
 
-        <div id="form-warning" class="form-warning" hidden></div>
         <div id="form-error" class="form-error" hidden></div>
         <div class="form-actions">
           <button class="primary-button" type="submit">คำนวณมหาทศา</button>
@@ -73,7 +70,7 @@
 
     <section id="dashboard" hidden>
       <div class="profile-toolbar">
-        <div>
+        <div class="profile-copy">
           <span id="profile-birth" class="profile-line"></span>
           <span id="profile-target" class="profile-line muted"></span>
         </div>
@@ -103,8 +100,8 @@
           <span><i class="legend-swatch good"></i>ตำแหน่งมหาภูติดี</span>
           <span><i class="legend-swatch bad"></i>ตำแหน่งมหาภูติเสีย</span>
           <span><i class="legend-swatch unknown"></i>ราหู / ไม่มีตำแหน่งมหาภูติ</span>
-          <span><i class="legend-badge friend"></i>คู่มิตร</span>
-          <span><i class="legend-badge enemy"></i>คู่ศัตรู</span>
+          <span><i class="legend-badge friend"></i>มิตร</span>
+          <span><i class="legend-badge enemy"></i>ศัตรู</span>
           <span><i class="legend-line"></i>ความสัมพันธ์ประเภทอื่น</span>
         </div>
 
@@ -117,11 +114,6 @@
       </section>
 
       <div id="subperiod-explorer"></div>
-
-      <section class="method-note">
-        <strong>หลักการคำนวณ จ.ศ.</strong>
-        <span>ระบบคำนวณวันและเวลาเถลิงศกจากเกณฑ์สุริยยาตร์ภายในเครื่อง ไม่ต้องเรียก MyHora ขณะใช้งาน โดยใช้ MyHora เป็นชุดสอบทานผล และแปลงเวลาท้องถิ่นกรุงเทพฯเดิม (UTC+06:42) เป็นเวลามาตรฐานประเทศไทย (UTC+07:00) ก่อนเปรียบเทียบกับเวลาเกิด</span>
-      </section>
     </section>
 
     <div id="fatal-error" class="fatal-error" hidden></div>

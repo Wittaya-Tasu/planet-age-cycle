@@ -42,12 +42,18 @@ function styleFor(state) {
 }
 
 function relationChip(x, y, relation) {
-  if (!relation.otherLabels?.length) return null;
-  const label = relation.otherLabels.join(" / ");
-  const width = Math.min(168, 18 + label.length * 7);
+  const items = relation.otherItems ?? [];
+  if (!items.length) return null;
   const group = svg("g", { class: "timeline-relation-chip" });
-  group.append(svg("rect", { x, y: y - 15, width, height: 30, rx: 15, fill: "#FFFDF9", stroke: "#D9CEC4" }));
-  group.append(text(x + width / 2, y + 5, label, "timeline-relation-text", "#655548", "middle"));
+  let cursor = x;
+  items.forEach((item, index) => {
+    const approxWidth = Math.max(34, item.shortLabelTh.length * 9 + 8);
+    group.append(text(cursor, y + 4, item.shortLabelTh, "timeline-relation-text", item.color));
+    cursor += approxWidth;
+    if (index < items.length - 1) {
+      group.append(text(cursor - 7, y + 4, "·", "timeline-relation-separator", "#A4968A"));
+    }
+  });
   return group;
 }
 
