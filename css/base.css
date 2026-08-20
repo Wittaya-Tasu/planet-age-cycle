@@ -5,7 +5,7 @@ body {
   min-height: 100vh;
   color: var(--ink);
   background: var(--bg);
-  font-family: "Noto Sans Thai", "Leelawadee UI", Tahoma, system-ui, sans-serif;
+  font-family: "Sarabun", sans-serif;
   line-height: 1.55;
 }
 button, input, select { font: inherit; }

@@ -1,21 +1,70 @@
 {
-  "schemaVersion": "0.1.0",
-  "calculationMethod": "verified-annual-boundary-table",
-  "timezone": "Asia/Bangkok",
-  "entries": [
+  "schemaVersion": "1.0.0",
+  "calculationMethod": "suriyayatra-thaloeng-sok-v1",
+  "runtimePolicy": "calculate-locally-no-network",
+  "suriyayatra": {
+    "constants": {
+      "epochCeYear": 638,
+      "epochMonth": 3,
+      "epochDay": 25,
+      "solarYearKammach": 292207,
+      "epochKammach": 373,
+      "kammachPerDay": 800
+    },
+    "timeConvention": {
+      "bangkokLocalMeanUtcOffsetMinutes": 402,
+      "thailandStandardUtcOffsetMinutes": 420
+    },
+    "formula": "JD = ((292207 * CS) + 373) / 800 + 1954167.5; CS = CE - 638",
+    "noteTh": "ผลสูตรเถลิงศกในขนบปฏิทินสุริยยาตร์อ้างเวลาท้องถิ่นกรุงเทพฯเดิม UTC+06:42 ระบบมหาทศาแปลงเป็นเวลามาตรฐานประเทศไทย UTC+07:00 โดยบวก 18 นาที ก่อนเปรียบเทียบกับเวลาเกิด"
+  },
+  "validationScope": {
+    "myHoraCoverageBe": [2300, 2700],
+    "role": "validation-only",
+    "noteTh": "MyHora ใช้สำหรับสอบทาน ไม่ใช่ฐานข้อมูลที่ WebApp เรียกขณะทำงาน"
+  },
+  "validationSamples": [
     {
+      "beYear": 2300,
+      "ceYear": 1757,
+      "localMean": "1757-04-12T00:10:48+06:42",
+      "thailandStandard": "1757-04-12T00:28:48+07:00",
+      "source": "MyHora Songkran 2300"
+    },
+    {
+      "beYear": 2400,
+      "ceYear": 1857,
+      "localMean": "1857-04-13T21:10:48+06:42",
+      "thailandStandard": "1857-04-13T21:28:48+07:00",
+      "source": "MyHora Thai Astro 2400"
+    },
+    {
+      "beYear": 2500,
+      "ceYear": 1957,
+      "localMean": "1957-04-15T18:10:48+06:42",
+      "thailandStandard": "1957-04-15T18:28:48+07:00",
+      "source": "MyHora Songkran 2500"
+    },
+    {
+      "beYear": 2527,
       "ceYear": 1984,
-      "thaloengSokAt": "1984-04-15T17:51:00+07:00",
-      "csBefore": 1345,
-      "csAfter": 1346,
-      "sourceVersion": "Thai-Astrology-Calendar-Conversion-Principles-v1.0",
-      "validationStatus": "verified-in-uploaded-knowledge"
+      "localMean": "1984-04-15T17:51:00+06:42",
+      "thailandStandard": "1984-04-15T18:09:00+07:00",
+      "source": "MyHora Songkran 2527"
+    },
+    {
+      "beYear": 2569,
+      "ceYear": 2026,
+      "localMean": "2026-04-16T14:40:12+06:42",
+      "thailandStandard": "2026-04-16T14:58:12+07:00",
+      "source": "MyHora Songkran 2569"
+    },
+    {
+      "beYear": 2600,
+      "ceYear": 2057,
+      "localMean": "2057-04-16T15:10:48+06:42",
+      "thailandStandard": "2057-04-16T15:28:48+07:00",
+      "source": "MyHora Songkran 2600"
     }
-  ],
-  "fallbackPolicy": {
-    "januaryToMarch": "candidate-minus-one",
-    "mayToDecember": "candidate",
-    "aprilWithoutVerifiedBoundary": "ambiguous",
-    "noteTh": "เอกสารต้นทางไม่ได้ให้สูตรสุริยยาตร์ฉบับเต็มหรือขอบเขตเถลิงศกรายปีครบทุกปี ดังนั้นเดือนเมษายนที่ไม่มีข้อมูลรอยต่อที่ตรวจสอบแล้วต้องคืนค่ากำกวม ห้ามเดาเวลาเถลิงศก"
-  }
+  ]
 }

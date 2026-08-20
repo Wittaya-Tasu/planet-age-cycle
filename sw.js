@@ -1,8 +1,9 @@
-const CACHE_NAME = "maha-thasa-v0.8.0";
+const CACHE_NAME = "maha-thasa-v0.8.1";
 const APP_SHELL = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
+  "./css/fonts.css",
   "./css/variables.css",
   "./css/base.css",
   "./css/layout.css",
@@ -25,6 +26,14 @@ const APP_SHELL = [
   "./data/kalayok-positions.json",
   "./data/planet-relationships.json",
   "./data/annual-boundaries.json",
+  "./assets/fonts/sarabun-thai-400-normal.woff2",
+  "./assets/fonts/sarabun-thai-600-normal.woff2",
+  "./assets/fonts/sarabun-thai-700-normal.woff2",
+  "./assets/fonts/sarabun-thai-800-normal.woff2",
+  "./assets/fonts/sarabun-latin-400-normal.woff2",
+  "./assets/fonts/sarabun-latin-600-normal.woff2",
+  "./assets/fonts/sarabun-latin-700-normal.woff2",
+  "./assets/fonts/sarabun-latin-800-normal.woff2",
   "./assets/icons/icon-192.png",
   "./assets/icons/icon-512.png"
 ];

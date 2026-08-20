@@ -1,0 +1,106 @@
+{
+  "version": "0.8.1",
+  "baseVersion": "0.8.0",
+  "files": [
+    {
+      "path": "CHANGELOG.md",
+      "sha256": "973361d34c7169a2c5107d120f54efe0f0a6031d2b56636d5af461b51c91c868",
+      "bytes": 4056
+    },
+    {
+      "path": "PROJECT_STATE.md",
+      "sha256": "54cec1f0fa69bee503492cfe30544a59e4c1d5f6d3158005c34d909ab1b86d6f",
+      "bytes": 2949
+    },
+    {
+      "path": "README.md",
+      "sha256": "0d10205e44065c4a24a645ee46086e6378b897ba74e5ca6cb43c8687251fe260",
+      "bytes": 4308
+    },
+    {
+      "path": "README-UPDATE-v0.8.1.md",
+      "sha256": "06ea8a3c45be39001cf687913010e61e7f0dec748bc8f3eecf3dbbbfffaa7a86",
+      "bytes": 1825
+    },
+    {
+      "path": "TEST-REPORT-v0.8.1.md",
+      "sha256": "e4e63f371bac8ce4de1016fd28e36c25e932482ca071d7c85078d39b6bb4aaa2",
+      "bytes": 1285
+    },
+    {
+      "path": "index.html",
+      "sha256": "f23a0d1b46729dbdb846b2fb6121b1551c35d9698c0262d8ccdd4796bd15f0f3",
+      "bytes": 7580
+    },
+    {
+      "path": "package.json",
+      "sha256": "8b6b0c30b6722417109221aaaa5945bf6580b6cf529dad60e60b1159e9e5798b",
+      "bytes": 147
+    },
+    {
+      "path": "sw.js",
+      "sha256": "6f67eb076f2b68a098e38c8bf4d9f0100b31d3933d1364b3b66668d680d9ff7d",
+      "bytes": 2447
+    },
+    {
+      "path": "css/fonts.css",
+      "sha256": "90a8659adecefe06e8dcf3589ed3befaef695463eece275c5929167644bba7d9",
+      "bytes": 2415
+    },
+    {
+      "path": "css/base.css",
+      "sha256": "c14284ee3bcee7452ea8026243834cc790da19c508c6cf5fc271f68c95d62794",
+      "bytes": 370
+    },
+    {
+      "path": "css/visuals.css",
+      "sha256": "06d484d73bedf822a6f05b07a01d600000d120c208fc4fd4629d67b5f9a86221",
+      "bytes": 1620
+    },
+    {
+      "path": "data/annual-boundaries.json",
+      "sha256": "69695ae4311022bf74fa9ca287984906328bd3ce4643f643c08275fd3a03f25e",
+      "bytes": 2492
+    },
+    {
+      "path": "js/components/summary.js",
+      "sha256": "8dfc0de86ce5e18fd93a3f937dc245a70d82afedd3e6ef6415aff801acfcf790",
+      "bytes": 2176
+    },
+    {
+      "path": "js/components/timeline.js",
+      "sha256": "9f8b1ae16f9b1c6ecc0939e812ac88bd7123c84bc87bb3af57ee0f1c1ce7586f",
+      "bytes": 6902
+    },
+    {
+      "path": "js/components/wheel.js",
+      "sha256": "9689dcb00dab84b7d81c3d42a467e7001bfa554124b0c600de1e253e8e4247d0",
+      "bytes": 9704
+    },
+    {
+      "path": "js/core/exportImage.js",
+      "sha256": "cb12f3c3c77be8cfb7896d0a9f7e0f551c22e747f7af17652f1369c86ae00cfc",
+      "bytes": 4245
+    },
+    {
+      "path": "js/core/relationships.js",
+      "sha256": "6e396806b51f40aad3343fde840f68181b076ad35ca7c6f2fbe691a62ec01454",
+      "bytes": 920
+    },
+    {
+      "path": "js/core/thaiCalendar.js",
+      "sha256": "551da34b61df56b5cef0a05df2d80729cb0c1fd13cd043234a9164603e9355ee",
+      "bytes": 5706
+    },
+    {
+      "path": "knowledge/SURIYAYATRA-THALOENG-SOK-ENGINE-v1.0.md",
+      "sha256": "d1cfcc0c65df81d9c3c793f5a7bc23d61468abee640d7d11b2b0b8304629a9b4",
+      "bytes": 2207
+    },
+    {
+      "path": "tests/run-tests.mjs",
+      "sha256": "67400b98f0307b5b5acd6de0a99d51449407f515fc706ec5eca34b57df29c124",
+      "bytes": 9394
+    }
+  ]
+}

@@ -35,5 +35,8 @@ export function renderCurrentSummary(container, { age, current, planetsByNumber,
   if (!birthTimeKnown) {
     card.append(create("p", "summary-note", "เวลาเกิดไม่ทราบ: ระบบเก็บเวลาเป็น null และแสดงจุดเปลี่ยนช่วงในระดับวันโดยไม่ใช้เวลาเกิดสมมติในการคำนวณจุลศักราช"));
   }
+  (chulasakaratResult.warnings ?? []).forEach((warning) => {
+    card.append(create("p", "summary-note", warning));
+  });
   container.append(card);
 }

@@ -65,13 +65,13 @@ export async function saveVisualizationImage({ visualizationContainer, mode, pro
   ctx.fillStyle = "#F3EEE5";
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.fillStyle = "#6F1D1B";
-  ctx.font = "700 26px sans-serif";
+  ctx.font = '700 26px "Sarabun", sans-serif';
   ctx.fillText("มหาทศา · โหราศาสตร์ไทย", 70, 56);
   ctx.fillStyle = "#2F2925";
-  ctx.font = "800 48px sans-serif";
+  ctx.font = '800 48px "Sarabun", sans-serif';
   ctx.fillText(mode === "wheel" ? "วงกลมดาวเสวยอายุ" : "Timeline ดาวเสวยอายุ", 70, 116);
   ctx.fillStyle = "#6E655F";
-  ctx.font = "500 21px sans-serif";
+  ctx.font = '500 21px "Sarabun", sans-serif';
   ctx.fillText(profileText, 70, 154);
   ctx.fillText(summaryText, 70, 181);
 
@@ -85,7 +85,7 @@ export async function saveVisualizationImage({ visualizationContainer, mode, pro
   ctx.drawImage(image, 70, headerHeight + 10, visualWidth, visualHeight - 20);
 
   ctx.fillStyle = "#81766D";
-  ctx.font = "500 18px sans-serif";
+  ctx.font = '500 18px "Sarabun", sans-serif';
   ctx.fillText("ข้อมูลตามหลักโหราศาสตร์ ใช้ประกอบการพิจารณา ไม่ใช่ข้อยืนยันเหตุการณ์", 70, canvas.height - 28);
 
   const blob = await canvasBlob(canvas);

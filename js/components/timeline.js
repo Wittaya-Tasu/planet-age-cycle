@@ -42,7 +42,7 @@ function styleFor(state) {
 }
 
 function relationChip(x, y, relation) {
-  if (!relation.otherLabels.length) return null;
+  if (!relation.otherLabels?.length) return null;
   const label = relation.otherLabels.join(" / ");
   const width = Math.min(168, 18 + label.length * 7);
   const group = svg("g", { class: "timeline-relation-chip" });

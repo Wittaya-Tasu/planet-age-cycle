@@ -70,7 +70,7 @@ function createDashedRelations(model, context) {
   const group = svg("g", { class: "wheel-relation-lines", "aria-hidden": "true" });
   model.mainSegments.forEach((segment) => {
     const relation = getRelationship(context.relationshipsData, context.birthPlanet, segment.planet);
-    if (!relation.otherLabels.length) return;
+    if (!relation.otherLabels?.length) return;
     const mid = (segment.startAngle + segment.endAngle) / 2;
     const start = polar(R.center + 5, mid);
     const end = polar(R.mainInner - 4, mid);

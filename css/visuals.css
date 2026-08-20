@@ -1,4 +1,4 @@
-.maha-wheel, .maha-timeline { display: block; width: 100%; height: auto; font-family: "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif; }
+.maha-wheel, .maha-timeline { display: block; width: 100%; height: auto; font-family: "Sarabun", sans-serif; }
 .wheel-main-segment { cursor: pointer; }
 .wheel-main-segment:focus { outline: none; filter: drop-shadow(0 0 5px rgba(111,29,27,.3)); }
 .wheel-main-number { font-size: 27px; font-weight: 900; paint-order: stroke; stroke: rgba(255,255,255,.65); stroke-width: 1.4px; }

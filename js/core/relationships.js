@@ -3,7 +3,16 @@ export function canonicalPair(a, b) {
 }
 
 export function getRelationship(relationshipsData, a, b) {
-  if (Number(a) === Number(b)) return { pair: canonicalPair(a, b), tags: [], labels: [], primaryBadge: null, otherTags: [] };
+  if (Number(a) === Number(b)) {
+    return {
+      pair: canonicalPair(a, b),
+      tags: [],
+      labels: [],
+      primaryBadge: null,
+      otherTags: [],
+      otherLabels: [],
+    };
+  }
   const pair = canonicalPair(a, b);
   const tags = relationshipsData.pairs[pair] ?? [];
   const labels = tags.map((tag) => relationshipsData.types[tag]?.labelTh ?? tag);
