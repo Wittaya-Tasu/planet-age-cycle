@@ -1,18 +1,22 @@
-/**
- * Gregorian/Buddhist calendar helpers for the พระเคราะห์เสวยอายุ WebApp.
- * All calculations use a fixed Asia/Bangkok offset (+07:00).
- */
+const BANGKOK_OFFSET = "+07:00";
+const THAI_MONTHS = [
+  "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
+  "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม",
+];
+const THAI_SHORT_MONTHS = [
+  "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.",
+  "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค.",
+];
+const THAI_WEEKDAYS = ["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"];
 
-export const BANGKOK_OFFSET_MINUTES = 420;
-const MINUTE_MS = 60_000;
-const DAY_MS = 86_400_000;
+export const BE_OFFSET = 543;
 
-export function buddhistToGregorian(yearBE) {
-  return Number(yearBE) - 543;
+export function buddhistToGregorian(yearBe) {
+  return Number(yearBe) - BE_OFFSET;
 }
 
-export function gregorianToBuddhist(yearCE) {
-  return Number(yearCE) + 543;
+export function gregorianToBuddhist(yearCe) {
+  return Number(yearCe) + BE_OFFSET;
 }
 
 export function isLeapYear(year) {
@@ -20,208 +24,116 @@ export function isLeapYear(year) {
 }
 
 export function daysInMonth(year, month) {
-  if (month < 1 || month > 12) throw new RangeError("month must be 1-12");
-  return new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return [31, isLeapYear(year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month - 1];
 }
 
-export function normalizeBirthParts(input) {
-  const year = input.year ?? (input.yearBE != null ? buddhistToGregorian(input.yearBE) : undefined);
-  const result = {
-    year: Number(year),
-    month: Number(input.month),
-    day: Number(input.day),
-    hour: Number(input.hour ?? 0),
-    minute: Number(input.minute ?? 0)
-  };
-  validateDateParts(result);
-  return result;
+export function validateCivilDate({ yearBe, month, day }) {
+  const year = buddhistToGregorian(yearBe);
+  if (!Number.isInteger(year) || year < 1) return false;
+  if (!Number.isInteger(month) || month < 1 || month > 12) return false;
+  return Number.isInteger(day) && day >= 1 && day <= daysInMonth(year, month);
 }
 
-export function validateDateParts(parts) {
-  const { year, month, day, hour = 0, minute = 0 } = parts;
-  if (!Number.isInteger(year) || year < 1) throw new RangeError("invalid year");
-  if (!Number.isInteger(month) || month < 1 || month > 12) throw new RangeError("invalid month");
-  if (!Number.isInteger(day) || day < 1 || day > daysInMonth(year, month)) {
-    throw new RangeError("invalid day for month");
-  }
-  if (!Number.isInteger(hour) || hour < 0 || hour > 23) throw new RangeError("invalid hour");
-  if (!Number.isInteger(minute) || minute < 0 || minute > 59) throw new RangeError("invalid minute");
-  return true;
+export function datePartsToEpoch({ yearBe, month, day }, time = null, defaultHour = 12) {
+  const ce = buddhistToGregorian(yearBe);
+  const hour = time?.hour ?? defaultHour;
+  const minute = time?.minute ?? 0;
+  const second = time?.second ?? 0;
+  const iso = `${String(ce).padStart(4, "0")}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}T${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}:${String(second).padStart(2, "0")}${BANGKOK_OFFSET}`;
+  return Date.parse(iso);
 }
 
-export function bangkokPartsToEpochMs(input) {
-  const p = normalizeBirthParts(input);
-  return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute) -
-    BANGKOK_OFFSET_MINUTES * MINUTE_MS;
-}
-
-export function epochMsToBangkokParts(epochMs) {
-  const d = new Date(epochMs + BANGKOK_OFFSET_MINUTES * MINUTE_MS);
-  return {
-    year: d.getUTCFullYear(),
-    month: d.getUTCMonth() + 1,
-    day: d.getUTCDate(),
-    hour: d.getUTCHours(),
-    minute: d.getUTCMinutes()
-  };
-}
-
-export function addCalendarYearsClamped(input, yearsToAdd) {
-  const p = normalizeBirthParts(input);
-  if (!Number.isInteger(yearsToAdd)) throw new TypeError("yearsToAdd must be an integer");
-  const targetYear = p.year + yearsToAdd;
-  const targetDay = Math.min(p.day, daysInMonth(targetYear, p.month));
-  return {
-    parts: { ...p, year: targetYear, day: targetDay },
-    adjustedForLeapDay: p.month === 2 && p.day === 29 && targetDay === 28
-  };
-}
-
-/**
- * Uses the original birth date as the anchor every time.
- * A 29-Feb birth maps to 28-Feb in non-leap years and returns to 29-Feb in leap years.
- */
-export function birthdayAnniversaryEpochMs(birthInput, elapsedYears) {
-  const result = addCalendarYearsClamped(birthInput, elapsedYears);
-  return {
-    epochMs: bangkokPartsToEpochMs(result.parts),
-    adjustedForLeapDay: result.adjustedForLeapDay,
-    parts: result.parts
-  };
-}
-
-export function addCalendarMonthsClamped(input, monthsToAdd) {
-  const p = normalizeBirthParts(input);
-  if (!Number.isInteger(monthsToAdd)) throw new TypeError("monthsToAdd must be an integer");
-  const zeroBased = (p.month - 1) + monthsToAdd;
-  const targetYear = p.year + Math.floor(zeroBased / 12);
-  const targetMonth = ((zeroBased % 12) + 12) % 12 + 1;
-  const targetDay = Math.min(p.day, daysInMonth(targetYear, targetMonth));
-  return { ...p, year: targetYear, month: targetMonth, day: targetDay };
-}
-
-export function addCalendarDays(input, daysToAdd) {
-  const p = normalizeBirthParts(input);
-  const ms = bangkokPartsToEpochMs(p) + daysToAdd * DAY_MS;
-  return epochMsToBangkokParts(ms);
-}
-
-export function getGregorianWeekday(input) {
-  const p = normalizeBirthParts(input);
-  return new Date(Date.UTC(p.year, p.month - 1, p.day)).getUTCDay();
-}
-
-export function isLeapDayBirth(input) {
-  const p = normalizeBirthParts(input);
-  return p.month === 2 && p.day === 29;
-}
-
-export function getLeapDayNoticeTh(input) {
-  return isLeapDayBirth(input)
-    ? "ผู้เกิดวันที่ 29 กุมภาพันธ์: ในปีที่ไม่มีวันที่ 29 กุมภาพันธ์ ระบบจะใช้วันที่ 28 กุมภาพันธ์ เวลาเดิมเป็นวันครบรอบชั่วคราว และจะกลับไปใช้วันที่ 29 กุมภาพันธ์ในปีอธิกสุรทิน"
-    : null;
-}
-
-function compareParts(a, b) {
-  return bangkokPartsToEpochMs(a) - bangkokPartsToEpochMs(b);
-}
-
-/**
- * Calendar difference in Bangkok time. Useful for current age and time remaining.
- * Seconds are intentionally omitted because the source system uses minute precision.
- */
-export function calendarDifference(startEpochMs, endEpochMs) {
-  if (endEpochMs < startEpochMs) throw new RangeError("end must not be before start");
-
-  const start = epochMsToBangkokParts(startEpochMs);
-  const endMs = endEpochMs;
-
-  let years = Math.max(0, epochMsToBangkokParts(endMs).year - start.year);
-  while (bangkokPartsToEpochMs(addCalendarYearsClamped(start, years).parts) > endMs) years -= 1;
-  while (bangkokPartsToEpochMs(addCalendarYearsClamped(start, years + 1).parts) <= endMs) years += 1;
-
-  let cursor = addCalendarYearsClamped(start, years).parts;
-  let months = 0;
-  while (months < 11) {
-    const next = addCalendarMonthsClamped(cursor, 1);
-    if (bangkokPartsToEpochMs(next) > endMs) break;
-    cursor = next;
-    months += 1;
-  }
-
-  let days = 0;
-  while (days < 31) {
-    const next = addCalendarDays(cursor, 1);
-    if (bangkokPartsToEpochMs(next) > endMs) break;
-    cursor = next;
-    days += 1;
-  }
-
-  const remainderMinutes = Math.max(
-    0,
-    Math.floor((endMs - bangkokPartsToEpochMs(cursor)) / MINUTE_MS)
-  );
-  const hours = Math.floor(remainderMinutes / 60);
-  const minutes = remainderMinutes % 60;
-
-  return { years, months, days, hours, minutes };
-}
-
-
-export const THAI_MONTH_ABBREVIATIONS = Object.freeze([
-  "ม.ค.",
-  "ก.พ.",
-  "มี.ค.",
-  "เม.ย.",
-  "พ.ค.",
-  "มิ.ย.",
-  "ก.ค.",
-  "ส.ค.",
-  "ก.ย.",
-  "ต.ค.",
-  "พ.ย.",
-  "ธ.ค.",
-]);
-
-export function formatThaiShortDateTime(
-  epochMs,
-  { includeTime = true } = {},
-) {
-  const parts = epochMsToBangkokParts(epochMs);
-  const dateText =
-    `${parts.day} ` +
-    `${THAI_MONTH_ABBREVIATIONS[parts.month - 1]} ` +
-    `${gregorianToBuddhist(parts.year)}`;
-
-  if (!includeTime) return dateText;
-
-  const hour = String(parts.hour).padStart(2, "0");
-  const minute = String(parts.minute).padStart(2, "0");
-  return `${dateText} ${hour}:${minute} น.`;
-}
-
-export function formatThaiDateTime(epochMs, { includeTime = true } = {}) {
-  const options = {
+export function epochToBangkokParts(epochMs) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Bangkok",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    calendar: "buddhist"
-  };
-  if (includeTime) {
-    options.hour = "2-digit";
-    options.minute = "2-digit";
-    options.hour12 = false;
-  }
-  return new Intl.DateTimeFormat("th-TH-u-ca-buddhist", options).format(new Date(epochMs));
+    year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23",
+  }).formatToParts(new Date(epochMs));
+  const get = (type) => Number(parts.find((part) => part.type === type)?.value);
+  return { year: get("year"), month: get("month"), day: get("day"), hour: get("hour"), minute: get("minute"), second: get("second") };
 }
 
-export function formatDurationTh(duration) {
-  const parts = [];
-  if (duration.years) parts.push(`${duration.years} ปี`);
-  if (duration.months) parts.push(`${duration.months} เดือน`);
-  if (duration.days) parts.push(`${duration.days} วัน`);
-  if (duration.hours) parts.push(`${duration.hours} ชั่วโมง`);
-  if (duration.minutes) parts.push(`${duration.minutes} นาที`);
-  return parts.length ? parts.join(" ") : "0 นาที";
+export function civilWeekday({ yearBe, month, day }) {
+  const ce = buddhistToGregorian(yearBe);
+  return new Date(Date.UTC(ce, month - 1, day)).getUTCDay();
+}
+
+export function civilWeekdayName(date) {
+  return THAI_WEEKDAYS[civilWeekday(date)];
+}
+
+export function addYearsFromBirth(birthDate, time, years) {
+  const targetCe = buddhistToGregorian(birthDate.yearBe) + years;
+  const month = birthDate.month;
+  let day = birthDate.day;
+  if (month === 2 && day === 29 && !isLeapYear(targetCe)) day = 28;
+  return datePartsToEpoch({ yearBe: gregorianToBuddhist(targetCe), month, day }, time, 12);
+}
+
+export function interpolateEpoch(startEpochMs, endEpochMs, fraction) {
+  return Math.round(startEpochMs + (endEpochMs - startEpochMs) * fraction);
+}
+
+export function calculateCalendarAge(birth, target) {
+  const birthCe = buddhistToGregorian(birth.yearBe);
+  const targetCe = buddhistToGregorian(target.yearBe);
+  let years = targetCe - birthCe;
+  let months = target.month - birth.month;
+  let days = target.day - birth.day;
+
+  if (days < 0) {
+    months -= 1;
+    const previousMonth = target.month === 1 ? 12 : target.month - 1;
+    const previousYear = target.month === 1 ? targetCe - 1 : targetCe;
+    days += daysInMonth(previousYear, previousMonth);
+  }
+  if (months < 0) {
+    years -= 1;
+    months += 12;
+  }
+  return { years, months, days };
+}
+
+export function compareCivilDates(a, b) {
+  const av = buddhistToGregorian(a.yearBe) * 10000 + a.month * 100 + a.day;
+  const bv = buddhistToGregorian(b.yearBe) * 10000 + b.month * 100 + b.day;
+  return av - bv;
+}
+
+export function currentBangkokDate() {
+  const p = epochToBangkokParts(Date.now());
+  return { yearBe: gregorianToBuddhist(p.year), month: p.month, day: p.day };
+}
+
+export function isTodayBangkok(date) {
+  return compareCivilDates(date, currentBangkokDate()) === 0;
+}
+
+export function targetDateToEpoch(date) {
+  if (isTodayBangkok(date)) return Date.now();
+  return datePartsToEpoch(date, { hour: 12, minute: 0 }, 12);
+}
+
+export function formatThaiDate(date) {
+  return `${date.day} ${THAI_MONTHS[date.month - 1]} ${date.yearBe}`;
+}
+
+export function formatThaiDateShortFromEpoch(epochMs, includeTime = true) {
+  const p = epochToBangkokParts(epochMs);
+  const base = `${p.day} ${THAI_SHORT_MONTHS[p.month - 1]} ${gregorianToBuddhist(p.year)}`;
+  if (!includeTime) return base;
+  return `${base} ${String(p.hour).padStart(2, "0")}:${String(p.minute).padStart(2, "0")} น.`;
+}
+
+export function formatAge(age) {
+  return `${age.years} ปี ${age.months} เดือน ${age.days} วัน`;
+}
+
+export function calendarDifferenceDates(startEpochMs, endEpochMs) {
+  const a = epochToBangkokParts(startEpochMs);
+  const b = epochToBangkokParts(endEpochMs);
+  return calculateCalendarAge(
+    { yearBe: gregorianToBuddhist(a.year), month: a.month, day: a.day },
+    { yearBe: gregorianToBuddhist(b.year), month: b.month, day: b.day },
+  );
 }

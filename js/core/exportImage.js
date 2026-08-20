@@ -1,395 +1,95 @@
-const EXPORT_WIDTH = 1600;
-const EXPORT_WHEEL_HEIGHT = 1180;
-const EXPORT_TIMELINE_HEIGHT = 2070;
-const BACKGROUND = "#f3eee5";
-const SURFACE = "#fffdf9";
-const INK = "#29221e";
-const MUTED = "#746b65";
-const ACCENT = "#6f1d1b";
-const LINE = "rgba(70, 47, 33, 0.14)";
-
-const SVG_STYLE_PROPERTIES = [
-  "fill",
-  "stroke",
-  "stroke-width",
-  "stroke-dasharray",
-  "stroke-linecap",
-  "stroke-linejoin",
-  "opacity",
-  "font-family",
-  "font-size",
-  "font-weight",
-  "text-anchor",
-  "paint-order",
-  "filter",
-  "display",
-  "visibility",
-];
-
-function roundedRect(context, x, y, width, height, radius) {
-  const r = Math.min(radius, width / 2, height / 2);
-  context.beginPath();
-  context.moveTo(x + r, y);
-  context.arcTo(x + width, y, x + width, y + height, r);
-  context.arcTo(x + width, y + height, x, y + height, r);
-  context.arcTo(x, y + height, x, y, r);
-  context.arcTo(x, y, x + width, y, r);
-  context.closePath();
-}
-
-function drawCard(context, x, y, width, height) {
-  context.save();
-  context.shadowColor = "rgba(64, 40, 23, 0.10)";
-  context.shadowBlur = 30;
-  context.shadowOffsetY = 12;
-  context.fillStyle = SURFACE;
-  roundedRect(context, x, y, width, height, 28);
-  context.fill();
-  context.restore();
-  context.strokeStyle = LINE;
-  context.lineWidth = 1;
-  roundedRect(context, x, y, width, height, 28);
-  context.stroke();
-}
-
-function segmentText(text) {
-  if (!text) return [];
-
-  if (typeof Intl?.Segmenter === "function") {
-    const segmenter = new Intl.Segmenter("th", { granularity: "word" });
-    return [...segmenter.segment(text)].map((item) => item.segment);
-  }
-
-  return text.split(/(\s+)/).filter(Boolean);
-}
-
-function drawWrappedText(context, text, x, y, maxWidth, lineHeight, maxLines = Infinity) {
-  const chunks = segmentText(text);
-  const lines = [];
-  let line = "";
-
-  chunks.forEach((chunk) => {
-    const candidate = `${line}${chunk}`;
-    if (line && context.measureText(candidate).width > maxWidth) {
-      lines.push(line.trim());
-      line = chunk.trimStart();
-    } else {
-      line = candidate;
-    }
-  });
-
-  if (line.trim()) lines.push(line.trim());
-  const visibleLines = lines.slice(0, maxLines);
-
-  if (lines.length > maxLines && visibleLines.length) {
-    let last = visibleLines.at(-1);
-    while (last && context.measureText(`${last}…`).width > maxWidth) {
-      last = last.slice(0, -1);
-    }
-    visibleLines[visibleLines.length - 1] = `${last}…`;
-  }
-
-  visibleLines.forEach((value, index) => {
-    context.fillText(value, x, y + index * lineHeight);
-  });
-
-  return y + visibleLines.length * lineHeight;
-}
-
-function inlineSvgStyles(sourceSvg, clonedSvg) {
-  const sourceNodes = [sourceSvg, ...sourceSvg.querySelectorAll("*")];
-  const clonedNodes = [clonedSvg, ...clonedSvg.querySelectorAll("*")];
-
-  sourceNodes.forEach((sourceNode, index) => {
-    const targetNode = clonedNodes[index];
-    if (!targetNode) return;
-    const style = window.getComputedStyle(sourceNode);
-    const declarations = SVG_STYLE_PROPERTIES.map(
-      (property) => `${property}:${style.getPropertyValue(property)}`,
-    );
-    targetNode.setAttribute("style", declarations.join(";"));
+function inlineStyles(source, clone) {
+  const srcNodes = [source, ...source.querySelectorAll("*")];
+  const dstNodes = [clone, ...clone.querySelectorAll("*")];
+  const props = ["fill", "stroke", "stroke-width", "stroke-dasharray", "font-family", "font-size", "font-weight", "text-anchor", "opacity", "paint-order"];
+  srcNodes.forEach((node, index) => {
+    const target = dstNodes[index];
+    if (!target) return;
+    const computed = getComputedStyle(node);
+    target.setAttribute("style", props.map((p) => `${p}:${computed.getPropertyValue(p)}`).join(";"));
   });
 }
 
-async function svgToImage(svg) {
-  const clone = svg.cloneNode(true);
+async function svgToImage(source) {
+  const clone = source.cloneNode(true);
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-  clone.setAttribute("width", svg.viewBox.baseVal.width || 800);
-  clone.setAttribute("height", svg.viewBox.baseVal.height || 800);
-  inlineSvgStyles(svg, clone);
-
-  const source = new XMLSerializer().serializeToString(clone);
-  const blob = new Blob([source], { type: "image/svg+xml;charset=utf-8" });
+  inlineStyles(source, clone);
+  const blob = new Blob([new XMLSerializer().serializeToString(clone)], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(blob);
-
   try {
     const image = new Image();
-    image.decoding = "async";
-    const loaded = new Promise((resolve, reject) => {
+    const promise = new Promise((resolve, reject) => {
       image.onload = () => resolve(image);
-      image.onerror = () => reject(new Error("ไม่สามารถแปลงผังเป็นรูปภาพได้"));
+      image.onerror = () => reject(new Error("ไม่สามารถแปลงแผนผังเป็นรูปภาพได้"));
     });
     image.src = url;
-    return await loaded;
+    return await promise;
   } finally {
     URL.revokeObjectURL(url);
   }
 }
 
-function extractRows(container, rowSelector, termSelector, valueSelector) {
-  return [...container.querySelectorAll(rowSelector)].map((row) => ({
-    label: row.querySelector(termSelector)?.textContent?.trim() ?? "",
-    value: row.querySelector(valueSelector)?.textContent?.trim() ?? "",
-  }));
-}
-
-function drawRows(context, rows, x, y, width, limit = rows.length) {
-  let cursorY = y;
-
-  rows.slice(0, limit).forEach(({ label, value }) => {
-    context.fillStyle = MUTED;
-    context.font = '600 23px "Sarabun", sans-serif';
-    context.fillText(label, x, cursorY);
-
-    context.fillStyle = INK;
-    context.font = '700 23px "Sarabun", sans-serif';
-    cursorY = drawWrappedText(context, value, x + 190, cursorY, width - 190, 31, 2);
-    cursorY += 13;
-  });
-
-  return cursorY;
-}
-
-function drawBadges(context, badges, x, y) {
-  let cursorX = x;
-
-  badges.forEach((badge) => {
-    const isBad = badge.classList.contains("relation-bad") || badge.classList.contains("effect-bad");
-    const isMixed = badge.classList.contains("effect-mixed");
-    const fill = isBad
-      ? "rgba(165, 29, 39, 0.14)"
-      : isMixed
-        ? "rgba(224, 173, 25, 0.22)"
-        : "rgba(46, 111, 78, 0.15)";
-    const ink = isBad ? "#8d1f28" : isMixed ? "#6b4d0b" : "#1f603f";
-    const text = badge.textContent.trim();
-    context.font = '800 21px "Sarabun", sans-serif';
-    const width = context.measureText(text).width + 34;
-
-    context.fillStyle = fill;
-    roundedRect(context, cursorX, y - 23, width, 38, 19);
-    context.fill();
-    context.fillStyle = ink;
-    context.fillText(text, cursorX + 17, y + 3);
-    cursorX += width + 10;
-  });
-}
-
-function canvasToBlob(canvas) {
-  return new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (blob) resolve(blob);
-      else reject(new Error("ไม่สามารถสร้างไฟล์ PNG ได้"));
-    }, "image/png");
-  });
-}
-
-function downloadBlob(blob, filename) {
+function download(blob, name) {
   const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = filename;
-  document.body.append(anchor);
-  anchor.click();
-  anchor.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1_000);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function buildFilename(now = new Date(), visualizationMode = "wheel") {
-  const parts = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
-    "-",
-    String(now.getHours()).padStart(2, "0"),
-    String(now.getMinutes()).padStart(2, "0"),
-  ];
-  return `planet-age-cycle-${visualizationMode}-${parts.join("")}.png`;
+function canvasBlob(canvas) {
+  return new Promise((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("สร้าง PNG ไม่สำเร็จ")), "image/png"));
 }
 
-function drawHeader(context, profileBirthText, profileTargetText, visualizationMode) {
-  context.fillStyle = ACCENT;
-  context.font = '800 27px "Sarabun", sans-serif';
-  context.fillText("โหราศาสตร์ไทย · วงจรตามสัดส่วนเวลา", 64, 60);
-  context.fillStyle = INK;
-  context.font = '800 54px "Sarabun", sans-serif';
-  context.fillText("พระเคราะห์เสวยอายุ", 64, 122);
-  context.fillStyle = MUTED;
-  context.font = '600 25px "Sarabun", sans-serif';
-  context.fillText(profileBirthText, 64, 169);
-  context.fillText(profileTargetText, 64, 207);
-
-  const chipText = visualizationMode === "timeline" ? "มุมมอง: Timeline แนวนอน" : "มุมมอง: วงล้อ";
-  context.font = '800 21px "Sarabun", sans-serif';
-  const chipWidth = context.measureText(chipText).width + 40;
-  context.fillStyle = "rgba(111, 29, 27, 0.10)";
-  roundedRect(context, EXPORT_WIDTH - chipWidth - 48, 42, chipWidth, 42, 21);
-  context.fill();
-  context.fillStyle = ACCENT;
-  context.fillText(chipText, EXPORT_WIDTH - chipWidth - 28, 70);
-}
-
-function drawWheelLayout(context, visualImage, journeySummary, detailPanel) {
-  drawCard(context, 42, 238, 870, 870);
-  context.drawImage(visualImage, 72, 268, 810, 810);
-
-  const cardX = 946;
-  const cardWidth = 612;
-  const journeyRows = extractRows(
-    journeySummary,
-    ".journey-summary-row",
-    "span",
-    "strong",
-  );
-  const journeyTitle = journeySummary.querySelector("h2")?.textContent?.trim() ?? "ช่วงชีวิตปัจจุบัน";
-
-  drawCard(context, cardX, 238, cardWidth, 392);
-  context.fillStyle = ACCENT;
-  context.font = '800 22px "Sarabun", sans-serif';
-  context.fillText("ช่วงชีวิตปัจจุบัน", cardX + 32, 282);
-  context.fillStyle = INK;
-  context.font = '800 33px "Sarabun", sans-serif';
-  let cursorY = drawWrappedText(
-    context,
-    journeyTitle,
-    cardX + 32,
-    328,
-    cardWidth - 64,
-    42,
-    2,
-  );
-  cursorY += 16;
-  drawRows(context, journeyRows, cardX + 32, cursorY, cardWidth - 64, 5);
-
-  drawDetailCard(context, detailPanel, cardX, 658, cardWidth, 450, 4);
-}
-
-function drawDetailCard(context, detailPanel, x, y, width, height, rowLimit = 4) {
-  drawCard(context, x, y, width, height);
-  const detailEyebrow = detailPanel.querySelector(".detail-eyebrow")?.textContent?.trim() ?? "รายละเอียด";
-  const detailTitle = detailPanel.querySelector("h2")?.textContent?.trim() ?? "รายละเอียดช่วง";
-  const detailRows = extractRows(detailPanel, ".detail-row", "dt", "dd");
-  const badges = [...detailPanel.querySelectorAll(".prediction-badge")];
-
-  context.fillStyle = ACCENT;
-  context.font = '800 22px "Sarabun", sans-serif';
-  context.fillText(detailEyebrow, x + 32, y + 46);
-  context.fillStyle = INK;
-  context.font = '800 31px "Sarabun", sans-serif';
-  let cursorY = drawWrappedText(
-    context,
-    detailTitle,
-    x + 32,
-    y + 90,
-    width - 64,
-    39,
-    2,
-  );
-  cursorY += 12;
-  cursorY = drawRows(context, detailRows, x + 32, cursorY, width - 64, rowLimit);
-
-  if (badges.length) {
-    drawBadges(context, badges, x + 32, cursorY + 8);
-  }
-}
-
-function drawImageContain(context, image, x, y, width, height) {
-  const sourceWidth = image.naturalWidth || image.width || width;
-  const sourceHeight = image.naturalHeight || image.height || height;
-  const scale = Math.min(width / sourceWidth, height / sourceHeight);
-  const drawWidth = sourceWidth * scale;
-  const drawHeight = sourceHeight * scale;
-  const drawX = x + (width - drawWidth) / 2;
-  const drawY = y + (height - drawHeight) / 2;
-  context.drawImage(image, drawX, drawY, drawWidth, drawHeight);
-}
-
-function drawTimelineLayout(context, visualImage, journeySummary, detailPanel) {
-  drawCard(context, 42, 238, 1516, 1080);
-  drawImageContain(context, visualImage, 68, 264, 1464, 1028);
-
-  const journeyRows = extractRows(
-    journeySummary,
-    ".journey-summary-row",
-    "span",
-    "strong",
-  );
-  const journeyTitle =
-    journeySummary.querySelector("h2")?.textContent?.trim() ??
-    "ช่วงชีวิตปัจจุบัน";
-
-  drawCard(context, 42, 1350, 742, 640);
-  context.fillStyle = ACCENT;
-  context.font = '800 22px "Sarabun", sans-serif';
-  context.fillText("ช่วงชีวิตปัจจุบัน", 74, 1394);
-  context.fillStyle = INK;
-  context.font = '800 31px "Sarabun", sans-serif';
-  let cursorY = drawWrappedText(
-    context,
-    journeyTitle,
-    74,
-    1438,
-    678,
-    39,
-    2,
-  );
-  cursorY += 12;
-  drawRows(context, journeyRows, 74, cursorY, 678, 6);
-
-  drawDetailCard(context, detailPanel, 816, 1350, 742, 640, 6);
-}
-
-export async function saveDashboardImage({
-  visualizationContainer,
-  visualizationMode,
-  journeySummary,
-  detailPanel,
-  profileBirthText,
-  profileTargetText,
-}) {
-  const svg = visualizationContainer.querySelector("svg");
-  if (!svg) throw new Error("ยังไม่มีผังสำหรับบันทึกภาพ");
-
+export async function saveVisualizationImage({ visualizationContainer, mode, profileText, summaryText }) {
+  const source = visualizationContainer.querySelector("svg");
+  if (!source) throw new Error("ยังไม่มีแผนผังสำหรับบันทึกภาพ");
   if (document.fonts?.ready) await document.fonts.ready;
-  const visualImage = await svgToImage(svg);
+  const image = await svgToImage(source);
+  const viewBox = source.viewBox.baseVal;
+  const ratio = viewBox.height / viewBox.width;
+  const width = 1600;
+  const visualWidth = 1460;
+  const visualHeight = visualWidth * ratio;
+  const headerHeight = 190;
+  const footerHeight = 70;
   const canvas = document.createElement("canvas");
-  canvas.width = EXPORT_WIDTH;
-  canvas.height =
-    visualizationMode === "timeline"
-      ? EXPORT_TIMELINE_HEIGHT
-      : EXPORT_WHEEL_HEIGHT;
-  const context = canvas.getContext("2d");
-  if (!context) throw new Error("อุปกรณ์นี้ไม่รองรับการสร้างรูปภาพ");
+  canvas.width = width;
+  canvas.height = Math.ceil(headerHeight + visualHeight + footerHeight);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("อุปกรณ์นี้ไม่รองรับการสร้างรูปภาพ");
 
-  context.fillStyle = BACKGROUND;
-  context.fillRect(0, 0, EXPORT_WIDTH, canvas.height);
+  ctx.fillStyle = "#F3EEE5";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#6F1D1B";
+  ctx.font = "700 26px sans-serif";
+  ctx.fillText("มหาทศา · โหราศาสตร์ไทย", 70, 56);
+  ctx.fillStyle = "#2F2925";
+  ctx.font = "800 48px sans-serif";
+  ctx.fillText(mode === "wheel" ? "วงกลมดาวเสวยอายุ" : "Timeline ดาวเสวยอายุ", 70, 116);
+  ctx.fillStyle = "#6E655F";
+  ctx.font = "500 21px sans-serif";
+  ctx.fillText(profileText, 70, 154);
+  ctx.fillText(summaryText, 70, 181);
 
-  drawHeader(context, profileBirthText, profileTargetText, visualizationMode);
+  ctx.fillStyle = "#FFFDF9";
+  ctx.strokeStyle = "#DED4CB";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.roundRect(50, headerHeight, 1500, visualHeight, 24);
+  ctx.fill();
+  ctx.stroke();
+  ctx.drawImage(image, 70, headerHeight + 10, visualWidth, visualHeight - 20);
 
-  if (visualizationMode === "timeline") {
-    drawTimelineLayout(context, visualImage, journeySummary, detailPanel);
-  } else {
-    drawWheelLayout(context, visualImage, journeySummary, detailPanel);
-  }
+  ctx.fillStyle = "#81766D";
+  ctx.font = "500 18px sans-serif";
+  ctx.fillText("ข้อมูลตามหลักโหราศาสตร์ ใช้ประกอบการพิจารณา ไม่ใช่ข้อยืนยันเหตุการณ์", 70, canvas.height - 28);
 
-  context.fillStyle = MUTED;
-  context.font = '500 18px "Sarabun", sans-serif';
-  context.fillText(
-    "ข้อมูลตามหลักโหราศาสตร์ ใช้ประกอบการพิจารณา ไม่ใช่ข้อยืนยันเหตุการณ์",
-    64,
-    canvas.height - 30,
-  );
-
-  const blob = await canvasToBlob(canvas);
-  downloadBlob(blob, buildFilename(new Date(), visualizationMode));
+  const blob = await canvasBlob(canvas);
+  const now = new Date();
+  const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(now.getDate()).padStart(2, "0")}-${String(now.getHours()).padStart(2, "0")}${String(now.getMinutes()).padStart(2, "0")}`;
+  download(blob, `maha-thasa-${mode}-${stamp}.png`);
 }

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0.0",
+  "mode": "birth_day_primary",
+  "types": {
+    "friend": {"labelTh":"คู่มิตร","polarity":"supportive","primaryBadge":true},
+    "enemy": {"labelTh":"คู่ศัตรู","polarity":"conflicting","primaryBadge":true},
+    "elemental_pair": {"labelTh":"คู่ธาตุ","polarity":"supportive","primaryBadge":false},
+    "elemental_enemy": {"labelTh":"คู่ศัตรูธาตุ","polarity":"conflicting","primaryBadge":false},
+    "power_pair": {"labelTh":"คู่สมพล","polarity":"supportive","primaryBadge":false},
+    "power_enemy": {"labelTh":"คู่ศัตรูสมพล","polarity":"conflicting","primaryBadge":false}
+  },
+  "pairs": {
+    "1-3": ["enemy"],
+    "1-4": ["elemental_enemy", "power_enemy"],
+    "1-5": ["friend"],
+    "1-6": ["power_pair"],
+    "1-7": ["elemental_pair"],
+    "2-3": ["elemental_enemy"],
+    "2-4": ["friend"],
+    "2-5": ["elemental_pair", "enemy"],
+    "2-6": ["power_enemy"],
+    "2-8": ["power_pair"],
+    "3-5": ["power_pair"],
+    "3-6": ["friend"],
+    "3-8": ["elemental_pair", "power_enemy"],
+    "4-6": ["elemental_pair"],
+    "4-7": ["power_pair"],
+    "4-8": ["enemy"],
+    "5-7": ["power_enemy"],
+    "5-8": ["elemental_enemy"],
+    "6-7": ["enemy", "elemental_enemy"],
+    "7-8": ["friend"]
+  },
+  "resolutionNotes": {
+    "2-5": "ต้นฉบับให้คู่ธาตุสำคัญกว่าคู่ศัตรู แต่ UI เก็บและแสดงแท็กทั้งสอง",
+    "3-8": "ผลผสมที่ต้นฉบับไม่ได้ชี้ขาด",
+    "1-4": "ความขัดแย้งสองประเภท; ไม่สร้างคะแนนร้ายสองเท่า",
+    "6-7": "ความขัดแย้งสองประเภท; ไม่สร้างคะแนนร้ายสองเท่า"
+  }
+}

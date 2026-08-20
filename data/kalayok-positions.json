@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0.0",
+  "positions": [
+    {"key":"lokawinasa","sourceNameTh":"โลกาวินาสน์","displayNameTh":"โลกาวินาศ","order":1,"quality":"bad","severity":"very-high"},
+    {"key":"ari","sourceNameTh":"อริ","displayNameTh":"อริ","order":2,"quality":"bad","severity":"high"},
+    {"key":"khum_sap","sourceNameTh":"ขุมทรัพย์","displayNameTh":"ขุมทรัพย์","order":3,"quality":"good","severity":"positive"},
+    {"key":"marana","sourceNameTh":"มรณะ","displayNameTh":"มรณะ","order":4,"quality":"bad","severity":"high"},
+    {"key":"athibodi","sourceNameTh":"อธิบดี","displayNameTh":"อธิบดี","order":5,"quality":"good","severity":"positive","note":"UI v0.8.0 จัดเป็นกลุ่มบวกตามข้อกำหนดผู้ใช้; การตีความช่วงเวลาเชิงลึกอาจมีเงื่อนไขในองค์ความรู้ MAHA-TAKSA-04"},
+    {"key":"racha_chok","sourceNameTh":"ราชาโชค","displayNameTh":"ราชาโชค","order":6,"quality":"good","severity":"positive"},
+    {"key":"thong_chai","sourceNameTh":"ธงไชย","displayNameTh":"ธงชัย","order":7,"quality":"good","severity":"positive"}
+  ]
+}

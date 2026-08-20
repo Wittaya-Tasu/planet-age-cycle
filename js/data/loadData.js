@@ -1,32 +1,15 @@
-async function loadJson(url) {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Unable to load ${url}: ${response.status}`);
+async function loadJson(path) {
+  const response = await fetch(path, { cache: "no-cache" });
+  if (!response.ok) throw new Error(`โหลดข้อมูลไม่สำเร็จ: ${path}`);
   return response.json();
 }
 
-export async function loadPlanetAgeData(basePath = "./data") {
-  const [
-    planetsData,
-    subperiodsData,
-    predictionsData,
-    relationsData,
-    appConfig,
-    uiText
-  ] = await Promise.all([
-    loadJson(`${basePath}/planets.json`),
-    loadJson(`${basePath}/subperiods.json`),
-    loadJson(`${basePath}/predictions.json`),
-    loadJson(`${basePath}/day-planet-relations.json`),
-    loadJson(`${basePath}/app-config.json`),
-    loadJson(`${basePath}/ui-text.th.json`)
+export async function loadAppData(base = "./data") {
+  const [planets, kalayok, relationships, boundaries] = await Promise.all([
+    loadJson(`${base}/planets.json`),
+    loadJson(`${base}/kalayok-positions.json`),
+    loadJson(`${base}/planet-relationships.json`),
+    loadJson(`${base}/annual-boundaries.json`),
   ]);
-
-  return {
-    planetsData,
-    subperiodsData,
-    predictionsData,
-    relationsData,
-    appConfig,
-    uiText
-  };
+  return { planets, kalayok, relationships, boundaries };
 }

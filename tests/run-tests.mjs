@@ -1,261 +1,118 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { buildWheelModel } from "../js/core/angles.js";
-import { validateWheelModel } from "../js/utils/validation.js";
-import { buildCycle, findCurrentPeriod, validateCycleGeometry } from "../js/core/periodCalculator.js";
-import {
-  bangkokPartsToEpochMs,
-  birthdayAnniversaryEpochMs,
-  formatThaiShortDateTime,
-} from "../js/core/calendar.js";
-import {
-  getActiveSegmentRelationBadge,
-  getPlanetRelation,
-  getSegmentRelationBadge,
-} from "../js/core/relations.js";
-import { collectWheelRelationMarkers } from "../js/components/wheel.js";
-import { collectTimelineRelationMarkers } from "../js/components/timeline.js";
-const model = buildWheelModel();
-const validation = validateWheelModel(model);
-assert.equal(validation.valid, true, validation.errors.join("\n"));
-assert.equal(model.mainSegments.length, 8);
-assert.equal(model.subSegments.length, 64);
-assert.deepEqual(
-  buildWheelModel(7).mainSegments.map(
-    (segment) => segment.mainNumber,
-  ),
-  [7, 5, 8, 6, 1, 2, 3, 4],
-);
-assert.equal(buildWheelModel(7).mainSegments[0].startAngle, -90);
-assert.deepEqual(
-  buildWheelModel(6).mainSegments.map(
-    (segment) => segment.mainNumber,
-  ),
-  [6, 1, 2, 3, 4, 7, 5, 8],
-);
+import { calculateCalendarAge, datePartsToEpoch } from "../js/core/calendar.js";
+import { calculateChulasakarat } from "../js/core/thaiCalendar.js";
+import { calculateMahabhutaMap, getKalayokState } from "../js/core/mahabhuta.js";
+import { canonicalPair, getRelationship } from "../js/core/relationships.js";
+import { buildCycle, rotateSequence, traditionalSubDuration, validateCycle } from "../js/core/mahadasha.js";
+
 const root = fileURLToPath(new URL("../", import.meta.url));
-const readJson = async (name) => JSON.parse(await readFile(`${root}data/${name}`, "utf8"));
-const datasets = {
-  planetsData: await readJson("planets.json"),
-  subperiodsData: await readJson("subperiods.json"),
-  predictionsData: await readJson("predictions.json"),
-  relationsData: await readJson("day-planet-relations.json"),
-  appConfig: await readJson("app-config.json"),
-  uiText: await readJson("ui-text.th.json"),
-};
-assert.equal(datasets.predictionsData.predictions.length, 64);
-assert.equal(datasets.predictionsData.predictions.find((p) => p.id === "4-3").sourceDuration.months, 3);
-assert.equal(datasets.predictionsData.predictions.find((p) => p.id === "4-3").sourceDuration.days, 3);
-assert.equal(datasets.predictionsData.predictions.find((p) => p.id === "4-3").sourceDuration.minutes, 20);
-assert.equal(datasets.relationsData.unspecifiedBehavior, "hide");
-assert.equal(getPlanetRelation(datasets.relationsData, "sunday", 5), "good");
-assert.equal(getPlanetRelation(datasets.relationsData, "sunday", 3), "bad");
-assert.equal(getPlanetRelation(datasets.relationsData, "sunday", 2), null);
-assert.equal(getPlanetRelation(datasets.relationsData, "wednesday-night", 7), "good");
-assert.equal(getPlanetRelation(datasets.relationsData, "saturday", 6), "bad");
-assert.equal(
-  datasets.relationsData.displayScope.mode,
-  "all-periods",
-);
-const activeMainMars = {
-  key: "main-3",
-  type: "main",
-  mainNumber: 3,
-};
-const inactiveMainJupiter = {
-  key: "main-5",
-  type: "main",
-  mainNumber: 5,
-};
-const activeSubJupiter = {
-  key: "sub-3-5",
-  type: "sub",
-  mainNumber: 3,
-  subNumber: 5,
-};
-const inactiveSubMars = {
-  key: "sub-1-3",
-  type: "sub",
-  mainNumber: 1,
-  subNumber: 3,
-};
-assert.equal(
-  getActiveSegmentRelationBadge(
-    datasets.relationsData,
-    "sunday",
-    activeMainMars,
-    activeMainMars,
-  ).status,
-  "bad",
-);
-assert.equal(
-  getSegmentRelationBadge(
-    datasets.relationsData,
-    "sunday",
-    inactiveMainJupiter,
-  ).status,
-  "good",
-);
-assert.equal(
-  getActiveSegmentRelationBadge(
-    datasets.relationsData,
-    "sunday",
-    inactiveMainJupiter,
-    activeMainMars,
-  ),
-  null,
-);
-assert.equal(
-  getSegmentRelationBadge(
-    datasets.relationsData,
-    "sunday",
-    activeSubJupiter,
-  ).status,
-  "good",
-);
-assert.equal(
-  getSegmentRelationBadge(
-    datasets.relationsData,
-    "sunday",
-    inactiveSubMars,
-  ).status,
-  "bad",
-);
+const json = async (name) => JSON.parse(await readFile(`${root}data/${name}`, "utf8"));
+const planets = await json("planets.json");
+const kalayok = await json("kalayok-positions.json");
+const relationships = await json("planet-relationships.json");
+const boundaries = await json("annual-boundaries.json");
 
-const relationMarkerContext = (birthDayType) => ({
-  relationsData: datasets.relationsData,
-  birthDayType,
+assert.deepEqual(planets.sequence, [1, 2, 3, 4, 7, 5, 8, 6]);
+assert.equal(planets.planets.reduce((sum, p) => sum + p.years, 0), 108);
+assert.deepEqual(rotateSequence(planets.sequence, 7), [7, 5, 8, 6, 1, 2, 3, 4]);
+assert.equal(planets.birthDayStartPlanet["wednesday-night"], 8);
+assert.equal(planets.planets.find((p) => p.number === 8).nature, "bapa");
+assert.equal(planets.planets.find((p) => p.number === 5).nature, "subha");
+
+const cycle = buildCycle({
+  birthDate: { yearBe: 2527, month: 4, day: 21 },
+  birthTime: { hour: 1, minute: 49 },
+  startPlanet: 7,
+  cycleIndex: 0,
+  planetsData: planets,
 });
-const countMarkers = (markers, status) =>
-  markers.filter((item) => item.relation.status === status).length;
+assert.equal(cycle.mainPeriods.length, 8);
+assert.equal(validateCycle(cycle), true);
+assert.equal(cycle.mainPeriods[0].planet, 7);
+assert.equal(cycle.mainPeriods[0].years, 10);
+assert.equal(cycle.mainPeriods[0].subperiods.length, 8);
+assert.equal(cycle.mainPeriods[0].subperiods[0].subPlanet, 7);
+assert.equal(cycle.mainPeriods[0].subperiods.at(-1).endEpochMs, cycle.mainPeriods[0].endEpochMs);
 
-const sundayWheelMarkers = collectWheelRelationMarkers(
-  model,
-  relationMarkerContext("sunday"),
-);
-const sundayTimelineMarkers = collectTimelineRelationMarkers(
-  model,
-  relationMarkerContext("sunday"),
-);
-assert.equal(sundayWheelMarkers.length, 18);
-assert.equal(countMarkers(sundayWheelMarkers, "good"), 9);
-assert.equal(countMarkers(sundayWheelMarkers, "bad"), 9);
-assert.equal(sundayTimelineMarkers.length, 18);
-assert.equal(countMarkers(sundayTimelineMarkers, "good"), 9);
-assert.equal(countMarkers(sundayTimelineMarkers, "bad"), 9);
+const saturnInSaturn = traditionalSubDuration(10, 10);
+assert.deepEqual(saturnInSaturn, { years: 0, months: 11, days: 3, hours: 8 });
 
-const thursdayWheelMarkers = collectWheelRelationMarkers(
-  model,
-  relationMarkerContext("thursday"),
+const beforeBoundary = calculateChulasakarat(
+  { yearBe: 2527, month: 4, day: 15 },
+  { hour: 17, minute: 50 },
+  boundaries,
 );
-assert.equal(thursdayWheelMarkers.length, 9);
-assert.equal(countMarkers(thursdayWheelMarkers, "good"), 9);
-assert.equal(countMarkers(thursdayWheelMarkers, "bad"), 0);
+assert.equal(beforeBoundary.status, "exact");
+assert.equal(beforeBoundary.value, 1345);
 
-const fridayTimelineMarkers = collectTimelineRelationMarkers(
-  model,
-  relationMarkerContext("friday"),
+const atBoundary = calculateChulasakarat(
+  { yearBe: 2527, month: 4, day: 15 },
+  { hour: 17, minute: 51 },
+  boundaries,
 );
-assert.equal(fridayTimelineMarkers.length, 18);
-assert.equal(countMarkers(fridayTimelineMarkers, "good"), 9);
-assert.equal(countMarkers(fridayTimelineMarkers, "bad"), 9);
-const profile = {
-  birthDayType: "saturday",
-  birth: { yearBE: 2527, month: 4, day: 21, hour: 1, minute: 49 },
-};
-const cycle = buildCycle(profile, 0, datasets);
-assert.equal(validateCycleGeometry(cycle), true);
-for (const main of cycle.mainPeriods) {
-  assert.equal(main.subperiods[0].startEpochMs, main.startEpochMs);
-  assert.equal(main.subperiods.at(-1).endEpochMs, main.endEpochMs);
-}
-const leapBirth = { yearBE: 2543, month: 2, day: 29, hour: 8, minute: 30 };
-const nonLeapAnniversary = birthdayAnniversaryEpochMs(leapBirth, 1).parts;
-assert.deepEqual(nonLeapAnniversary, { year: 2001, month: 2, day: 28, hour: 8, minute: 30 });
-const leapAgain = birthdayAnniversaryEpochMs(leapBirth, 4).parts;
-assert.deepEqual(leapAgain, { year: 2004, month: 2, day: 29, hour: 8, minute: 30 });
-const target = bangkokPartsToEpochMs({ year: 2026, month: 8, day: 2, hour: 20, minute: 0 });
-const result = findCurrentPeriod(profile, target, datasets);
-assert.ok(result.current.startEpochMs <= target && target < result.current.endEpochMs);
-assert.ok(result.next);
-const sw = await readFile(`${root}sw.js`, "utf8");
-assert.match(sw, /planet-age-cycle-v0\.7\.1/);
-assert.match(sw, /js\/core\/exportImage\.js/);
-assert.match(sw, /js\/components\/timeline\.js/);
-const wheelSource = await readFile(`${root}js/components/wheel.js`, "utf8");
-const timelineSource = await readFile(`${root}js/components/timeline.js`, "utf8");
-const tooltipSource = await readFile(`${root}js/components/tooltip.js`, "utf8");
-const detailSource = await readFile(`${root}js/components/detail-panel.js`, "utf8");
-const indexSource = await readFile(`${root}index.html`, "utf8");
+assert.equal(atBoundary.value, 1346);
+
+const unknownTimeBoundary = calculateChulasakarat(
+  { yearBe: 2527, month: 4, day: 15 },
+  null,
+  boundaries,
+);
+assert.equal(unknownTimeBoundary.status, "ambiguous");
+assert.deepEqual(unknownTimeBoundary.values, [1345, 1346]);
+
+const aprilWithoutBoundary = calculateChulasakarat(
+  { yearBe: 2533, month: 4, day: 20 },
+  { hour: 7, minute: 0 },
+  boundaries,
+);
+assert.equal(aprilWithoutBoundary.status, "ambiguous");
+
+const march = calculateChulasakarat({ yearBe: 2569, month: 3, day: 1 }, null, boundaries);
+assert.equal(march.value, 1387);
+const may = calculateChulasakarat({ yearBe: 2569, month: 5, day: 1 }, null, boundaries);
+assert.equal(may.value, 1388);
+
+const map1388 = calculateMahabhutaMap(1388, kalayok);
+assert.equal(map1388.remainder, 2);
+assert.equal(map1388.byPlanet[1].key, "thong_chai");
+assert.equal(map1388.byPlanet[2].key, "lokawinasa");
+assert.equal(map1388.byPlanet[7].key, "racha_chok");
+assert.equal(getKalayokState(map1388, 8).quality, "unknown");
+assert.equal(getKalayokState(map1388, 5).quality, "bad"); // มรณะ
+
+assert.equal(canonicalPair(7, 6), "6-7");
+const saturnVenus = getRelationship(relationships, 7, 6);
+assert.equal(saturnVenus.primaryBadge, "enemy");
+assert.deepEqual(saturnVenus.otherLabels, ["คู่ศัตรูธาตุ"]);
+const saturnRahu = getRelationship(relationships, 7, 8);
+assert.equal(saturnRahu.primaryBadge, "friend");
+const saturnSun = getRelationship(relationships, 7, 1);
+assert.deepEqual(saturnSun.otherLabels, ["คู่ธาตุ"]);
+const moonJupiter = getRelationship(relationships, 2, 5);
+assert.ok(moonJupiter.tags.includes("elemental_pair") && moonJupiter.tags.includes("enemy"));
+
+assert.deepEqual(
+  calculateCalendarAge({ yearBe: 2533, month: 11, day: 22 }, { yearBe: 2569, month: 8, day: 3 }),
+  { years: 35, months: 8, days: 12 },
+);
+
 const exportSource = await readFile(`${root}js/core/exportImage.js`, "utf8");
+assert.doesNotMatch(exportSource, /EXPORT_HEIGHT/);
 const appSource = await readFile(`${root}js/app.js`, "utf8");
-const summarySource = await readFile(
-  `${root}js/components/journey-summary.js`,
-  "utf8",
-);
-const layoutSource = await readFile(`${root}css/layout.css`, "utf8");
-assert.doesNotMatch(wheelSource, /text\.textContent\s*=\s*segment\.subPlanet\.number/);
-assert.match(wheelSource, /relation-marker/);
-assert.doesNotMatch(wheelSource, /birth-start-ring/);
-assert.match(wheelSource, /journey-current-arrow/);
-assert.match(wheelSource, /mainRelation: 180/);
-assert.match(wheelSource, /getSegmentRelationBadge/);
-assert.match(wheelSource, /collectWheelRelationMarkers/);
-assert.match(wheelSource, /data-layer": "relations"/);
-const wheelAppendSource = wheelSource.slice(
-  wheelSource.lastIndexOf("svg.append("),
-);
-assert.ok(
-  wheelAppendSource.indexOf("createCenter(age, birthDay)") <
-    wheelAppendSource.indexOf("createRelationOverlay(model, context)"),
-);
-assert.doesNotMatch(tooltipSource, /formatPercentage/);
-assert.doesNotMatch(detailSource, /สัดส่วนในแถบหลัก/);
-assert.match(detailSource, /คำพยากรณ์และรายละเอียด/);
-assert.match(detailSource, /options\.period && !isCurrentSub/);
-assert.match(indexSource, /id="save-image-button"/);
-assert.match(indexSource, /id="view-wheel-button"/);
-assert.match(indexSource, /id="view-timeline-button"/);
-assert.match(exportSource, /visualizationMode/);
-assert.doesNotMatch(exportSource, /\bEXPORT_HEIGHT\b/);
-assert.match(exportSource, /fillRect\(0, 0, EXPORT_WIDTH, canvas\.height\)/);
-assert.match(exportSource, /Timeline แนวนอน/);
-assert.match(exportSource, /EXPORT_TIMELINE_HEIGHT = 2070/);
-assert.match(appSource, /renderTimeline/);
-assert.match(appSource, /setVisualizationMode/);
-assert.doesNotMatch(appSource, /requestAnimationFrame\(\(\) => timelineController\?\.scrollToCurrent/);
-assert.match(summarySource, /formatThaiShortDateTime/);
-assert.match(layoutSource, /timeline-container/);
-assert.match(layoutSource, /view-switch/);
-assert.match(layoutSource, /timeline-row-surface/);
-assert.match(timelineSource, /one-main-period-per-row/);
-assert.match(timelineSource, /createAgeRange/);
-assert.match(timelineSource, /MAX_MAIN_YEARS = 21/);
-assert.match(timelineSource, /collectTimelineRelationMarkers/);
-assert.doesNotMatch(timelineSource, /createAxis/);
-assert.doesNotMatch(indexSource, /class="interaction-hint"/);
-assert.doesNotMatch(
-  indexSource,
-  /ตำแหน่ง 12 นาฬิกาคือพระเคราะห์ประจำวันเกิด/,
-);
-assert.equal(
-  formatThaiShortDateTime(
-    bangkokPartsToEpochMs({
-      year: 2026,
-      month: 5,
-      day: 18,
-      hour: 9,
-      minute: 5,
-    }),
-  ),
-  "18 พ.ค. 2569 09:05 น.",
-);
-console.log("✓ วงล้อหมุนให้พระเคราะห์วันเกิดเริ่มที่ 12 นาฬิกา");
-console.log("✓ คำพยากรณ์ 64 ช่องและข้อมูลพระอังคารแทรกพระพุธถูกต้อง");
-console.log("✓ ปฏิทินจริงและนโยบาย 29 กุมภาพันธ์ถูกต้อง");
-console.log("✓ แถบย่อยปิดพอดีกับแถบหลักทุกกลุ่ม");
-console.log("✓ สัญลักษณ์ดีและไม่ดีแสดงครบตามวันเกิด ทั้งวงล้อและ Timeline");
-console.log("✓ Timeline แยกพระเคราะห์หลักเป็น 8 แถวและแสดงช่วงอายุครบ");
-console.log("✓ เดือนแบบย่อและแถบความคืบหน้าช่วงปัจจุบันยังถูกต้อง");
-console.log("✓ ปุ่มบันทึกภาพและ Offline cache v0.7.1 พร้อมใช้งาน");
+assert.doesNotMatch(appSource, /predictions\.json|day-planet-relations/);
+assert.match(appSource, /calculateChulasakarat/);
+assert.match(appSource, /calculateMahabhutaMap/);
+const swSource = await readFile(`${root}sw.js`, "utf8");
+assert.match(swSource, /maha-thasa-v0\.8\.0/);
+assert.doesNotMatch(swSource, /predictions\.json|day-planet-relations\.json/);
+
+console.log("✓ มหาทศา v0.8.0: ลำดับ 108 ปีและดาวแทรกถูกต้อง");
+console.log("✓ พุธกลางคืนยังเริ่มด้วยราหู (8) เฉพาะระบบเสวยอายุ");
+console.log("✓ กาลโยคมหาภูติใช้เฉพาะดาว 1–7 และตัวอย่าง จ.ศ. 1388 ถูกต้อง");
+console.log("✓ วันเวลาเถลิงศก 15 เม.ย. 2527 17:51 แยก จ.ศ. 1345/1346 ถูกต้อง");
+console.log("✓ เดือนเมษายนที่ไม่มี boundary ที่ตรวจสอบแล้วคืนค่า ambiguous ไม่เดา");
+console.log("✓ ความสัมพันธ์ 6 ประเภทและ badge คู่มิตร/คู่ศัตรูพร้อมใช้งาน");
+console.log("✓ ระบบใหม่ไม่โหลดคำพยากรณ์เดิมและไม่ใช้ ✓/! เดิม");
+console.log("✓ PNG export ไม่มี regression EXPORT_HEIGHT");

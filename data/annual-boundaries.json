@@ -1,0 +1,21 @@
+{
+  "schemaVersion": "0.1.0",
+  "calculationMethod": "verified-annual-boundary-table",
+  "timezone": "Asia/Bangkok",
+  "entries": [
+    {
+      "ceYear": 1984,
+      "thaloengSokAt": "1984-04-15T17:51:00+07:00",
+      "csBefore": 1345,
+      "csAfter": 1346,
+      "sourceVersion": "Thai-Astrology-Calendar-Conversion-Principles-v1.0",
+      "validationStatus": "verified-in-uploaded-knowledge"
+    }
+  ],
+  "fallbackPolicy": {
+    "januaryToMarch": "candidate-minus-one",
+    "mayToDecember": "candidate",
+    "aprilWithoutVerifiedBoundary": "ambiguous",
+    "noteTh": "เอกสารต้นทางไม่ได้ให้สูตรสุริยยาตร์ฉบับเต็มหรือขอบเขตเถลิงศกรายปีครบทุกปี ดังนั้นเดือนเมษายนที่ไม่มีข้อมูลรอยต่อที่ตรวจสอบแล้วต้องคืนค่ากำกวม ห้ามเดาเวลาเถลิงศก"
+  }
+}

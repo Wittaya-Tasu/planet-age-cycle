@@ -1,300 +1,132 @@
 <!doctype html>
 <html lang="th">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#6f1d1b" />
-    <meta name="color-scheme" content="light" />
-    <meta name="description" content="คำนวณอายุและแสดงตำแหน่งพระเคราะห์เสวยอายุบนวงจร 108 ปี" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="เสวยอายุ" />
-    <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="apple-touch-icon" href="./assets/icons/apple-touch-icon.png" />
-    <link rel="icon" type="image/svg+xml" href="./assets/icons/icon.svg" />
-    <link rel="stylesheet" href="./css/fonts.css" />
-    <link rel="stylesheet" href="./css/variables.css" />
-    <link rel="stylesheet" href="./css/base.css" />
-    <link rel="stylesheet" href="./css/layout.css" />
-    <link rel="stylesheet" href="./css/wheel.css" />
-    <link rel="stylesheet" href="./css/responsive.css" />
-    <title>พระเคราะห์เสวยอายุ</title>
-  </head>
-  <body>
-    <a class="skip-link" href="#main-content">ข้ามไปยังเนื้อหาหลัก</a>
-
-    <div class="app-shell">
-      <header class="site-header">
-        <div class="brand-mark" aria-hidden="true">
-          <span>๑๐๘</span>
-        </div>
-        <div class="brand-copy">
-          <p class="eyebrow">โหราศาสตร์ไทย · วงจรตามสัดส่วนเวลา</p>
-          <h1>พระเคราะห์เสวยอายุ</h1>
-          <p class="intro">คำนวณช่วงชีวิตจริง พร้อมคำพยากรณ์บนวงจรพระเคราะห์ 108 ปี</p>
-        </div>
-        <div class="header-actions">
-          <span class="status-pill" aria-label="เวอร์ชัน 0.7.1">
-            <span class="status-dot" aria-hidden="true"></span>
-            v0.7.1
-          </span>
-          <button
-            id="support-button"
-            class="utility-button"
-            type="button"
-            aria-expanded="false"
-            aria-controls="supporting-info"
-            hidden
-          >
-            ข้อมูลประกอบ
-          </button>
-          <button id="install-button" class="install-button" type="button" hidden>
-            เพิ่มไปยังหน้าจอโฮม
-          </button>
-        </div>
-      </header>
-
-      <noscript>
-        <div class="error-banner">
-          WebApp นี้ต้องเปิดใช้งาน JavaScript จึงจะคำนวณและแสดงวงแหวนได้
-        </div>
-      </noscript>
-      <div id="validation-error" class="error-banner" role="alert" hidden></div>
-
-      <main id="main-content">
-        <section id="onboarding" class="birth-card" aria-labelledby="birth-form-title">
-          <div class="birth-card-intro">
-            <p class="section-kicker">เริ่มต้นใช้งาน</p>
-            <h2 id="birth-form-title">กรอกข้อมูลวันเกิด</h2>
-            <p>
-              เลือกวันประจำพระเคราะห์และวันเกิด พ.ศ.
-              ระบบจะใช้วันปัจจุบันเป็นวันเป้าหมายโดยอัตโนมัติ
-            </p>
-          </div>
-
-          <form id="birth-form" class="birth-form" novalidate>
-            <div class="field field-wide">
-              <label for="birth-weekday">วันเกิดตามพระเคราะห์</label>
-              <select id="birth-weekday" name="birthWeekday" required>
-                <option value="">เลือกวันเกิด</option>
-              </select>
-            </div>
-
-            <fieldset class="date-fieldset">
-              <legend>วันที่เกิด (พ.ศ.)</legend>
-              <div class="date-inputs">
-                <div class="field">
-                  <label for="birth-day">วันที่</label>
-                  <select id="birth-day" name="birthDay" required></select>
-                </div>
-                <div class="field field-month">
-                  <label for="birth-month">เดือน</label>
-                  <select id="birth-month" name="birthMonth" required></select>
-                </div>
-                <div class="field">
-                  <label for="birth-year-be">ปี พ.ศ.</label>
-                  <input
-                    id="birth-year-be"
-                    name="birthYearBe"
-                    type="number"
-                    inputmode="numeric"
-                    min="2300"
-                    max="2800"
-                    placeholder="เช่น 2527"
-                    required
-                  />
-                </div>
-              </div>
-            </fieldset>
-
-            <fieldset class="date-fieldset time-fieldset">
-              <legend>เวลาเกิด</legend>
-              <div class="time-inputs">
-                <div class="field">
-                  <label for="birth-hour">ชั่วโมง</label>
-                  <select id="birth-hour" name="birthHour" required></select>
-                </div>
-                <span aria-hidden="true">:</span>
-                <div class="field">
-                  <label for="birth-minute">นาที</label>
-                  <select id="birth-minute" name="birthMinute" required></select>
-                </div>
-              </div>
-              <p id="leap-day-form-notice" class="leap-day-notice" hidden>
-                ผู้เกิดวันที่ 29 กุมภาพันธ์: ในปีที่ไม่มีวันที่ 29 กุมภาพันธ์ ระบบจะใช้วันที่ 28 กุมภาพันธ์ เวลาเดิมเป็นวันครบรอบชั่วคราว และกลับไปใช้วันที่ 29 กุมภาพันธ์ในปีอธิกสุรทิน
-              </p>
-            </fieldset>
-
-            <fieldset class="date-fieldset target-fieldset">
-              <legend>วันที่เป้าหมาย (พ.ศ.)</legend>
-              <button id="today-button" class="text-button" type="button">ใช้วันนี้</button>
-              <div class="date-inputs">
-                <div class="field">
-                  <label for="target-day">วันที่</label>
-                  <select id="target-day" name="targetDay" required></select>
-                </div>
-                <div class="field field-month">
-                  <label for="target-month">เดือน</label>
-                  <select id="target-month" name="targetMonth" required></select>
-                </div>
-                <div class="field">
-                  <label for="target-year-be">ปี พ.ศ.</label>
-                  <input
-                    id="target-year-be"
-                    name="targetYearBe"
-                    type="number"
-                    inputmode="numeric"
-                    min="2300"
-                    max="2800"
-                    required
-                  />
-                </div>
-              </div>
-              <div class="time-inputs target-time-inputs">
-                <div class="field">
-                  <label for="target-hour">ชั่วโมง</label>
-                  <select id="target-hour" name="targetHour" required></select>
-                </div>
-                <span aria-hidden="true">:</span>
-                <div class="field">
-                  <label for="target-minute">นาที</label>
-                  <select id="target-minute" name="targetMinute" required></select>
-                </div>
-              </div>
-            </fieldset>
-
-            <p id="form-error" class="form-error" role="alert" hidden></p>
-
-            <div class="form-actions">
-              <button id="cancel-edit-button" class="secondary-button" type="button" hidden>
-                ยกเลิก
-              </button>
-              <button class="primary-button" type="submit">
-                คำนวณพระเคราะห์เสวยอายุ
-              </button>
-            </div>
-          </form>
-        </section>
-
-        <section id="profile-bar" class="profile-bar" aria-label="ข้อมูลที่ใช้คำนวณ" hidden>
-          <div class="profile-primary">
-            <span class="profile-label">ข้อมูลเจ้าชะตา</span>
-            <strong id="profile-birth"></strong>
-          </div>
-          <div class="profile-divider" aria-hidden="true"></div>
-          <div class="profile-target">
-            <span class="profile-label">คำนวณถึง</span>
-            <strong id="profile-target"></strong>
-          </div>
-          <div class="profile-actions">
-            <button
-              id="save-image-button"
-              class="secondary-button compact-button save-image-button"
-              type="button"
-              title="บันทึกภาพวงล้อหรือ Timeline แนวนอนเป็นไฟล์ PNG"
-            >
-              บันทึกภาพ
-            </button>
-            <button id="edit-profile-button" class="secondary-button compact-button" type="button">
-              แก้ไขข้อมูล
-            </button>
-            <button id="reset-button" class="danger-button compact-button" type="button">
-              รีเซ็ต
-            </button>
-          </div>
-        </section>
-
-        <div id="app-content" hidden>
-          <section id="wheel-section" class="visualization-layout" aria-labelledby="wheel-heading">
-            <article class="wheel-card">
-              <div class="section-heading">
-                <div>
-                  <p class="section-kicker">แผนผังวงจร</p>
-                  <h2 id="wheel-heading">ตำแหน่งพระเคราะห์ตามอายุ</h2>
-                </div>
-                <div class="ring-key" aria-label="คำอธิบายสัญลักษณ์">
-                  <span><i class="key-line key-line-main"></i>วงหลัก</span>
-                  <span><i class="journey-key"></i>เส้นทางอายุ</span>
-                </div>
-              </div>
-
-              <div class="view-switch" role="group" aria-label="เลือกรูปแบบการแสดงผล">
-                <button id="view-wheel-button" class="view-switch-button is-active" type="button" aria-pressed="true">
-                  วงล้อ
-                </button>
-                <button id="view-timeline-button" class="view-switch-button" type="button" aria-pressed="false">
-                  Timeline
-                </button>
-              </div>
-
-              <div id="wheel-stage" class="visual-stage">
-                <div id="wheel-container" class="wheel-container" aria-live="polite"></div>
-              </div>
-
-              <div id="timeline-stage" class="visual-stage timeline-stage" hidden>
-                <div id="timeline-container" class="timeline-container" aria-live="polite"></div>
-              </div>
-
-            </article>
-
-            <aside class="side-stack">
-              <section id="journey-summary" class="journey-summary" aria-live="polite"></section>
-
-              <section id="detail-panel" class="detail-card" aria-live="polite"></section>
-            </aside>
-          </section>
-
-          <div id="supporting-info" class="supporting-info" hidden>
-            <section class="legend-section" aria-labelledby="legend-heading">
-              <div class="section-heading">
-                <div>
-                  <p class="section-kicker">สีประจำพระเคราะห์</p>
-                  <h2 id="legend-heading">ลำดับวงจรหลัก</h2>
-                </div>
-                <p class="legend-total">รวม <strong>108 ปี</strong></p>
-              </div>
-              <div id="legend" class="legend-grid"></div>
-            </section>
-
-            <section class="formula-note" aria-labelledby="formula-heading">
-              <div>
-                <p class="section-kicker">หลักการคำนวณ</p>
-                <h2 id="formula-heading">ทุกแถบกว้างตามเวลา ไม่ได้แบ่งเท่ากัน</h2>
-              </div>
-              <div class="formula-grid">
-                <p>
-                  <span>แถบหลัก</span>
-                  ปีของพระเคราะห์ ÷ 108 × 360°
-                </p>
-                <p>
-                  <span>แถบย่อย</span>
-                  ระยะเวลาแถบหลัก × ค่าน้ำหนักย่อย ÷ 108
-                </p>
-                <p>
-                  <span>อายุบนวงจร</span>
-                  อายุเต็ม + เดือน ÷ 12 + วัน ÷ 360
-                </p>
-              </div>
-            </section>
-
-            <section class="install-note">
-              <strong>ใช้งานเหมือนแอป</strong>
-              <span>
-                บน iPhone หรือ iPad เปิดด้วย Safari แล้วเลือก
-                แชร์ → เพิ่มไปยังหน้าจอโฮม
-              </span>
-            </section>
-          </div>
-        </div>
-      </main>
-
-      <footer>
-        <p>พระเคราะห์เสวยอายุ · ข้อมูลและคำพยากรณ์จะเก็บและประมวลผลในอุปกรณ์นี้</p>
-      </footer>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#6f1d1b" />
+  <meta name="description" content="มหาทศา — ระบบดาวเสวยอายุ 108 ปีและกาลโยคมหาภูติกำเนิด" />
+  <title>มหาทศา | โหราศาสตร์ไทย</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./assets/icons/icon-192.png" />
+  <link rel="stylesheet" href="./css/variables.css" />
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/visuals.css" />
+  <link rel="stylesheet" href="./css/responsive.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div>
+      <p class="brand-kicker">โหราศาสตร์ไทย · มหาทักษา</p>
+      <h1>มหาทศา</h1>
+      <p class="brand-subtitle">ดาวเสวยอายุ 108 ปี · กาลโยคมหาภูติกำเนิด · ความสัมพันธ์ของดาว</p>
     </div>
+    <div class="header-actions">
+      <span class="version-badge">v0.8.0</span>
+      <button id="install-button" class="quiet-button" type="button" hidden>ติดตั้ง</button>
+    </div>
+  </header>
 
-    <div id="tooltip" class="tooltip" role="tooltip" hidden></div>
+  <main class="app-shell">
+    <section id="onboarding" class="input-card">
+      <div class="section-heading">
+        <div>
+          <p class="section-kicker">ข้อมูลเจ้าชะตา</p>
+          <h2>กรอกวัน เดือน ปี และเวลาเกิด</h2>
+        </div>
+      </div>
 
-    <script type="module" src="./js/app.js"></script>
-  </body>
+      <form id="birth-form" novalidate>
+        <div class="form-grid">
+          <label class="field field-wide">
+            <span>วันเกิด</span>
+            <select id="birth-day-type" required>
+              <option value="sunday">วันอาทิตย์</option>
+              <option value="monday">วันจันทร์</option>
+              <option value="tuesday">วันอังคาร</option>
+              <option value="wednesday-day">วันพุธกลางวัน</option>
+              <option value="wednesday-night">วันพุธกลางคืน / ราหู</option>
+              <option value="thursday">วันพฤหัสบดี</option>
+              <option value="friday">วันศุกร์</option>
+              <option value="saturday">วันเสาร์</option>
+            </select>
+          </label>
+
+          <label class="field"><span>วันที่</span><input id="birth-date-day" type="number" min="1" max="31" required /></label>
+          <label class="field"><span>เดือน</span><select id="birth-date-month" required></select></label>
+          <label class="field"><span>ปี พ.ศ.</span><input id="birth-date-year" type="number" min="1800" max="3200" required /></label>
+          <label class="field"><span>เวลาเกิด</span><input id="birth-time" type="time" step="60" /></label>
+          <label class="checkbox-field"><input id="birth-time-unknown" type="checkbox" /><span>ไม่ทราบเวลาเกิด</span></label>
+
+          <label class="field field-target"><span>วันที่ต้องการคำนวณอายุ</span><input id="target-date" type="date" required /></label>
+        </div>
+
+        <div id="form-warning" class="form-warning" hidden></div>
+        <div id="form-error" class="form-error" hidden></div>
+        <div class="form-actions">
+          <button class="primary-button" type="submit">คำนวณมหาทศา</button>
+          <button id="today-button" class="secondary-button" type="button">ใช้วันที่วันนี้</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="dashboard" hidden>
+      <div class="profile-toolbar">
+        <div>
+          <span id="profile-birth" class="profile-line"></span>
+          <span id="profile-target" class="profile-line muted"></span>
+        </div>
+        <div class="toolbar-actions">
+          <button id="edit-button" class="secondary-button" type="button">แก้ไขข้อมูล</button>
+          <button id="reset-button" class="quiet-button" type="button">เริ่มใหม่</button>
+          <button id="save-image-button" class="primary-button compact" type="button">บันทึกภาพ</button>
+        </div>
+      </div>
+
+      <div id="current-summary"></div>
+      <div id="kalayok-table"></div>
+
+      <section class="visual-card">
+        <div class="visual-heading">
+          <div>
+            <p class="section-kicker">ดาวเสวยอายุและดาวแทรก</p>
+            <h2>วงจร 108 ปี</h2>
+          </div>
+          <div class="view-switch" role="group" aria-label="เลือกรูปแบบการแสดงผล">
+            <button id="view-wheel" class="view-button is-active" type="button" aria-pressed="true">วงกลม</button>
+            <button id="view-timeline" class="view-button" type="button" aria-pressed="false">Timeline</button>
+          </div>
+        </div>
+
+        <div class="visual-legend">
+          <span><i class="legend-swatch good"></i>ตำแหน่งมหาภูติดี</span>
+          <span><i class="legend-swatch bad"></i>ตำแหน่งมหาภูติเสีย</span>
+          <span><i class="legend-swatch unknown"></i>ราหู / ไม่มีตำแหน่งมหาภูติ</span>
+          <span><i class="legend-badge friend"></i>คู่มิตร</span>
+          <span><i class="legend-badge enemy"></i>คู่ศัตรู</span>
+          <span><i class="legend-line"></i>ความสัมพันธ์ประเภทอื่น</span>
+        </div>
+
+        <div id="wheel-stage" class="visual-stage">
+          <div id="wheel-container" class="wheel-container"></div>
+        </div>
+        <div id="timeline-stage" class="visual-stage" hidden>
+          <div id="timeline-container" class="timeline-container"></div>
+        </div>
+      </section>
+
+      <div id="subperiod-explorer"></div>
+
+      <section class="method-note">
+        <strong>หลักการคำนวณ จ.ศ.</strong>
+        <span>ระบบใช้วันและเวลาเถลิงศกที่ผ่านการตรวจสอบเมื่อมีข้อมูล และไม่ใช้กฎลัด 16 เมษายน 06:00 น. หากปีเกิดอยู่ในเดือนเมษายนและยังไม่มีข้อมูลรอยต่อที่ตรวจสอบ ระบบจะแสดงความกำกวมแทนการเดา</span>
+      </section>
+    </section>
+
+    <div id="fatal-error" class="fatal-error" hidden></div>
+  </main>
+
+  <footer class="site-footer">ข้อมูลตามหลักโหราศาสตร์ ใช้ประกอบการพิจารณา ไม่ใช่ข้อยืนยันเหตุการณ์</footer>
+  <script type="module" src="./js/app.js"></script>
+</body>
 </html>
