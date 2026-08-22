@@ -23,7 +23,7 @@ import { renderSubperiodExplorer } from "./components/subperiod-explorer.js";
 import { renderAnnualForecast } from "./components/annual-view.js";
 import { saveVisualizationImage } from "./core/exportImage.js";
 
-const STORAGE_KEY = "maha-thasa-profile-v0.9.2";
+const STORAGE_KEY = "maha-thasa-profile-v0.9.3";
 const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 const BIRTH_DAY_META = {
   sunday: { label: "อาทิตย์", weekday: 0 },

@@ -1,0 +1,19 @@
+{
+  "version": "0.9.3",
+  "type": "update-only",
+  "files": [
+    "index.html",
+    "js/app.js",
+    "js/components/annual-view.js",
+    "package.json",
+    "sw.js",
+    "tests/run-tests.mjs",
+    "tests/annual-forecast-tests.mjs",
+    "CHANGELOG.md",
+    "PROJECT_STATE.md",
+    "README.md",
+    "README-UPDATE-v0.9.3.md",
+    "TEST-REPORT-v0.9.3.md",
+    "UPDATE-MANIFEST-v0.9.3.json"
+  ]
+}

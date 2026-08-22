@@ -1,4 +1,4 @@
-import { datePartsToEpoch, daysInMonth, epochToBangkokParts, gregorianToBuddhist } from "../core/calendar.js";
+import { datePartsToEpoch, epochToBangkokParts, gregorianToBuddhist } from "../core/calendar.js";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const WIDTH = 1450;
@@ -232,41 +232,48 @@ function drawAnutaksa(root, model, planetsByNumber) {
   root.append(group);
 }
 
-function addMonthsToEpoch(epochMs, count) {
+function startOfNextCalendarMonth(epochMs) {
   const p = epochToBangkokParts(epochMs);
-  const rawMonthIndex = p.month - 1 + count;
-  const targetYear = p.year + Math.floor(rawMonthIndex / 12);
-  const targetMonth = ((rawMonthIndex % 12) + 12) % 12 + 1;
-  const targetDay = Math.min(p.day, daysInMonth(targetYear, targetMonth));
+  const nextMonth = p.month === 12 ? 1 : p.month + 1;
+  const nextYear = p.month === 12 ? p.year + 1 : p.year;
   return datePartsToEpoch(
-    { yearBe: gregorianToBuddhist(targetYear), month: targetMonth, day: targetDay },
-    { hour: p.hour, minute: p.minute, second: p.second },
+    { yearBe: gregorianToBuddhist(nextYear), month: nextMonth, day: 1 },
+    { hour: 0, minute: 0, second: 0 },
     12,
   );
 }
 
-function buildMonthSegments(model) {
+export function buildCalendarMonthSegments(model) {
   const segments = [];
-  for (let index = 0; index < 12; index += 1) {
-    const startEpochMs = index === 0 ? model.yearStartEpochMs : addMonthsToEpoch(model.yearStartEpochMs, index);
-    const rawEndEpochMs = index === 11 ? model.yearEndEpochMs : addMonthsToEpoch(model.yearStartEpochMs, index + 1);
-    const endEpochMs = index === 11 ? model.yearEndEpochMs : Math.min(rawEndEpochMs, model.yearEndEpochMs);
-    const parts = epochToBangkokParts(startEpochMs);
+  let startEpochMs = model.yearStartEpochMs;
+  let guard = 0;
+
+  while (startEpochMs < model.yearEndEpochMs && guard < 14) {
+    const startParts = epochToBangkokParts(startEpochMs);
+    const nextBoundaryEpochMs = startOfNextCalendarMonth(startEpochMs);
+    const endEpochMs = Math.min(nextBoundaryEpochMs, model.yearEndEpochMs);
+
     segments.push({
-      index,
+      index: segments.length,
       startEpochMs,
       endEpochMs,
-      month: parts.month,
-      yearBe: gregorianToBuddhist(parts.year),
-      label: `${THAI_SHORT_MONTHS[parts.month - 1]} ${gregorianToBuddhist(parts.year)}`,
+      month: startParts.month,
+      yearBe: gregorianToBuddhist(startParts.year),
+      isPartialStart: startEpochMs === model.yearStartEpochMs && (startParts.day !== 1 || startParts.hour !== 0 || startParts.minute !== 0 || startParts.second !== 0),
+      isPartialEnd: endEpochMs === model.yearEndEpochMs,
     });
+
+    if (endEpochMs >= model.yearEndEpochMs) break;
+    startEpochMs = endEpochMs;
+    guard += 1;
   }
+
   return segments;
 }
 
 function drawMonthBar(root, model) {
   const group = svg("g", { class: "annual-month-bar" });
-  buildMonthSegments(model).forEach((segment) => {
+  buildCalendarMonthSegments(model).forEach((segment) => {
     const { y, height } = segmentY(segment.startEpochMs, segment.endEpochMs, model);
     group.append(svg("rect", {
       x: MONTH_X,
@@ -292,6 +299,7 @@ function drawHeaders(root) {
     [SUB_X + BAR_W / 2, "2 · ดาวเสวยแทรก", "มหาภูติประจำปี"],
     [PHUMI_X + BAR_W / 2, "3 · ภูมิทักษา", "ภูมิอายุประจำปี"],
     [ANU_X + BAR_W / 2, "4 · อนุทักษา", "8 ช่วงภายในปี"],
+    [MONTH_X + BAR_W / 2, "5 · เดือนปฏิทิน", "แกนเวลาเดียวกัน"],
   ];
   headers.forEach(([x, title, subtitle]) => {
     root.append(text(x, 74, title, "annual-column-title", "#302B28"));

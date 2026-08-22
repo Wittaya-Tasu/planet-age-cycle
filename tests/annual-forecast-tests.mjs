@@ -10,7 +10,8 @@ import {
   relationPolarity,
 } from "../js/core/annualForecast.js";
 import { getRelationship } from "../js/core/relationships.js";
-import { addYearsFromBirth } from "../js/core/calendar.js";
+import { addYearsFromBirth, datePartsToEpoch } from "../js/core/calendar.js";
+import { buildCalendarMonthSegments } from "../js/components/annual-view.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const json = async (name) => JSON.parse(await readFile(`${root}data/${name}`, "utf8"));
@@ -105,6 +106,23 @@ for (let i = 1; i < projection.length; i += 1) {
   assert.equal(projection[i - 1].endEpochMs, projection[i].startEpochMs);
 }
 
+// แท่งเดือนปฏิทินต้องใช้แกนเวลาเดียวกับอนุทักษาและตัดที่รอยต่อเดือนจริง
+const monthSegments = buildCalendarMonthSegments({ yearStartEpochMs: yearStart, yearEndEpochMs: yearEnd });
+assert.equal(monthSegments[0].startEpochMs, yearStart);
+assert.equal(monthSegments.at(-1).endEpochMs, yearEnd);
+assert.equal(monthSegments.length, 13, "ปีชีวิตที่เริ่มกลางเดือนต้องมีเดือนต้น/ปลายแบบ partial รวมเป็น 13 ชิ้นที่ต่อเนื่อง");
+assert.equal(
+  monthSegments[0].endEpochMs,
+  datePartsToEpoch({ yearBe: 2568, month: 12, day: 1 }, { hour: 0, minute: 0, second: 0 }),
+);
+assert.equal(
+  monthSegments.at(-1).startEpochMs,
+  datePartsToEpoch({ yearBe: 2569, month: 11, day: 1 }, { hour: 0, minute: 0, second: 0 }),
+);
+for (let i = 1; i < monthSegments.length; i += 1) {
+  assert.equal(monthSegments[i - 1].endEpochMs, monthSegments[i].startEpochMs);
+}
+
 // ความสัมพันธ์รองรับผลผสม ไม่บังคับให้เหลือเขียวหรือแดงด้านเดียว
 assert.equal(relationPolarity(getRelationship(relationships, 1, 5)), "supportive");
 assert.equal(relationPolarity(getRelationship(relationships, 1, 3)), "conflicting");
@@ -167,11 +185,14 @@ assert.match(appSource, /annualAgeBasis/);
 assert.match(annualViewSource, /drawRelationConnectors/);
 assert.match(annualViewSource, /drawBoundaryEvents/);
 assert.match(annualViewSource, /จ\.ศ\./);
-assert.match(swSource, /maha-thasa-v0\.9\.1/);
+assert.match(swSource, /maha-thasa-v0\.9\.3/);
+assert.match(annualViewSource, /drawMonthBar/);
+assert.match(annualViewSource, /hideRahuUnknownLabel/);
 
 console.log("✓ ภูมิทักษาใช้ดาวละ 1 ปี เริ่มนับจากดาวเกิด และอายุย่างเป็นค่าเริ่มต้น");
 console.log("✓ อนุทักษาใช้กำลังจำเพาะคงที่ 20, 50, 26, 57, 33, 64, 40, 70 รวม 360 วัน");
 console.log("✓ ฉายอนุทักษาลงปีปฏิทินจริงแบบสัดส่วนโดยไม่มีช่องว่างและไม่มีช่วงซ้อน");
 console.log("✓ กาลโยคประจำปีเปลี่ยนได้กลางช่วงอนุทักษาเมื่อผ่านเถลิงศก");
 console.log("✓ ราหูคงสถานะนอกมหาภูติ และความสัมพันธ์แบบ mixed ไม่ถูกบังคับให้เป็นด้านเดียว");
+console.log("✓ เดือนปฏิทินใช้รอยต่อวันที่ 1 ของเดือนจริง และใช้แกนเวลาเดียวกับอนุทักษา");
 console.log("✓ หน้าใหม่ ‘ผลประจำปี’ เชื่อมมหาทศา ดาวแทรก ภูมิทักษา อนุทักษา และกาลโยคประจำปีแล้ว");
