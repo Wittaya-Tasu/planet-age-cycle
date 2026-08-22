@@ -20,7 +20,7 @@
   <header class="site-header">
     <div class="brand-block"><h1>มหาทศา</h1></div>
     <div class="header-actions">
-      <span class="version-badge">v0.9.1</span>
+      <span class="version-badge">v0.9.2</span>
       <button id="install-button" class="quiet-button" type="button" hidden>ติดตั้ง</button>
     </div>
   </header>
@@ -54,7 +54,14 @@
           <label class="field"><span>ปี พ.ศ.</span><input id="birth-date-year" type="number" min="1800" max="3200" required /></label>
           <label class="field"><span>เวลาเกิด</span><input id="birth-time" type="time" step="60" /></label>
           <label class="checkbox-field"><input id="birth-time-unknown" type="checkbox" /><span>ไม่ทราบเวลาเกิด</span></label>
-          <label class="field field-target"><span>วันที่ต้องการคำนวณอายุ</span><input id="target-date" type="date" required /></label>
+          <div class="field field-target-group">
+            <span class="field-group-label">วันที่ต้องการคำนวณอายุ (พ.ศ.)</span>
+            <div class="target-date-grid">
+              <label class="field"><span>วันที่</span><input id="target-date-day" type="number" min="1" max="31" required /></label>
+              <label class="field"><span>เดือน</span><select id="target-date-month" required></select></label>
+              <label class="field"><span>ปี พ.ศ.</span><input id="target-date-year" type="number" min="1800" max="3200" required /></label>
+            </div>
+          </div>
         </div>
         <div id="form-error" class="form-error" hidden></div>
         <div class="form-actions">
@@ -123,7 +130,7 @@
           <div class="annual-controls">
             <label for="annual-age-basis">ฐานอายุภูมิทักษา</label>
             <select id="annual-age-basis">
-              <option value="yang_age">อายุย่าง (ตามต้นฉบับ)</option>
+              <option value="yang_age">อายุย่าง</option>
               <option value="full_age">อายุเต็ม</option>
             </select>
           </div>

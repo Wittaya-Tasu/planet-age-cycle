@@ -23,7 +23,7 @@ import { renderSubperiodExplorer } from "./components/subperiod-explorer.js";
 import { renderAnnualForecast } from "./components/annual-view.js";
 import { saveVisualizationImage } from "./core/exportImage.js";
 
-const STORAGE_KEY = "maha-thasa-profile-v0.8";
+const STORAGE_KEY = "maha-thasa-profile-v0.9.2";
 const MONTHS = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
 const BIRTH_DAY_META = {
   sunday: { label: "อาทิตย์", weekday: 0 },
@@ -45,7 +45,9 @@ const birthMonth = document.querySelector("#birth-date-month");
 const birthYear = document.querySelector("#birth-date-year");
 const birthTime = document.querySelector("#birth-time");
 const birthTimeUnknown = document.querySelector("#birth-time-unknown");
-const targetDate = document.querySelector("#target-date");
+const targetDateDay = document.querySelector("#target-date-day");
+const targetDateMonth = document.querySelector("#target-date-month");
+const targetDateYear = document.querySelector("#target-date-year");
 const formError = document.querySelector("#form-error");
 const todayButton = document.querySelector("#today-button");
 const currentSummary = document.querySelector("#current-summary");
@@ -90,14 +92,18 @@ function setError(message = "") {
   formError.hidden = !message;
 }
 
-function toInputDate(date) {
-  const ce = date.yearBe - 543;
-  return `${String(ce).padStart(4, "0")}-${String(date.month).padStart(2, "0")}-${String(date.day).padStart(2, "0")}`;
+function writeTargetDate(date) {
+  targetDateDay.value = String(date.day);
+  targetDateMonth.value = String(date.month);
+  targetDateYear.value = String(date.yearBe);
 }
 
-function fromInputDate(value) {
-  const [year, month, day] = value.split("-").map(Number);
-  return { yearBe: gregorianToBuddhist(year), month, day };
+function readTargetDate() {
+  return {
+    yearBe: Number(targetDateYear.value),
+    month: Number(targetDateMonth.value),
+    day: Number(targetDateDay.value),
+  };
 }
 
 function parseTime(value) {
@@ -116,9 +122,9 @@ function readProfile() {
     month: Number(birthMonth.value),
     day: Number(birthDay.value),
   };
-  if (!validateCivilDate(birthDateValue)) throw new Error("วัน เดือน หรือปีเกิดไม่ถูกต้องตามปฏิทินเกรกอเรียน");
-  if (!targetDate.value) throw new Error("กรุณาระบุวันที่ต้องการคำนวณอายุ");
-  const target = fromInputDate(targetDate.value);
+  if (!validateCivilDate(birthDateValue)) throw new Error("วัน เดือน หรือปีเกิดไม่ถูกต้อง");
+  const target = readTargetDate();
+  if (!validateCivilDate(target)) throw new Error("กรุณาระบุวันที่ต้องการคำนวณอายุให้ถูกต้อง");
   if (compareCivilDates(target, birthDateValue) < 0) throw new Error("วันที่คำนวณอายุต้องไม่อยู่ก่อนวันเกิด");
   const time = birthTimeUnknown.checked ? null : parseTime(birthTime.value);
   return { birthDayType: birthDayType.value, birthDate: birthDateValue, birthTime: time, targetDate: target };
@@ -132,7 +138,7 @@ function writeProfile(profile) {
   birthTimeUnknown.checked = !profile.birthTime;
   birthTime.disabled = !profile.birthTime;
   birthTime.value = profile.birthTime ? `${String(profile.birthTime.hour).padStart(2, "0")}:${String(profile.birthTime.minute).padStart(2, "0")}` : "";
-  targetDate.value = toInputDate(profile.targetDate);
+  writeTargetDate(profile.targetDate);
 }
 
 function deriveState(profile) {
@@ -219,8 +225,9 @@ function renderAnnualPage() {
     annualConfig: datasets.annualForecast,
     ageBasis: annualAgeBasis.value,
   });
-  annualTitle.textContent = `ผลประจำปี · อายุเต็ม ${annualModel.completedAgeYears} ปี · อายุย่าง ${annualModel.ageYang}`;
-  annualRange.textContent = `${formatThaiDateShortFromEpoch(annualModel.yearStartEpochMs, false)} → ก่อน ${formatThaiDateShortFromEpoch(annualModel.yearEndEpochMs, false)} · ใช้อายุคำนวณ ${annualModel.calculationAge} ปี · ภูมิ ${annualModel.phumi.thaksaPosition.nameTh}`;
+  const ageBasisLabel = annualModel.ageBasis === "yang_age" ? "อายุย่าง" : "อายุเต็ม";
+  annualTitle.textContent = `ผลประจำปี · ${ageBasisLabel} ${annualModel.calculationAge} ปี`;
+  annualRange.textContent = `${formatThaiDateShortFromEpoch(annualModel.yearStartEpochMs, false)} → ก่อน ${formatThaiDateShortFromEpoch(annualModel.yearEndEpochMs, false)} · ใช้อายุคำนวณ ${ageBasisLabel} ${annualModel.calculationAge} ปี · ภูมิ ${annualModel.phumi.thaksaPosition.nameTh}`;
   renderAnnualForecast(annualVisualContainer, annualModel, currentState.pMap);
 }
 
@@ -277,7 +284,13 @@ function initializeForm() {
     return option;
   }));
   const today = currentBangkokDate();
-  targetDate.value = toInputDate(today);
+  targetDateMonth.replaceChildren(...MONTHS.map((name, index) => {
+    const option = document.createElement("option");
+    option.value = String(index + 1);
+    option.textContent = name;
+    return option;
+  }));
+  writeTargetDate(today);
   birthTime.value = "07:00";
   birthYear.value = String(today.yearBe - 30);
   birthMonth.value = "1";
@@ -289,7 +302,7 @@ birthTimeUnknown.addEventListener("change", () => {
   if (birthTimeUnknown.checked) birthTime.value = "";
 });
 
-todayButton.addEventListener("click", () => { targetDate.value = toInputDate(currentBangkokDate()); });
+todayButton.addEventListener("click", () => { writeTargetDate(currentBangkokDate()); });
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();

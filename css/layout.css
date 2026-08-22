@@ -28,6 +28,10 @@
 }
 .field-wide { grid-column: span 2; }
 .field-target { grid-column: span 2; }
+
+.field-target-group { grid-column: span 3; display: grid; gap: 7px; }
+.field-group-label { color: var(--muted); font-weight: 700; }
+.target-date-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .checkbox-field { display: flex; align-items: center; gap: 8px; min-height: 46px; font-weight: 700; color: var(--muted); }
 .form-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
 .toolbar-actions {

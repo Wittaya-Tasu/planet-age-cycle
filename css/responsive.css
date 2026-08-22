@@ -1,6 +1,6 @@
 @media (max-width: 1100px) {
   .form-grid { grid-template-columns: repeat(3, 1fr); }
-  .field-wide, .field-target { grid-column: span 1; }
+  .field-wide, .field-target, .field-target-group { grid-column: span 1; }
   .current-summary-strip { grid-template-columns: 1fr; }
   .summary-grid { grid-template-columns: repeat(3, 1fr); }
   .kalayok-grid { grid-template-columns: repeat(4, 1fr); }
@@ -13,7 +13,8 @@
   .app-shell { padding: 0 12px 26px; }
   .input-card, .visual-card, .kalayok-card, .sub-explorer { border-radius: 18px; padding: 15px; }
   .form-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .field-wide, .field-target { grid-column: 1/-1; }
+  .field-wide, .field-target, .field-target-group { grid-column: 1/-1; }
+  .target-date-grid { grid-template-columns: 1fr; gap: 10px; }
   .profile-toolbar { align-items: flex-start; flex-direction: column; }
   .toolbar-actions {
     width: 100%;

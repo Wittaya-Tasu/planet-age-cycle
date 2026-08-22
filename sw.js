@@ -1,4 +1,4 @@
-const CACHE_NAME = "maha-thasa-v0.9.1";
+const CACHE_NAME = "maha-thasa-v0.9.2";
 const APP_SHELL = [
   "./",
   "./index.html",

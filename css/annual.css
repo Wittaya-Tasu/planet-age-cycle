@@ -69,7 +69,7 @@
   padding: 14px;
   overflow-x: auto;
 }
-.annual-visual-container { min-width: 1020px; }
+.annual-visual-container { min-width: 1180px; }
 .annual-forecast-svg {
   display: block;
   width: 100%;
@@ -86,7 +86,7 @@
 .annual-age-label { font-size: 18px; font-weight: 850; }
 .annual-segment-number { font-size: 22px; font-weight: 900; }
 .annual-segment-number.compact { font-size: 15px; }
-.annual-segment-position { font-size: 12px; font-weight: 850; }
+.annual-segment-position { font-size: 11px; font-weight: 850; }
 .annual-segment-date { font-size: 9px; font-weight: 650; }
 .annual-boundary-label { font-size: 11px; font-weight: 850; }
 .annual-flow-arrow { font-size: 28px; font-weight: 800; }
@@ -110,3 +110,6 @@
 .annual-anutaksa-number { font-size: 22px; font-weight: 900; text-anchor: middle; }
 .annual-anutaksa-date { font-size: 8px; font-weight: 750; }
 .annual-anutaksa-position { font-size: 9px; font-weight: 800; }
+
+.annual-month-label { font-size: 10px; font-weight: 800; }
+.annual-month-label.compact { font-size: 8px; }
