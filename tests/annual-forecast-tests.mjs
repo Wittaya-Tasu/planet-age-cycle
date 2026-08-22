@@ -11,7 +11,11 @@ import {
 } from "../js/core/annualForecast.js";
 import { getRelationship } from "../js/core/relationships.js";
 import { addYearsFromBirth, datePartsToEpoch } from "../js/core/calendar.js";
-import { buildCalendarMonthSegments } from "../js/components/annual-view.js";
+import {
+  buildCalendarMonthSegments,
+  formatCalendarMonthLabel,
+  getCurrentCalendarMonthSegment,
+} from "../js/components/annual-view.js";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const json = async (name) => JSON.parse(await readFile(`${root}data/${name}`, "utf8"));
@@ -122,6 +126,16 @@ assert.equal(
 for (let i = 1; i < monthSegments.length; i += 1) {
   assert.equal(monthSegments[i - 1].endEpochMs, monthSegments[i].startEpochMs);
 }
+assert.equal(formatCalendarMonthLabel({ month: 5, yearBe: 2569 }), "พ.ค.69");
+const currentMonthProbe = datePartsToEpoch(
+  { yearBe: 2569, month: 8, day: 22 },
+  { hour: 18, minute: 53, second: 0 },
+);
+const highlightedMonth = getCurrentCalendarMonthSegment(monthSegments, currentMonthProbe);
+assert.ok(highlightedMonth);
+assert.equal(highlightedMonth.month, 8);
+assert.equal(highlightedMonth.yearBe, 2569);
+assert.equal(formatCalendarMonthLabel(highlightedMonth), "ส.ค.69");
 
 // ความสัมพันธ์รองรับผลผสม ไม่บังคับให้เหลือเขียวหรือแดงด้านเดียว
 assert.equal(relationPolarity(getRelationship(relationships, 1, 5)), "supportive");
@@ -184,8 +198,11 @@ assert.match(appSource, /buildAnnualForecast/);
 assert.match(appSource, /annualAgeBasis/);
 assert.match(annualViewSource, /drawRelationConnectors/);
 assert.match(annualViewSource, /drawBoundaryEvents/);
+assert.match(annualViewSource, /formatCalendarMonthLabel/);
+assert.match(annualViewSource, /getCurrentCalendarMonthSegment/);
+assert.match(annualViewSource, /monthCurrentFill/);
 assert.match(annualViewSource, /จ\.ศ\./);
-assert.match(swSource, /maha-thasa-v0\.9\.3/);
+assert.match(swSource, /maha-thasa-v0\.9\.4/);
 assert.match(annualViewSource, /drawMonthBar/);
 assert.match(annualViewSource, /hideRahuUnknownLabel/);
 

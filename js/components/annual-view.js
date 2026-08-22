@@ -25,7 +25,10 @@ const COLORS = {
   conflicting: "#8E2630",
   neutral: "#A79B91",
   monthFill: "#F3EEE8",
+  monthCurrentFill: "#D8D0C7",
+  monthCurrentStroke: "#7A6E64",
   monthText: "#52463D",
+  monthCurrentText: "#302A26",
 };
 
 const THAI_SHORT_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
@@ -271,23 +274,58 @@ export function buildCalendarMonthSegments(model) {
   return segments;
 }
 
+export function formatCalendarMonthLabel(segment) {
+  const shortYear = String(segment.yearBe).slice(-2);
+  return `${THAI_SHORT_MONTHS[segment.month - 1]}${shortYear}`;
+}
+
+export function getCurrentCalendarMonthSegment(segments, currentEpochMs = Date.now()) {
+  return segments.find(
+    (segment) => currentEpochMs >= segment.startEpochMs && currentEpochMs < segment.endEpochMs,
+  ) ?? null;
+}
+
 function drawMonthBar(root, model) {
   const group = svg("g", { class: "annual-month-bar" });
-  buildCalendarMonthSegments(model).forEach((segment) => {
+  const segments = buildCalendarMonthSegments(model);
+  const currentSegment = getCurrentCalendarMonthSegment(segments);
+
+  segments.forEach((segment) => {
     const { y, height } = segmentY(segment.startEpochMs, segment.endEpochMs, model);
+    const isCurrent = currentSegment?.index === segment.index;
+    const fill = isCurrent ? COLORS.monthCurrentFill : COLORS.monthFill;
+    const stroke = isCurrent ? COLORS.monthCurrentStroke : "#FFFDF9";
+    const strokeWidth = isCurrent ? 2 : 1.5;
+    const labelColor = isCurrent ? COLORS.monthCurrentText : COLORS.monthText;
+    const label = formatCalendarMonthLabel(segment);
+
     group.append(svg("rect", {
       x: MONTH_X,
       y,
       width: BAR_W,
       height,
-      fill: COLORS.monthFill,
-      stroke: "#FFFDF9",
-      "stroke-width": 1.5,
+      fill,
+      stroke,
+      "stroke-width": strokeWidth,
+      class: isCurrent ? "annual-month-segment is-current" : "annual-month-segment",
     }));
-    if (height >= 42) {
-      group.append(multilineText(MONTH_X + BAR_W / 2, y + height / 2 - 6, [THAI_SHORT_MONTHS[segment.month - 1], String(segment.yearBe)], "annual-month-label", COLORS.monthText, "middle", 13));
-    } else if (height >= 24) {
-      group.append(text(MONTH_X + BAR_W / 2, y + height / 2 + 4, THAI_SHORT_MONTHS[segment.month - 1], "annual-month-label compact", COLORS.monthText));
+
+    if (height >= 24) {
+      group.append(text(
+        MONTH_X + BAR_W / 2,
+        y + height / 2 + 4,
+        label,
+        isCurrent ? "annual-month-label is-current" : "annual-month-label",
+        labelColor,
+      ));
+    } else if (height >= 12) {
+      group.append(text(
+        MONTH_X + BAR_W / 2,
+        y + height / 2 + 3,
+        label,
+        isCurrent ? "annual-month-label compact is-current" : "annual-month-label compact",
+        labelColor,
+      ));
     }
   });
   root.append(group);

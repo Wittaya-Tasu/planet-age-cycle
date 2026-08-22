@@ -111,5 +111,8 @@
 .annual-anutaksa-date { font-size: 8px; font-weight: 750; }
 .annual-anutaksa-position { font-size: 9px; font-weight: 800; }
 
+/* v0.9.4 — calendar month rail */
+.annual-month-segment { transition: fill 160ms ease, stroke 160ms ease; }
 .annual-month-label { font-size: 10px; font-weight: 800; }
-.annual-month-label.compact { font-size: 8px; }
+.annual-month-label.compact { font-size: 7.5px; }
+.annual-month-label.is-current { font-weight: 900; }
