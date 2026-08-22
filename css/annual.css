@@ -83,9 +83,7 @@
 .annual-planet-name { font-size: 18px; font-weight: 850; }
 .annual-position-name { font-size: 17px; font-weight: 900; }
 .annual-small-note { font-size: 11px; font-weight: 700; }
-.annual-status-mark { font-size: 15px; font-weight: 900; }
-.annual-piece-mark { font-size: 13px; font-weight: 900; }
-.annual-piece-mark.compact { font-size: 10px; }
+.annual-age-label { font-size: 18px; font-weight: 850; }
 .annual-segment-number { font-size: 22px; font-weight: 900; }
 .annual-segment-number.compact { font-size: 15px; }
 .annual-segment-position { font-size: 12px; font-weight: 850; }
@@ -109,5 +107,6 @@
   .annual-visual-container { min-width: 980px; }
 }
 
-.annual-anutaksa-number { font-size: 14px; font-weight: 900; text-anchor: middle; }
+.annual-anutaksa-number { font-size: 22px; font-weight: 900; text-anchor: middle; }
 .annual-anutaksa-date { font-size: 8px; font-weight: 750; }
+.annual-anutaksa-position { font-size: 9px; font-weight: 800; }

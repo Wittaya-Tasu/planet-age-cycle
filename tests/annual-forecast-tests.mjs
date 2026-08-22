@@ -167,7 +167,7 @@ assert.match(appSource, /annualAgeBasis/);
 assert.match(annualViewSource, /drawRelationConnectors/);
 assert.match(annualViewSource, /drawBoundaryEvents/);
 assert.match(annualViewSource, /จ\.ศ\./);
-assert.match(swSource, /maha-thasa-v0\.9\.0/);
+assert.match(swSource, /maha-thasa-v0\.9\.1/);
 
 console.log("✓ ภูมิทักษาใช้ดาวละ 1 ปี เริ่มนับจากดาวเกิด และอายุย่างเป็นค่าเริ่มต้น");
 console.log("✓ อนุทักษาใช้กำลังจำเพาะคงที่ 20, 50, 26, 57, 33, 64, 40, 70 รวม 360 วัน");

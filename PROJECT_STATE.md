@@ -1,7 +1,7 @@
 # PROJECT STATE — มหาทศา
 
-**Version:** `0.9.0`  
-**Status:** Annual Forecast Expansion — ภูมิทักษา + อนุทักษา
+**Version:** `0.9.1`  
+**Status:** Annual Forecast UI Polish — ปรับหน้าตาแผนภาพผลประจำปี
 
 ## หน้าของระบบ
 
@@ -65,4 +65,4 @@
 - กาลโยคมหาภูติใช้ดาว 1–7 เท่านั้น
 - ราหูต้องเป็น `not_applicable` / สีเทาในชั้นกาลโยค ห้ามสร้างตำแหน่งให้ราหู
 - คู่ดาวสามารถมีหลาย relationship tags; ห้ามยุบข้อมูล mixed ให้เหลือด้านเดียว
-- Service Worker cache: `maha-thasa-v0.9.0`
+- Service Worker cache: `maha-thasa-v0.9.1`

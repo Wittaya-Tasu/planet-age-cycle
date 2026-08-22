@@ -42,9 +42,9 @@ function text(x, y, value, className, fill = null, anchor = "middle") {
 }
 
 function styleFor(state) {
-  if (state?.quality === "good") return { fill: COLORS.goodFill, text: COLORS.goodText, mark: "✓" };
-  if (state?.quality === "bad") return { fill: COLORS.badFill, text: COLORS.badText, mark: "!" };
-  return { fill: COLORS.unknownFill, text: COLORS.unknownText, mark: "–" };
+  if (state?.quality === "good") return { fill: COLORS.goodFill, text: COLORS.goodText };
+  if (state?.quality === "bad") return { fill: COLORS.badFill, text: COLORS.badText };
+  return { fill: COLORS.unknownFill, text: COLORS.unknownText };
 }
 
 function shortDate(epochMs) {
@@ -66,10 +66,6 @@ function segmentY(startEpochMs, endEpochMs, model) {
   };
 }
 
-function statusBadge(group, x, y, style) {
-  group.append(svg("circle", { cx: x, cy: y, r: 12, fill: style.text, stroke: "#FFF", "stroke-width": 2 }));
-  group.append(text(x, y + 5, style.mark, "annual-status-mark", "#FFF"));
-}
 
 function drawMainBar(root, model, planetsByNumber) {
   const state = model.main.natalState;
@@ -77,11 +73,11 @@ function drawMainBar(root, model, planetsByNumber) {
   const planet = planetsByNumber[model.main.planet];
   const group = svg("g", { class: "annual-main-bar" });
   group.append(svg("rect", { x: MAIN_X, y: BAR_TOP, width: MAIN_W, height: BAR_HEIGHT, rx: 20, fill: style.fill, stroke: style.text, "stroke-width": 1.5 }));
-  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 220, String(model.main.planet), "annual-big-number", style.text));
-  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 262, planet.shortNameTh, "annual-planet-name", style.text));
-  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 303, state.displayNameTh, "annual-position-name", style.text));
-  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 337, "มหาภูติกำเนิด", "annual-small-note", style.text));
-  statusBadge(group, MAIN_X + MAIN_W - 24, BAR_TOP + 26, style);
+  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 128, String(model.main.planet), "annual-big-number", style.text));
+  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 172, planet.shortNameTh, "annual-planet-name", style.text));
+  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 210, state.displayNameTh, "annual-position-name", style.text));
+  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 350, "อายุ", "annual-age-label", style.text));
+  group.append(text(MAIN_X + MAIN_W / 2, BAR_TOP + 420, String(model.completedAgeYears), "annual-big-number", style.text));
   root.append(group);
 }
 
@@ -100,18 +96,12 @@ function drawDynamicBar(root, pieces, x, width, model, planetsByNumber, options 
     const cy = y + height / 2;
     if (height >= 48) {
       group.append(text(x + width / 2, cy - 7, String(piece.planet), "annual-segment-number", style.text));
-      if (style.mark !== "–") {
-        group.append(text(x + width - 18, cy - 7, style.mark, "annual-piece-mark", style.text));
-      }
       group.append(text(x + width / 2, cy + 13, piece.state.displayNameTh, "annual-segment-position", style.text));
       if (options.showDates && height >= 72) {
         group.append(text(x + width / 2, cy + 31, `${shortDate(piece.startEpochMs)} – ${inclusiveDate(piece.endEpochMs)}`, "annual-segment-date", "#6C625A"));
       }
     } else if (height >= 26) {
       group.append(text(x + width / 2, cy + 5, String(piece.planet), "annual-segment-number compact", style.text));
-      if (style.mark !== "–") {
-        group.append(text(x + width - 14, cy + 5, style.mark, "annual-piece-mark compact", style.text));
-      }
     }
     const title = svg("title");
     title.textContent = `${planet?.nameTh ?? piece.planet} · ${piece.state.displayNameTh} · ${shortDate(piece.startEpochMs)} ถึง ${inclusiveDate(piece.endEpochMs)}${piece.chulasakarat ? ` · จ.ศ. ${piece.chulasakarat}` : ""}`;
@@ -138,13 +128,12 @@ function relationColor(polarity) {
 function drawRelationConnectors(root, model) {
   const group = svg("g", { class: "annual-relation-connectors", "aria-hidden": "true" });
   const sourceX = MAIN_X + MAIN_W;
-  const sourceY = BAR_TOP + BAR_HEIGHT / 2;
   model.subPeriods.forEach((sub) => {
     const targetY = BAR_TOP + (((sub.overlapStartEpochMs + sub.overlapEndEpochMs) / 2 - model.yearStartEpochMs) / model.yearDurationMs) * BAR_HEIGHT;
     const targetX = SUB_X;
     const midX = (sourceX + targetX) / 2;
     group.append(svg("line", {
-      x1: sourceX + 8, y1: sourceY, x2: targetX - 8, y2: targetY,
+      x1: sourceX + 8, y1: targetY, x2: targetX - 8, y2: targetY,
       stroke: COLORS.line, "stroke-width": 1.5, "stroke-dasharray": "5 6",
     }));
     const polarity = sub.relationshipPolarity;
@@ -152,13 +141,13 @@ function drawRelationConnectors(root, model) {
       const clipId = `annual-mixed-${sub.mainPlanet}-${sub.subPlanet}`;
       const defs = svg("defs");
       const clip = svg("clipPath", { id: clipId });
-      clip.append(svg("rect", { x: midX - 11, y: (sourceY + targetY) / 2 - 11, width: 11, height: 22 }));
+      clip.append(svg("rect", { x: midX - 11, y: targetY - 11, width: 11, height: 22 }));
       defs.append(clip);
       group.append(defs);
-      group.append(svg("circle", { cx: midX, cy: (sourceY + targetY) / 2, r: 11, fill: COLORS.conflicting, stroke: "#FFF", "stroke-width": 2 }));
-      group.append(svg("circle", { cx: midX, cy: (sourceY + targetY) / 2, r: 11, fill: COLORS.supportive, "clip-path": `url(#${clipId})` }));
+      group.append(svg("circle", { cx: midX, cy: targetY, r: 11, fill: COLORS.conflicting, stroke: "#FFF", "stroke-width": 2 }));
+      group.append(svg("circle", { cx: midX, cy: targetY, r: 11, fill: COLORS.supportive, "clip-path": `url(#${clipId})` }));
     } else {
-      group.append(svg("circle", { cx: midX, cy: (sourceY + targetY) / 2, r: 10, fill: relationColor(polarity), stroke: "#FFF", "stroke-width": 2 }));
+      group.append(svg("circle", { cx: midX, cy: targetY, r: 10, fill: relationColor(polarity), stroke: "#FFF", "stroke-width": 2 }));
     }
     const title = svg("title");
     title.textContent = sub.relationship.labels.length ? sub.relationship.labels.join(" / ") : "ไม่มีความสัมพันธ์ที่กำหนดในตาราง";
@@ -186,20 +175,51 @@ function tinyDate(epochMs) {
 }
 
 function drawAnutaksa(root, model, planetsByNumber) {
-  const pieces = model.anutaksa.flatMap((period) => period.pieces.map((piece) => ({ ...piece, canonicalDays: period.canonicalDays })));
-  drawDynamicBar(root, pieces, ANU_X, ANU_W, model, planetsByNumber, { className: "annual-anutaksa-bar", showDates: false });
-
-  const labels = svg("g", { class: "annual-anutaksa-labels", "aria-hidden": "true" });
+  const group = svg("g", { class: "annual-anutaksa-bar" });
   model.anutaksa.forEach((period) => {
     const { y, height } = segmentY(period.startEpochMs, period.endEpochMs, model);
-    const cy = y + height / 2;
-    const statePiece = period.pieces[Math.floor(period.pieces.length / 2)] ?? period.pieces[0];
-    const style = styleFor(statePiece?.state);
-    labels.append(text(ANU_X + 24, cy + 4, String(period.planet), "annual-anutaksa-number", style.text));
-    const range = `${tinyDate(period.startEpochMs)}–${tinyDate(period.endEpochMs - 1)}`;
-    labels.append(text(ANU_X + ANU_W - 10, cy + 4, range, "annual-anutaksa-date", "#5F5751", "end"));
+    period.pieces.forEach((piece) => {
+      const pieceSeg = segmentY(piece.startEpochMs, piece.endEpochMs, model);
+      const style = styleFor(piece.state);
+      const textColor = piece.planet === 8 ? COLORS.badText : style.text;
+      group.append(svg("rect", {
+        x: ANU_X,
+        y: pieceSeg.y,
+        width: ANU_W,
+        height: pieceSeg.height,
+        fill: style.fill,
+        stroke: "#FFFDF9",
+        "stroke-width": 1.5,
+      }));
+      if (piece.state?.quality !== "unknown" && pieceSeg.height >= 18) {
+        group.append(text(ANU_X + 10, pieceSeg.y + pieceSeg.height / 2 + 4, piece.state.displayNameTh, "annual-anutaksa-position", textColor, "start"));
+      }
+      const title = svg("title");
+      title.textContent = `${planetsByNumber[piece.planet]?.nameTh ?? piece.planet} · ${piece.state.displayNameTh} · ${shortDate(piece.startEpochMs)} ถึง ${inclusiveDate(piece.endEpochMs)}${piece.chulasakarat ? ` · จ.ศ. ${piece.chulasakarat}` : ""}`;
+      group.append(title);
+    });
+    const midStyle = styleFor(period.pieces[Math.floor(period.pieces.length / 2)]?.state ?? period.pieces[0]?.state);
+    const numberColor = period.planet === 8 ? COLORS.badText : midStyle.text;
+    group.append(text(ANU_X + ANU_W / 2, y + height / 2 + 6, String(period.planet), "annual-anutaksa-number", numberColor));
   });
-  root.append(labels);
+
+  const boundaries = [{ epochMs: model.yearStartEpochMs }];
+  model.anutaksa.forEach((period) => boundaries.push({ epochMs: period.endEpochMs }));
+  boundaries.forEach((entry, index) => {
+    const isTop = index === 0;
+    const y = isTop ? BAR_TOP : segmentY(model.yearStartEpochMs, entry.epochMs, model).height + BAR_TOP;
+    group.append(svg("line", {
+      x1: ANU_X + ANU_W - 16,
+      y1: y,
+      x2: ANU_X + ANU_W + 20,
+      y2: y,
+      stroke: COLORS.line,
+      "stroke-width": 1.2,
+      "stroke-dasharray": "3 3",
+    }));
+    group.append(text(ANU_X + ANU_W + 28, y + (isTop ? 11 : -4), tinyDate(entry.epochMs - (isTop ? 0 : 1)), "annual-anutaksa-date", "#5F5751", "start"));
+  });
+  root.append(group);
 }
 
 function drawHeaders(root) {
