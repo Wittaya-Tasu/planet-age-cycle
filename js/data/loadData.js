@@ -5,11 +5,12 @@ async function loadJson(path) {
 }
 
 export async function loadAppData(base = "./data") {
-  const [planets, kalayok, relationships, boundaries] = await Promise.all([
+  const [planets, kalayok, relationships, boundaries, annualForecast] = await Promise.all([
     loadJson(`${base}/planets.json`),
     loadJson(`${base}/kalayok-positions.json`),
     loadJson(`${base}/planet-relationships.json`),
     loadJson(`${base}/annual-boundaries.json`),
+    loadJson(`${base}/annual-forecast.json`),
   ]);
-  return { planets, kalayok, relationships, boundaries };
+  return { planets, kalayok, relationships, boundaries, annualForecast };
 }

@@ -78,7 +78,6 @@ function textOf(root, selector) {
 function drawSupplementaryExplorer(ctx, container, x, y, width) {
   const section = container?.querySelector?.(".sub-explorer");
   if (!section || container.hidden) return 0;
-
   const height = 500;
   drawCard(ctx, x, y, width, height, 24);
 
@@ -103,9 +102,7 @@ function drawSupplementaryExplorer(ctx, container, x, y, width) {
     const total = weights.reduce((sum, value) => sum + value, 0);
     let cursor = barX;
     segments.forEach((segment, index) => {
-      const segmentWidth = index === segments.length - 1
-        ? barX + barWidth - cursor
-        : barWidth * weights[index] / total;
+      const segmentWidth = index === segments.length - 1 ? barX + barWidth - cursor : barWidth * weights[index] / total;
       const computed = getComputedStyle(segment);
       ctx.fillStyle = computed.backgroundColor || "#ECEBE8";
       ctx.fillRect(cursor, barY, segmentWidth, barHeight);
@@ -140,7 +137,6 @@ function drawSupplementaryExplorer(ctx, container, x, y, width) {
     roundedRect(ctx, dx, dy, cardWidth, cardHeight, 14);
     ctx.fill();
     ctx.stroke();
-
     ctx.fillStyle = computed.color || "#2F2C29";
     ctx.font = '800 19px "Sarabun", sans-serif';
     ctx.fillText(fitText(ctx, textOf(detail, ".sub-detail-name"), cardWidth - 24), dx + 12, dy + 27);
@@ -158,8 +154,14 @@ function drawSupplementaryExplorer(ctx, container, x, y, width) {
       ctx.fillText(fitText(ctx, relation, cardWidth - 24), dx + 12, dy + 142);
     }
   });
-
   return height;
+}
+
+function titleForMode(mode) {
+  if (mode === "wheel") return "วงกลมดาวเสวยอายุ";
+  if (mode === "timeline") return "Timeline ดาวเสวยอายุ";
+  if (mode === "annual") return "ผลประจำปี · ภูมิทักษาและอนุทักษา";
+  return "มหาทศา";
 }
 
 export async function saveVisualizationImage({ visualizationContainer, supplementaryContainer = null, mode, profileText, summaryText }) {
@@ -189,7 +191,7 @@ export async function saveVisualizationImage({ visualizationContainer, supplemen
   ctx.fillText("มหาทศา · โหราศาสตร์ไทย", 70, 56);
   ctx.fillStyle = "#2F2925";
   ctx.font = '800 48px "Sarabun", sans-serif';
-  ctx.fillText(mode === "wheel" ? "วงกลมดาวเสวยอายุ" : "Timeline ดาวเสวยอายุ", 70, 116);
+  ctx.fillText(titleForMode(mode), 70, 116);
   ctx.fillStyle = "#6E655F";
   ctx.font = '500 21px "Sarabun", sans-serif';
   ctx.fillText(profileText, 70, 154);
@@ -197,10 +199,7 @@ export async function saveVisualizationImage({ visualizationContainer, supplemen
 
   drawCard(ctx, 50, headerHeight, 1500, visualHeight, 24);
   ctx.drawImage(image, 70, headerHeight + 10, visualWidth, visualHeight - 20);
-
-  if (supplementHeight) {
-    drawSupplementaryExplorer(ctx, supplementaryContainer, 50, headerHeight + visualHeight + supplementGap, 1500);
-  }
+  if (supplementHeight) drawSupplementaryExplorer(ctx, supplementaryContainer, 50, headerHeight + visualHeight + supplementGap, 1500);
 
   ctx.fillStyle = "#81766D";
   ctx.font = '500 18px "Sarabun", sans-serif';

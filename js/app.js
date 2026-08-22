@@ -6,6 +6,7 @@ import {
   datePartsToEpoch,
   formatAge,
   formatThaiDate,
+  formatThaiDateShortFromEpoch,
   gregorianToBuddhist,
   targetDateToEpoch,
   validateCivilDate,
@@ -13,11 +14,13 @@ import {
 import { calculateChulasakarat } from "./core/thaiCalendar.js";
 import { calculateMahabhutaMap } from "./core/mahabhuta.js";
 import { findCurrentPeriod, validateCycle } from "./core/mahadasha.js";
+import { buildAnnualForecast } from "./core/annualForecast.js";
 import { renderKalayokTable } from "./components/kalayok-table.js";
 import { renderCurrentSummary } from "./components/summary.js";
 import { renderWheel } from "./components/wheel.js";
 import { renderTimeline } from "./components/timeline.js";
 import { renderSubperiodExplorer } from "./components/subperiod-explorer.js";
+import { renderAnnualForecast } from "./components/annual-view.js";
 import { saveVisualizationImage } from "./core/exportImage.js";
 
 const STORAGE_KEY = "maha-thasa-profile-v0.8";
@@ -61,12 +64,22 @@ const resetButton = document.querySelector("#reset-button");
 const saveImageButton = document.querySelector("#save-image-button");
 const fatalError = document.querySelector("#fatal-error");
 const installButton = document.querySelector("#install-button");
+const pageTabMahadasha = document.querySelector("#page-tab-mahadasha");
+const pageTabAnnual = document.querySelector("#page-tab-annual");
+const mahadashaPage = document.querySelector("#mahadasha-page");
+const annualPage = document.querySelector("#annual-page");
+const annualAgeBasis = document.querySelector("#annual-age-basis");
+const annualTitle = document.querySelector("#annual-title");
+const annualRange = document.querySelector("#annual-range");
+const annualVisualContainer = document.querySelector("#annual-visual-container");
 
 let datasets;
 let currentState = null;
 let currentMode = "wheel";
+let currentResultPage = "mahadasha";
 let selectedMainPlanet = null;
 let deferredInstallPrompt = null;
+let annualModel = null;
 
 function planetsByNumber() {
   return Object.fromEntries(datasets.planets.planets.map((planet) => [planet.number, planet]));
@@ -193,6 +206,36 @@ function setMode(mode) {
   if (isWheel && currentState) onMainSelect(selectedMainPeriod());
 }
 
+function renderAnnualPage() {
+  if (!currentState) return;
+  annualModel = buildAnnualForecast({
+    profile: currentState.profile,
+    birthPlanet: currentState.birthPlanet,
+    natalKalayokMap: currentState.kalayokMap,
+    planetsData: datasets.planets,
+    kalayokData: datasets.kalayok,
+    relationshipsData: datasets.relationships,
+    boundariesConfig: datasets.boundaries,
+    annualConfig: datasets.annualForecast,
+    ageBasis: annualAgeBasis.value,
+  });
+  annualTitle.textContent = `ผลประจำปี · อายุเต็ม ${annualModel.completedAgeYears} ปี · อายุย่าง ${annualModel.ageYang}`;
+  annualRange.textContent = `${formatThaiDateShortFromEpoch(annualModel.yearStartEpochMs, false)} → ก่อน ${formatThaiDateShortFromEpoch(annualModel.yearEndEpochMs, false)} · ใช้อายุคำนวณ ${annualModel.calculationAge} ปี · ภูมิ ${annualModel.phumi.thaksaPosition.nameTh}`;
+  renderAnnualForecast(annualVisualContainer, annualModel, currentState.pMap);
+}
+
+function setResultPage(page) {
+  currentResultPage = page === "annual" ? "annual" : "mahadasha";
+  const annual = currentResultPage === "annual";
+  mahadashaPage.hidden = annual;
+  annualPage.hidden = !annual;
+  pageTabMahadasha.classList.toggle("is-active", !annual);
+  pageTabAnnual.classList.toggle("is-active", annual);
+  pageTabMahadasha.setAttribute("aria-pressed", String(!annual));
+  pageTabAnnual.setAttribute("aria-pressed", String(annual));
+  if (annual) renderAnnualPage();
+}
+
 function renderDashboard(profile) {
   currentState = deriveState(profile);
   selectedMainPlanet = currentState.current.main.planet;
@@ -219,6 +262,9 @@ function renderDashboard(profile) {
   renderTimeline(timelineContainer, visualContext(), { onMainSelect }, selectedMainPlanet);
   onMainSelect(selectedMainPeriod());
   setMode(currentMode);
+  annualAgeBasis.value = datasets.annualForecast.defaultAgeBasis;
+  renderAnnualPage();
+  setResultPage(currentResultPage);
   localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -250,6 +296,7 @@ form.addEventListener("submit", (event) => {
   try {
     const profile = readProfile();
     setError();
+    currentResultPage = "mahadasha";
     renderDashboard(profile);
   } catch (error) {
     setError(error instanceof Error ? error.message : String(error));
@@ -266,6 +313,8 @@ editButton.addEventListener("click", () => {
 resetButton.addEventListener("click", () => {
   localStorage.removeItem(STORAGE_KEY);
   currentState = null;
+  annualModel = null;
+  currentResultPage = "mahadasha";
   dashboard.hidden = true;
   onboarding.hidden = false;
   initializeForm();
@@ -274,6 +323,17 @@ resetButton.addEventListener("click", () => {
 
 viewWheel.addEventListener("click", () => setMode("wheel"));
 viewTimeline.addEventListener("click", () => setMode("timeline"));
+pageTabMahadasha.addEventListener("click", () => setResultPage("mahadasha"));
+pageTabAnnual.addEventListener("click", () => setResultPage("annual"));
+annualAgeBasis.addEventListener("change", () => {
+  try {
+    renderAnnualPage();
+  } catch (error) {
+    annualAgeBasis.value = "yang_age";
+    renderAnnualPage();
+    alert(error instanceof Error ? error.message : String(error));
+  }
+});
 
 saveImageButton.addEventListener("click", async () => {
   if (!currentState) return;
@@ -281,15 +341,26 @@ saveImageButton.addEventListener("click", async () => {
   saveImageButton.disabled = true;
   saveImageButton.textContent = "กำลังสร้างภาพ…";
   try {
-    const container = currentMode === "wheel" ? wheelContainer : timelineContainer;
-    const summary = `${currentState.pMap[currentState.current.main.planet].shortNameTh}เสวย · ${currentState.pMap[currentState.current.sub.subPlanet].shortNameTh}แทรก · อายุ ${formatAge(currentState.age)}`;
-    await saveVisualizationImage({
-      visualizationContainer: container,
-      supplementaryContainer: currentMode === "wheel" ? subExplorer : null,
-      mode: currentMode,
-      profileText: profileBirth.textContent,
-      summaryText: summary,
-    });
+    if (currentResultPage === "annual") {
+      const summary = `อายุเต็ม ${annualModel.completedAgeYears} ปี · อายุย่าง ${annualModel.ageYang} · ภูมิ ${annualModel.phumi.thaksaPosition.nameTh}`;
+      await saveVisualizationImage({
+        visualizationContainer: annualVisualContainer,
+        supplementaryContainer: null,
+        mode: "annual",
+        profileText: profileBirth.textContent,
+        summaryText: summary,
+      });
+    } else {
+      const container = currentMode === "wheel" ? wheelContainer : timelineContainer;
+      const summary = `${currentState.pMap[currentState.current.main.planet].shortNameTh}เสวย · ${currentState.pMap[currentState.current.sub.subPlanet].shortNameTh}แทรก · อายุ ${formatAge(currentState.age)}`;
+      await saveVisualizationImage({
+        visualizationContainer: container,
+        supplementaryContainer: currentMode === "wheel" ? subExplorer : null,
+        mode: currentMode,
+        profileText: profileBirth.textContent,
+        summaryText: summary,
+      });
+    }
   } catch (error) {
     alert(error instanceof Error ? error.message : String(error));
   } finally {
@@ -315,6 +386,7 @@ async function init() {
   try {
     initializeForm();
     datasets = await loadAppData("./data");
+    annualAgeBasis.value = datasets.annualForecast.defaultAgeBasis;
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {

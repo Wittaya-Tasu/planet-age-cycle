@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="theme-color" content="#6f1d1b" />
-  <meta name="description" content="มหาทศา — ระบบดาวเสวยอายุ 108 ปีและกาลโยคมหาภูติกำเนิด" />
+  <meta name="description" content="มหาทศา — ดาวเสวยอายุ กาลโยคมหาภูติ ภูมิทักษา และอนุทักษาพยากรณ์" />
   <title>มหาทศา | โหราศาสตร์ไทย</title>
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="icon" href="./assets/icons/icon-192.png" />
@@ -13,15 +13,14 @@
   <link rel="stylesheet" href="./css/base.css" />
   <link rel="stylesheet" href="./css/layout.css" />
   <link rel="stylesheet" href="./css/visuals.css" />
+  <link rel="stylesheet" href="./css/annual.css" />
   <link rel="stylesheet" href="./css/responsive.css" />
 </head>
 <body>
   <header class="site-header">
-    <div class="brand-block">
-      <h1>มหาทศา</h1>
-    </div>
+    <div class="brand-block"><h1>มหาทศา</h1></div>
     <div class="header-actions">
-      <span class="version-badge">v0.8.2</span>
+      <span class="version-badge">v0.9.0</span>
       <button id="install-button" class="quiet-button" type="button" hidden>ติดตั้ง</button>
     </div>
   </header>
@@ -50,16 +49,13 @@
               <option value="saturday">วันเสาร์</option>
             </select>
           </label>
-
           <label class="field"><span>วันที่</span><input id="birth-date-day" type="number" min="1" max="31" required /></label>
           <label class="field"><span>เดือน</span><select id="birth-date-month" required></select></label>
           <label class="field"><span>ปี พ.ศ.</span><input id="birth-date-year" type="number" min="1800" max="3200" required /></label>
           <label class="field"><span>เวลาเกิด</span><input id="birth-time" type="time" step="60" /></label>
           <label class="checkbox-field"><input id="birth-time-unknown" type="checkbox" /><span>ไม่ทราบเวลาเกิด</span></label>
-
           <label class="field field-target"><span>วันที่ต้องการคำนวณอายุ</span><input id="target-date" type="date" required /></label>
         </div>
-
         <div id="form-error" class="form-error" hidden></div>
         <div class="form-actions">
           <button class="primary-button" type="submit">คำนวณมหาทศา</button>
@@ -81,39 +77,72 @@
         </div>
       </div>
 
-      <div id="current-summary"></div>
-      <div id="kalayok-table"></div>
+      <nav class="page-tabs" aria-label="หน้าผลลัพธ์">
+        <button id="page-tab-mahadasha" class="page-tab is-active" type="button" aria-pressed="true">มหาทศา</button>
+        <button id="page-tab-annual" class="page-tab" type="button" aria-pressed="false">ผลประจำปี</button>
+      </nav>
 
-      <section class="visual-card">
-        <div class="visual-heading">
-          <div>
-            <p class="section-kicker">ดาวเสวยอายุและดาวแทรก</p>
-            <h2>วงจร 108 ปี</h2>
+      <div id="mahadasha-page">
+        <div id="current-summary"></div>
+        <div id="kalayok-table"></div>
+
+        <section class="visual-card">
+          <div class="visual-heading">
+            <div>
+              <p class="section-kicker">ดาวเสวยอายุและดาวแทรก</p>
+              <h2>วงจร 108 ปี</h2>
+            </div>
+            <div class="view-switch" role="group" aria-label="เลือกรูปแบบการแสดงผล">
+              <button id="view-wheel" class="view-button is-active" type="button" aria-pressed="true">วงกลม</button>
+              <button id="view-timeline" class="view-button" type="button" aria-pressed="false">Timeline</button>
+            </div>
           </div>
-          <div class="view-switch" role="group" aria-label="เลือกรูปแบบการแสดงผล">
-            <button id="view-wheel" class="view-button is-active" type="button" aria-pressed="true">วงกลม</button>
-            <button id="view-timeline" class="view-button" type="button" aria-pressed="false">Timeline</button>
+
+          <div class="visual-legend">
+            <span><i class="legend-swatch good"></i>ตำแหน่งมหาภูติดี</span>
+            <span><i class="legend-swatch bad"></i>ตำแหน่งมหาภูติเสีย</span>
+            <span><i class="legend-swatch unknown"></i>ราหู / ไม่มีตำแหน่งมหาภูติ</span>
+            <span><i class="legend-badge friend"></i>มิตร</span>
+            <span><i class="legend-badge enemy"></i>ศัตรู</span>
+            <span><i class="legend-line"></i>ความสัมพันธ์ประเภทอื่น</span>
+          </div>
+
+          <div id="wheel-stage" class="visual-stage"><div id="wheel-container" class="wheel-container"></div></div>
+          <div id="timeline-stage" class="visual-stage" hidden><div id="timeline-container" class="timeline-container"></div></div>
+        </section>
+        <div id="subperiod-explorer"></div>
+      </div>
+
+      <section id="annual-page" class="annual-page" hidden>
+        <div class="annual-header-card">
+          <div class="annual-heading">
+            <p class="section-kicker">ภูมิทักษา · อนุทักษาพยากรณ์</p>
+            <h2 id="annual-title">ผลประจำปี</h2>
+            <div id="annual-range" class="annual-range"></div>
+          </div>
+          <div class="annual-controls">
+            <label for="annual-age-basis">ฐานอายุภูมิทักษา</label>
+            <select id="annual-age-basis">
+              <option value="yang_age">อายุย่าง (ตามต้นฉบับ)</option>
+              <option value="full_age">อายุเต็ม</option>
+            </select>
           </div>
         </div>
 
-        <div class="visual-legend">
-          <span><i class="legend-swatch good"></i>ตำแหน่งมหาภูติดี</span>
-          <span><i class="legend-swatch bad"></i>ตำแหน่งมหาภูติเสีย</span>
-          <span><i class="legend-swatch unknown"></i>ราหู / ไม่มีตำแหน่งมหาภูติ</span>
-          <span><i class="legend-badge friend"></i>มิตร</span>
-          <span><i class="legend-badge enemy"></i>ศัตรู</span>
-          <span><i class="legend-line"></i>ความสัมพันธ์ประเภทอื่น</span>
+        <div class="annual-legend">
+          <span><i class="legend-swatch good"></i>มหาภูติดี</span>
+          <span><i class="legend-swatch bad"></i>มหาภูติเสีย</span>
+          <span><i class="legend-swatch unknown"></i>ราหู / นอกมหาภูติ</span>
+          <span><i class="annual-relation-dot supportive"></i>ความสัมพันธ์เกื้อหนุน</span>
+          <span><i class="annual-relation-dot conflicting"></i>ความสัมพันธ์ขัดแย้ง</span>
+          <span><i class="annual-relation-dot mixed"></i>มีทั้งเกื้อหนุนและขัดแย้ง</span>
         </div>
 
-        <div id="wheel-stage" class="visual-stage">
-          <div id="wheel-container" class="wheel-container"></div>
+        <div class="annual-visual-card">
+          <div id="annual-visual-container" class="annual-visual-container"></div>
         </div>
-        <div id="timeline-stage" class="visual-stage" hidden>
-          <div id="timeline-container" class="timeline-container"></div>
-        </div>
+        <p class="annual-note">อนุทักษาใช้กำลังจำเพาะ 360 วันตามตำรา และฉายสัดส่วนลงบนช่วงวันเกิดครบรอบจริงหนึ่งปี เพื่อให้วันเริ่ม–สิ้นสุดครอบคลุมทั้งปีโดยไม่เกิดช่องว่าง 5–6 วัน เมื่อผ่านวันเวลาเถลิงศก ระบบจะเปลี่ยนกาลโยคประจำปีทันทีแม้ดาวในชั้นเวลานั้นยังไม่เปลี่ยน</p>
       </section>
-
-      <div id="subperiod-explorer"></div>
     </section>
 
     <div id="fatal-error" class="fatal-error" hidden></div>

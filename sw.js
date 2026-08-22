@@ -1,4 +1,4 @@
-const CACHE_NAME = "maha-thasa-v0.8.2";
+const CACHE_NAME = "maha-thasa-v0.9.0";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -8,6 +8,7 @@ const APP_SHELL = [
   "./css/base.css",
   "./css/layout.css",
   "./css/visuals.css",
+  "./css/annual.css",
   "./css/responsive.css",
   "./js/app.js",
   "./js/data/loadData.js",
@@ -16,16 +17,19 @@ const APP_SHELL = [
   "./js/core/mahabhuta.js",
   "./js/core/mahadasha.js",
   "./js/core/relationships.js",
+  "./js/core/annualForecast.js",
   "./js/core/exportImage.js",
   "./js/components/kalayok-table.js",
   "./js/components/summary.js",
   "./js/components/wheel.js",
   "./js/components/timeline.js",
   "./js/components/subperiod-explorer.js",
+  "./js/components/annual-view.js",
   "./data/planets.json",
   "./data/kalayok-positions.json",
   "./data/planet-relationships.json",
   "./data/annual-boundaries.json",
+  "./data/annual-forecast.json",
   "./assets/fonts/sarabun-thai-400-normal.woff2",
   "./assets/fonts/sarabun-thai-600-normal.woff2",
   "./assets/fonts/sarabun-thai-700-normal.woff2",
